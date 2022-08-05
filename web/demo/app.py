@@ -13,6 +13,7 @@ import logging
 import flask
 
 # This project
+import web.demo.blueprints.word_checker
 import web.demo.blueprints.example
 import web.demo.blueprints.root
 
@@ -24,6 +25,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 _BLUEPRINTS = [
+    web.demo.blueprints.word_checker.BP,
     web.demo.blueprints.example.BP,
     web.demo.blueprints.root.BP,
 ]
