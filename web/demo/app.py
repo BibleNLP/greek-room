@@ -22,7 +22,7 @@ import web.demo.blueprints.root
 #
 
 _LOGGER = logging.getLogger(__name__)
-
+logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
     web.demo.blueprints.word_checker.BP,
@@ -43,7 +43,13 @@ def create_app():
     """
 
     # Instantiate app instance with some default config settings
-    app = flask.Flask(__name__, template_folder="templates", static_folder="static")
+    app = flask.Flask(
+        __name__,
+        template_folder="templates",
+        static_folder="static",
+        instance_relative_config=True,
+    )
+    app.config.from_pyfile("config.cfg")
 
     # Register blueprints
     for blueprint in _BLUEPRINTS:
