@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Word Checker Flask Blueprint</title>
+    <title>Word Checker</title>
     <link rel = "stylesheet" type="text/css" href = "static/word_checker.css"/>
 </head>
 <body>
-    <h1>Word Checker Flask Blueprint</h1>
-    <script src="static/word_checker.js"></script>
+  <h1>Word Checker</h1>
+  <div class="center">
+    <textarea id="scripture-content" name="scripture-content"
+              placeholder="No data loaded yet."
+              rows="50" cols="180">{{ scripture_data }}</textarea>
+  </div>
+  <script src="static/word_checker.js"></script>
 </body>
 </html>

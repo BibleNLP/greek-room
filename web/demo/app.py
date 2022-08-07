@@ -8,6 +8,7 @@ Factory for Flask application
 # Core python imports
 import inspect
 import logging
+from logging.config import dictConfig
 
 # 3rd party imports
 import flask
@@ -22,6 +23,26 @@ import web.demo.blueprints.root
 #
 
 _LOGGER = logging.getLogger(__name__)
+# dictConfig(
+#     {
+#         "version": 1,
+#         "formatters": {
+#             "default": {
+#                 "format": "%(asctime)s] %(levelname)s %(name)s %(module)s:%(lineno)d - %(message)s",
+#             }
+#         },
+#         "handlers": {
+#             "wsgi": {
+#                 "level": "DEBUG",
+#                 "class": "logging.StreamHandler",
+#                 "stream": "ext://sys.stdout",
+#                 "formatter": "default",
+#             },
+#         },
+#         "loggers": {"": {"level": "DEBUG", "handlers": ["wsgi"]}},
+#     }
+# )
+
 logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [

@@ -15,6 +15,7 @@ import logging
 import flask
 
 # This project
+from .core.utils import TSVDataExtractor
 
 #
 # Singletons
@@ -40,5 +41,8 @@ BP = flask.Blueprint(
 @BP.route("/index.html")
 def get_index():
     """Get the root index for the blueprint"""
-    _LOGGER.info(f'Config Settings {flask.current_app.config["DATA_PATH"]}')
-    return flask.render_template("word_checker/index.html")
+    tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
+
+    return flask.render_template(
+        "word_checker/index.html", scripture_data=tsv_extractor.pretty_print()
+    )
