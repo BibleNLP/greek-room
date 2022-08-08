@@ -5,8 +5,8 @@
     <title>Word Checker</title>
     <link rel="stylesheet" type="text/css" href = "static/word_checker.css"/>
 </head>
-<body>
-  <h1>Word Checker</h1>
+<body spellcheck="false">
+  <h1 class="center">Word Checker</h1>
   <div>
     {% for book in scripture_data %}
     {%   for chapter in scripture_data[book] %}
@@ -14,23 +14,22 @@
             <h2>{{ book }} {{ chapter }}</h2>
     {%     for verse in scripture_data[book][chapter] %}
             <div>
-              <span class="bold verse">{{ verse }}</span><span contenteditable="true">{{ scripture_data[book][chapter][verse] }}</span>
+              <span class="bold verse-number">{{ verse }}</span><span class="verse" contenteditable="true">{{ scripture_data[book][chapter][verse] }}</span>
             </div>
           {% endfor %}
           </div>
       {% endfor %}
     {% endfor %}
-
-    <!-- <div> -->
-    <!--   <h2>1</h2> -->
-    <!--   <div> -->
-    <!--     <span class="bold verse">1</span><span contenteditable="true">Paul, a servant of God and an apostle of Jesus Christ, for the faith of the chosen people of God and the knowledge of the truth that agrees with godliness,</span> -->
-    <!--   </div> -->
-    <!-- </div> -->
-    <!-- <textarea id="scripture-content" name="scripture-content" -->
-    <!--           placeholder="No data loaded yet." -->
-    <!--           rows="50" cols="180">{{ scripture_data }}</textarea> -->
   </div>
+
+  <!-- custom context menu -->
+  <ul id="menu" class="context-menu hidden">
+    <li class="menu-item">First word</li>
+    <li class="menu-item">Second word</li>
+    <li class="menu-divider"></li>
+    <li class="menu-item">Yet another word</li>
+  </ul>
+
   <script src="static/word_checker.js"></script>
 </body>
 </html>
