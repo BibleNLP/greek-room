@@ -4,5 +4,20 @@ h1 {
 
 .center {
     text-align: center;
+}
 
+.left {
+    text-align: left;
+}
+.bold {
+    font-weight: bold;
+}
+.verse {
+    padding-right: 1em;
+}
+body {
+    position: absolute ;
+    left: 5%;
+    max-width: 50em;
+    padding-bottom: 3em;
 }

@@ -44,5 +44,5 @@ def get_index():
     tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
 
     return flask.render_template(
-        "word_checker/index.html", scripture_data=tsv_extractor.pretty_print()
+        "word_checker/index.html", scripture_data=tsv_extractor.data
     )
