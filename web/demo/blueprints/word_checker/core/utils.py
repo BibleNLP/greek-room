@@ -68,7 +68,7 @@ class TSVDataExtractor(DataExtractor):
                 with tsv_file.open() as tsv_filehandler:
                     for idx, line in enumerate(tsv_filehandler):
                         # Assuming first line is header
-                        if idx == 0:
+                        if idx == 0 or len(line.strip()) == 0:
                             continue
 
                         book_code, chapter, verse, text = line.split(maxsplit=3)
