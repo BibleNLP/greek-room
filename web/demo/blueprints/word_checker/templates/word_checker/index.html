@@ -2,11 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Word Checker</title>
+    <title>Greek Room</title>
     <link rel="stylesheet" type="text/css" href = "static/word_checker.css"/>
 </head>
 <body spellcheck="false">
-  <h1 class="center">Word Checker</h1>
+  <h1 class="center">Greek Room Word Checker</h1>
+  <ul class="context-menu">
+  {% for item in spelling_suggestions %}
+    <li class="menu-item">{{ item.error_token }}</li>
+    <li class="menu-item">{{ item.suggestions }}</li>
+  {% endfor %}
+  </ul>
+
   <div>
     {% for book in scripture_data %}
     {%   for chapter in scripture_data[book] %}
