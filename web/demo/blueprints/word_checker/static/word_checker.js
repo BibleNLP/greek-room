@@ -26,11 +26,14 @@ function underlineText(text, tokens, color="red") {
     return text;
   }
 
+
+  const original_tokens = text.substring(startIndices[0], startIndices[0]+tokens.length);
+
   for (let j=0; j<startIndices.length; j++) {
     if (j===startIndices.length-1) {
-      underlinedText += '<span class="underline ' + `${color}` + '">' + tokens + '</span>' + text.substring(startIndices[j]+tokens.length);
+      underlinedText += '<span class="underline ' + `${color}` + '">' + original_tokens + '</span>' + text.substring(startIndices[j]+tokens.length);
     } else {
-      underlinedText += '<span class="underline ' + `${color}` + '">' + tokens + '</span>' + text.substring(startIndices[j]+tokens.length, startIndices[j+1]);
+      underlinedText += '<span class="underline ' + `${color}` + '">' + original_tokens + '</span>' + text.substring(startIndices[j]+tokens.length, startIndices[j+1]);
     }
   }
   underlinedText = text.substring(0, startIndices[0]) + underlinedText;
