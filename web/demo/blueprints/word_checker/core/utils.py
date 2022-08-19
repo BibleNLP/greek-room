@@ -88,3 +88,10 @@ class TSVDataExtractor(DataExtractor):
                     )
 
         return "\n".join(output_lines)
+
+    def bcvv_iterator(self):
+        """A book-chapter-versenumber-verse iterator"""
+        for book in self.data:
+            for chapter in self.data[book]:
+                for verse in self.data[book][chapter]:
+                    yield book, chapter, verse, self.data[book][chapter][verse]
