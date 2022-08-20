@@ -14,6 +14,7 @@ dist/
 downloads/
 eggs/
 .eggs/
+html/
 lib/
 lib64/
 parts/
@@ -127,3 +128,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+utilities/*py~v*
+MANIFEST.in
+ideas.txt
+notes.txt
+utilities/cgi-test.py
+utilities/extract-f-from-am-file.py
+utilities/log/
+utilities/old/
+utilities/scripts
