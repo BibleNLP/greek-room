@@ -39,3 +39,10 @@ BP = flask.Blueprint(
 def get_index():
     """Get the root index for the blueprint"""
     return flask.render_template("align_dev_viz/index.html")
+
+
+@BP.route("<lang_pair>/<book_chapter>")
+def get_chapter(lang_pair, book_chapter):
+    """Return the HTML file of the 'book_chapter' for 'lang_pair'"""
+
+    return flask.render_template(f"align_dev_viz/{lang_pair}/{book_chapter}")
