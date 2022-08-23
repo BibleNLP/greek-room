@@ -6,10 +6,10 @@ Main WSGI entry point for the Flask application.
 #
 
 # This project
-import web.demo.app as demo_app
+import web.ephesus.app as ephesus_app
 
 #
 # Singletons
 #
 
-APP = demo_app.create_app()
+APP = ephesus_app.create_app()

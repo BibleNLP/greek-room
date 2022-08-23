@@ -14,9 +14,10 @@ from logging.config import dictConfig
 import flask
 
 # This project
-import web.demo.blueprints.word_checker
-import web.demo.blueprints.example
-import web.demo.blueprints.root
+import web.ephesus.blueprints.word_checker
+import web.ephesus.blueprints.example
+import web.ephesus.blueprints.root
+import web.ephesus.blueprints.align_dev_viz
 
 #
 # Module scoped variables and singletons
@@ -46,9 +47,10 @@ _LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
-    web.demo.blueprints.word_checker.BP,
-    web.demo.blueprints.example.BP,
-    web.demo.blueprints.root.BP,
+    web.ephesus.blueprints.word_checker.BP,
+    web.ephesus.blueprints.example.BP,
+    web.ephesus.blueprints.root.BP,
+    web.ephesus.blueprints.align_dev_viz.BP,
 ]
 """List of blueprint singletons to load"""
 

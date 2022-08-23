@@ -9,7 +9,7 @@ from pathlib import Path
 from collections import defaultdict
 
 # This project
-from web.demo.constants import BookCodes
+from web.ephesus.constants import BookCodes
 
 _LOGGER = logging.getLogger(__name__)
 

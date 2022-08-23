@@ -135,3 +135,6 @@ dmypy.json
 
 # Mac files
 .DS_Store
+
+# Data directory
+web/data
