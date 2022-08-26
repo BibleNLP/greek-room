@@ -129,6 +129,17 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Emacs files
+*~
+\#*\#
+.\#*
+
+# Mac files
+.DS_Store
+
+# Data directory
+web/data
+
 utilities/*py~v*
 MANIFEST.in
 ideas.txt
@@ -138,3 +149,4 @@ utilities/extract-f-from-am-file.py
 utilities/log/
 utilities/old/
 utilities/scripts
+
