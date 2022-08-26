@@ -353,6 +353,7 @@ def main(
                 ):
                     n_matches += 1
                     m3b = re.match(r"([A-Z1-9][A-Z][A-Z])\s*(\d+):(\d+)$", ref)
+
                     if m3b:
                         book, chapter_number, verse_number = (
                             m3b.group(1),
@@ -385,7 +386,6 @@ def main(
         n_matches_shown = 0
         n_matches_remaining = n_matches
         n_matches_remaining_to_be_shown = max_number_output_snt
-        _LOGGER.debug(viz_file_list)
 
         chapter_html_dir = Path(flask.current_app.config["ENG_HIN_CHAPTER_HTML_DIR"])
         for viz_filename in viz_file_list:

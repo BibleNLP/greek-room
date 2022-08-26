@@ -53,14 +53,14 @@ def get_chapter(lang_pair, book_chapter):
 @BP.route("/filter-viz-snt-align", methods=["POST"])
 def search_filter():
 
-    e_search_term = flask.request.form.get("e_search_term")
-    f_search_term = flask.request.form.get("f_search_term")
-    text_filename = flask.request.form.get("text_filename")
-    html_filename_dir = flask.request.form.get("html_filename_dir")
-    log_filename = flask.request.form.get("log_filename")
-    e_prop = flask.request.form.get("e_prop")
-    f_prop = flask.request.form.get("f_prop")
-    prop_filename = flask.request.form.get("prop_filename")
+    e_search_term = flask.request.form.get("e_search_term") or None
+    f_search_term = flask.request.form.get("f_search_term") or None
+    text_filename = flask.request.form.get("text_filename") or None
+    html_filename_dir = flask.request.form.get("html_filename_dir") or None
+    log_filename = flask.request.form.get("log_filename") or None
+    e_prop = flask.request.form.get("e_prop") or None
+    f_prop = flask.request.form.get("f_prop") or None
+    prop_filename = flask.request.form.get("prop_filename") or None
     max_number_output_snt = (
         filter_viz_snt_align.int_or_float(
             flask.request.form.get("max_number_output_snt"), 0
@@ -75,8 +75,8 @@ def search_filter():
         or 100
     )
 
-    e_lang_name = flask.request.form.get("e_lang_name")
-    f_lang_name = flask.request.form.get("f_lang_name")
+    e_lang_name = flask.request.form.get("e_lang_name") or None
+    f_lang_name = flask.request.form.get("f_lang_name") or None
 
     return filter_viz_snt_align.main(
         e_search_term,
