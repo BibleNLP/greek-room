@@ -53,7 +53,6 @@ def get_chapter(lang_pair, book_chapter):
 
 @BP.route("/filter-viz-snt-align", methods=["POST"])
 def search_filter():
-
     e_search_term = flask.request.form.get("e_search_term") or None
     f_search_term = flask.request.form.get("f_search_term") or None
     text_filename = flask.request.form.get("text_filename") or None
@@ -79,7 +78,7 @@ def search_filter():
     e_lang_name = flask.request.form.get("e_lang_name") or None
     f_lang_name = flask.request.form.get("f_lang_name") or None
 
-    search_results, n_matches = filter_viz_snt_align.main(
+    search_results = filter_viz_snt_align.main(
         e_search_term,
         f_search_term,
         text_filename,
@@ -104,6 +103,8 @@ def search_filter():
         f_search_term=f_search_term,
         e_prop=e_prop,
         f_prop=f_prop,
-        search_results=search_results,
-        n_matches=n_matches,
+        search_results=search_results.get("results"),
+        n_matches=search_results.get("n_matches"),
+        error_message=search_results.get("error_message"),
+        sample_results_message=search_results.get("sample_results_message"),
     )

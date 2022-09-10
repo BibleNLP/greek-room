@@ -1,21 +1,15 @@
-#!/usr/bin/env python
+"""
+Search for matches and generate results output
+"""
 
-# Import modules for CGI handling
-import argparse
-from pathlib import Path
-import logging
-
-# import cgi
-import flask
-from flask import request
-
-from collections import defaultdict
-import random
 import re
-import sys
+import flask
+import random
+import logging
+from pathlib import Path
+from collections import defaultdict
 
 # from typing import Optional, TextIO, Union
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -151,10 +145,8 @@ def main(
 
     try:
         f_in = open(text_filename)
-    except BaseException as error:
-        generated_html.append(
-            f'<span style="color:red;">Error: Cannot open {text_filename} [{str(error)}]<span><br>\n"'
-        )
+    except Exception as error:
+        return {"error_message": f"Error: Cannot open {text_filename} [{str(error)}]"}
     else:
         n_matches = 0
         viz_file_dict = defaultdict(list)
@@ -197,22 +189,19 @@ def main(
                         if viz_filename not in viz_file_list:
                             viz_file_list.append(viz_filename)
                         # sys.stdout.write(viz_filename + ' ' + a_name_id + '<br>\n')
-        # plural_ending = "" if n_matches == 1 else "es"
-        # generated_html.append(f"Found {str(n_matches)} match{plural_ending}")
+        sample_results_message = ""
         if n_matches > max_number_output_snt:
             if auto_sample_percentage:
-                generated_html.append(
+                sample_results_message = (
                     f", random sample of {str(max_number_output_snt)} shown"
                 )
             elif sample_percentage < 100:
-                generated_html.append(
-                    f", random {str(sample_percentage)}% sample up to {str(max_number_output_snt)} shown"
-                )
+                sample_results_message = f", random {str(sample_percentage)}% sample up to {str(max_number_output_snt)} shown"
             else:
-                generated_html.append(f", first {str(max_number_output_snt)} shown")
+                sample_results_message = f", first {str(max_number_output_snt)} shown"
         elif sample_percentage < 100:
-            generated_html.append(f", random {str(sample_percentage)}% sample shown")
-        generated_html.append("<br><br>\n")
+            sample_results_message = f", random {str(sample_percentage)}% sample shown"
+
         f_in.close()
         n_matches_shown = 0
         n_matches_remaining = n_matches
@@ -224,7 +213,7 @@ def main(
             # full_viz_filename = html_filename_dir + "/" + viz_filename
             try:
                 f_in = open(str(full_viz_filename))
-            except BaseException as error:
+            except Exception as error:
                 generated_html.append(
                     """<span style="color:red;">Error: Cannot open """
                     + full_viz_filename
@@ -281,8 +270,12 @@ def main(
                 f_in.close()
             if n_matches_shown >= max_number_output_snt:
                 break
-        generated_html.append(f"{str(n_matches_shown)} shown<br><br><br><br>\n")
-    return "\n".join(generated_html), n_matches
+        generated_html.append(f"{str(n_matches_shown)} shown")
+    return {
+        "results": "\n".join(generated_html),
+        "n_matches": n_matches,
+        "sample_results_message": sample_results_message,
+    }
 
 
 if __name__ == "__main__":

@@ -126,9 +126,20 @@
                                          {% endif %}<br>
 
 
-Found {{ n_matches }} match {%- if n_matches == 1 -%} {{ "" }} {%- else -%} {{ "es" }} {% endif %}
+{# show error message, if present #}
+{% if error_message %}
+   <br /><span style="color:red;">{{ error_message }}<span><br>
+{% else %}
 
+{# show search results, otherwise #}
+Found {{ n_matches }} match {%- if n_matches == 1 -%} {{- "" -}} {% else %} {{- "es" -}} {% endif %}
+
+{{- sample_results_message -}}
+
+<br /><br />
 {{ search_results | safe }}
+<br /><br /><br /><br />
+{% endif %}
 
   </body>
 </html>
