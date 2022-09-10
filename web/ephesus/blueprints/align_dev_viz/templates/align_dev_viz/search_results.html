@@ -126,6 +126,8 @@
                                          {% endif %}<br>
 
 
+Found {{ n_matches }} match {%- if n_matches == 1 -%} {{ "" }} {%- else -%} {{ "es" }} {% endif %}
+
 {{ search_results | safe }}
 
   </body>

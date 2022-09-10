@@ -79,7 +79,7 @@ def search_filter():
     e_lang_name = flask.request.form.get("e_lang_name") or None
     f_lang_name = flask.request.form.get("f_lang_name") or None
 
-    search_results = filter_viz_snt_align.main(
+    search_results, n_matches = filter_viz_snt_align.main(
         e_search_term,
         f_search_term,
         text_filename,
@@ -99,10 +99,11 @@ def search_filter():
         "align_dev_viz/search_results.html",
         e_lang_name=e_lang_name,
         f_lang_name=f_lang_name,
-        date=datetime.strftime(datetime.now(), "%B %w, %Y at %H:%M"),
+        date=datetime.strftime(datetime.now(), "%B %d, %Y at %H:%M"),
         e_search_term=e_search_term,
         f_search_term=f_search_term,
         e_prop=e_prop,
         f_prop=f_prop,
         search_results=search_results,
+        n_matches=n_matches,
     )

@@ -10,7 +10,6 @@ import flask
 from flask import request
 
 from collections import defaultdict
-import datetime
 import random
 import re
 import sys
@@ -131,17 +130,10 @@ def main(
     e_lang_name=None,
     f_lang_name=None,
 ):
-    date = datetime.datetime.now().strftime("%B %d, %Y at %H:%M")
 
     text_filename = f'{flask.current_app.config["ENG_HIN_REF_FILE"]}'
 
     sample_fraction = sample_percentage * 0.01
-
-    if log_filename:
-        f_log = open(log_filename, "w")
-        f_log.write(date + "\n")
-    else:
-        f_log = None
 
     prop_dict = defaultdict(list)
 
@@ -205,8 +197,8 @@ def main(
                         if viz_filename not in viz_file_list:
                             viz_file_list.append(viz_filename)
                         # sys.stdout.write(viz_filename + ' ' + a_name_id + '<br>\n')
-        plural_ending = "" if n_matches == 1 else "es"
-        generated_html.append(f"Found {str(n_matches)} match{plural_ending}")
+        # plural_ending = "" if n_matches == 1 else "es"
+        # generated_html.append(f"Found {str(n_matches)} match{plural_ending}")
         if n_matches > max_number_output_snt:
             if auto_sample_percentage:
                 generated_html.append(
@@ -290,11 +282,7 @@ def main(
             if n_matches_shown >= max_number_output_snt:
                 break
         generated_html.append(f"{str(n_matches_shown)} shown<br><br><br><br>\n")
-    return "\n".join(generated_html)
-
-    # if f_log:
-    #     sys.stderr.write("Log: %s\n" % log_filename)
-    #     f_log.close()
+    return "\n".join(generated_html), n_matches
 
 
 if __name__ == "__main__":
