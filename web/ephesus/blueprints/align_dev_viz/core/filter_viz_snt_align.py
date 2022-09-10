@@ -305,16 +305,16 @@ def main(
                 prop_dict[(side, snt_id)].append(prop_class)
 
     generated_html = []
-    generated_html.append(print_html_head(date, e_lang_name, f_lang_name))
-    e_search_term2 = e_search_term if e_search_term else "<i>None</i>"
-    f_search_term2 = f_search_term if f_search_term else "<i>None</i>"
-    e_prop2 = e_prop if e_prop else "<i>None</i>"
-    f_prop2 = f_prop if f_prop else "<i>None</i>"
-    generated_html.append(f"{e_lang_name} search term: {e_search_term2}<br>\n")
-    generated_html.append(f"{f_lang_name} search term: {f_search_term2}<br>\n")
-    generated_html.append(f"{f_lang_name} search term: {f_search_term2}<br>\n")
-    generated_html.append(f"{e_lang_name} meta info restriction: {e_prop2}<br>\n")
-    generated_html.append(f"{f_lang_name} meta info restriction: {f_prop2}<br>\n")
+    # generated_html.append(print_html_head(date, e_lang_name, f_lang_name))
+    # e_search_term2 = e_search_term if e_search_term else "<i>None</i>"
+    # f_search_term2 = f_search_term if f_search_term else "<i>None</i>"
+    # e_prop2 = e_prop if e_prop else "<i>None</i>"
+    # f_prop2 = f_prop if f_prop else "<i>None</i>"
+    # generated_html.append(f"{e_lang_name} search term: {e_search_term2}<br>\n")
+    # generated_html.append(f"{f_lang_name} search term: {f_search_term2}<br>\n")
+    # generated_html.append(f"{f_lang_name} search term: {f_search_term2}<br>\n")
+    # generated_html.append(f"{e_lang_name} meta info restriction: {e_prop2}<br>\n")
+    # generated_html.append(f"{f_lang_name} meta info restriction: {f_prop2}<br>\n")
     # sys.stdout.write('<font color="#999999">Other input parameters &nbsp; '
     #                  't: %s &nbsp; dir: %s &nbsp; log: %s &nbsp; max: %d</font><br>\n'
     #                  % (text_filename, html_filename_dir, log_filename, max_number_output_snt))
@@ -451,7 +451,7 @@ def main(
             if n_matches_shown >= max_number_output_snt:
                 break
         generated_html.append(f"{str(n_matches_shown)} shown<br><br><br><br>\n")
-    generated_html.append(print_html_foot())
+    # generated_html.append(print_html_foot())
     return "\n".join(generated_html)
 
     # if f_log:

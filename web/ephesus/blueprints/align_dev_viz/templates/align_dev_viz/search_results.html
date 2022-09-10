@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Alignments</title>
+    <style>
+      [patitle]:hover:after {opacity: 1; transition: all 0.05s ease 0.1s; visibility: visible;}
+      [patitle]:after {
+        content: attr(patitle);
+        position: absolute;
+        bottom: 1.4em;
+        left: -9px;
+        padding: 5px 10px 5px 10px;
+        color: #000;
+        font-weight: normal;
+        white-space: wrap;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+        -moz-box-shadow: 0px 0px 4px #222;blue
+        -webkit-box-shadow: 0px 0px 4px #222;
+        box-shadow: 0px 0px 4px #222;
+        font-size: 100%;
+        background-color: #E0E7FF;
+        opacity: 0;
+        z-index: 99999;
+        visibility: hidden;}
+      [patitle] {position: relative; }
+      [pbtitle]:hover:after {opacity: 1; transition: all 0.05s ease 0.1s; visibility: visible;}
+      [pbtitle]:after {
+        content: attr(pbtitle);
+        position: absolute;
+        top: 1.4em;
+        left: -9px;
+        padding: 5px 10px 5px 10px;
+        color: #000;
+        font-weight: normal;
+        white-space: wrap;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+        -moz-box-shadow: 0px 0px 4px #222;
+        -webkit-box-shadow: 0px 0px 4px #222;
+        box-shadow: 0px 0px 4px #222;
+        font-size: 100%;
+        background-color: #FFE0E7;
+        opacity: 0;
+        z-index: 99999;
+        visibility: hidden;}
+      [pbtitle] {position: relative; }
+    </style>
+    <script type="text/javascript">
+
+    function h(id, value) {
+       if ((s = document.getElementById(id)) != null) {
+          if (! s.origColor) {
+             if (s.style.color) {
+                s.origColor = s.style.color;
+             } else {
+                s.origColor = '#000000';
+             }
+          }
+          if (! s.origFontWeight) {
+             if (s.style.fontWeight) {
+                s.origFontWeight = s.style.fontWeight;
+             } else {
+                s.origFontWeight = 'normal';
+             }
+          }
+          if (value == '1') {
+             s.style.color = '#0000FF';
+             s.style.fontWeight = 'bold';
+          } else if (value == '1+') {
+             s.style.color = '#00AAFF';
+             s.style.fontWeight = 'bold';
+          } else if (value == '1-') {
+             s.style.color = '#FF00FF';
+             s.style.fontWeight = 'bold';
+          } else {
+             s.style.color = s.origColor;
+             s.style.fontWeight = s.origFontWeight;
+          }
+       }
+    }
+
+    </script>
+  </head>
+  <body bgcolor="#FFFFEE">
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+      <tr bgcolor="#BBCCFF">
+        <td><table border="0" cellpadding="3" cellspacing="0"><tr>
+          <td><b><font class="large2" size="+2">&nbsp; Alignment Visualization (Search Results)</font></b></td>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td><table border="0" style="font-size:-1;">
+                <tr><td>{{ e_lang_name }} &ndash; {{ f_lang_name}}</td></tr>
+                <tr><td>{{ date }}</td></tr></table></td>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td><table border="0" style="color:#777777;font-size:-1;">
+                <tr><td>Script filter-viz-snt-align.py version 0.0.5</td></tr>
+          </table></td>
+      </tr>
+    </table></td></tr></table><p>
+
+{{ e_lang_name }} search term: {% if e_search_term %}
+                                 {{ e_search_term }}
+                               {% else %}
+                                 <i>None</i>
+                               {% endif %}<br>
+
+{{ f_lang_name }} search term: {% if f_search_term %}
+                                 {{ f_search_term }}
+                               {% else %}
+                                 <i>None</i>
+                               {% endif %}<br>
+
+{{ e_lang_name }} meta info restriction: {% if e_prop %}
+                                           {{ e_prop }}
+                                         {% else %}
+                                           <i>None</i>
+                                         {% endif %}<br>
+
+{{ f_lang_name }} meta info restriction: {% if f_prop %}
+                                           {{ f_prop }}
+                                         {% else %}
+                                           <i>None</i>
+                                         {% endif %}<br>
+
+
+{{ search_results | safe }}
+
+  </body>
+</html>

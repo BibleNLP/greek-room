@@ -8,6 +8,7 @@ Parent module for the "Alignment Developer Visualization (align_dev_viz)" Flask 
 
 # Core python imports
 import logging
+from datetime import datetime
 
 # 3rd party imports
 import flask
@@ -78,7 +79,7 @@ def search_filter():
     e_lang_name = flask.request.form.get("e_lang_name") or None
     f_lang_name = flask.request.form.get("f_lang_name") or None
 
-    return filter_viz_snt_align.main(
+    search_results = filter_viz_snt_align.main(
         e_search_term,
         f_search_term,
         text_filename,
@@ -92,4 +93,16 @@ def search_filter():
         sample_percentage,
         e_lang_name,
         f_lang_name,
+    )
+
+    return flask.render_template(
+        "align_dev_viz/search_results.html",
+        e_lang_name=e_lang_name,
+        f_lang_name=f_lang_name,
+        date=datetime.strftime(datetime.now(), "%B %w, %Y at %H:%M"),
+        e_search_term=e_search_term,
+        f_search_term=f_search_term,
+        e_prop=e_prop,
+        f_prop=f_prop,
+        search_results=search_results,
     )
