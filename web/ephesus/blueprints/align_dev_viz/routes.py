@@ -103,7 +103,7 @@ def search_filter():
         f_search_term=f_search_term,
         e_prop=e_prop,
         f_prop=f_prop,
-        search_results=search_results.get("results"),
+        search_results=search_results.get("search_results_html"),
         n_matches=search_results.get("n_matches"),
         error_message=search_results.get("error_message"),
         sample_results_message=search_results.get("sample_results_message"),

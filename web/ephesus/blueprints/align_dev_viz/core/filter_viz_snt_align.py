@@ -272,7 +272,7 @@ def main(
                 break
         generated_html.append(f"{str(n_matches_shown)} shown")
     return {
-        "results": "\n".join(generated_html),
+        "search_results_html": "\n".join(generated_html),
         "n_matches": n_matches,
         "sample_results_message": sample_results_message,
     }
