@@ -18,6 +18,7 @@ import web.ephesus.blueprints.word_checker
 import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
+import web.ephesus.blueprints.wildebeest
 
 #
 # Module scoped variables and singletons
@@ -51,6 +52,7 @@ _BLUEPRINTS = [
     web.ephesus.blueprints.example.BP,
     web.ephesus.blueprints.root.BP,
     web.ephesus.blueprints.align_dev_viz.BP,
+    web.ephesus.blueprints.wildebeest.BP,
 ]
 """List of blueprint singletons to load"""
 

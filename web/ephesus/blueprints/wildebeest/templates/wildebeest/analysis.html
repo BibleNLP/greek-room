@@ -1,0 +1,18 @@
+{% extends "wildebeest/index.html" %}
+{% block content %}
+
+<table>
+  <tr>
+    <th>Reference</th>
+    <th>Text</th>
+  </tr>
+{% for line in analysis_results[1:] %}
+  <tr>
+    <td>{{ line[0] ~ ' ' ~ line[1] ~ ':' ~ line[2]|trim('"') }}</td>
+    <td>{{ line[3] }}</td>
+  </tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}
