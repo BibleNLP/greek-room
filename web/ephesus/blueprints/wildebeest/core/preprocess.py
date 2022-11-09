@@ -16,10 +16,22 @@ def parse_usfm(filepath):
     try:
         _LOGGER.debug("Starting work to parse file")
 
-        file_content = open(filepath).read()
+        file_content = open(filepath, encoding="utf-8", errors="surrogateescape").read()
         usfm_parser = USFMParser(file_content)
-        return usfm_parser.to_list([Filter.SCRIPTURE_TEXT])
+
+        # Get verses list from USFM
+        verses = usfm_parser.to_list([Filter.SCRIPTURE_TEXT])
+
+        # Create references dict
+        ref_id_dict = {
+            idx: f"{row[0]} {row[1]}:{row[2]}" for idx, row in enumerate(verses[1:])
+        }
+
+        # Clean out references
+        verses = [v[3].strip('"').strip() for v in verses[1:]]
 
         _LOGGER.debug("Finished work to parse file")
+
+        return verses, ref_id_dict
     except Exception as e:
         _LOGGER.error("Error while parsing file", e)

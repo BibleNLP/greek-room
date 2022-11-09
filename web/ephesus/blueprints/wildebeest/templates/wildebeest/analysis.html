@@ -1,18 +1,37 @@
 {% extends "wildebeest/index.html" %}
 {% block content %}
 
-<table>
-  <tr>
-    <th>Reference</th>
-    <th>Text</th>
-  </tr>
-{% for line in analysis_results[1:] %}
-  <tr>
-    <td>{{ line[0] ~ ' ' ~ line[1] ~ ':' ~ line[2]|trim('"') }}</td>
-    <td>{{ line[3] }}</td>
-  </tr>
-{% endfor %}
+<!-- <table> -->
+<!--   <tr> -->
+<!--     <th>Reference</th> -->
+<!--     <th>Text</th> -->
+<!--   </tr> -->
+<!-- {# for line in analysis_results[1:] #} -->
+<!--   <tr> -->
+<!--     <td>{# {{ line[0] ~ ' ' ~ line[1] ~ ':' ~ line[2]|trim('"') }} #}</td> -->
+<!--     <td>{# {{ line[3] }} #}</td> -->
+<!--   </tr> -->
+<!-- {# {% endfor %} #}-->
 
-</table>
+  <!-- </table> -->
+
+<section>
+
+  <article>
+        <p>File size: {{ wb['n_lines'] }} lines, {{ wb['n_characters'] }} characters</p>
+        <p>Letter scripts: {{ wb['letter-script']|length }}
+          {% for script_name, script_details in wb['letter-script'].items() %}
+            <p class="indent">{{ script_name }} ({{ script_details['count'] }} instances) </p>
+          {% endfor %}
+        <p>Number scripts: {{ wb['number-script']|length }}</p>
+  </article>
+
+    <!-- <details> -->
+    <!--   <summary>Overview</summary> -->
+    <!--   <details> -->
+
+    <!--   </details> -->
+
+</section>
 
 {% endblock %}

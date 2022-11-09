@@ -17,6 +17,7 @@ from werkzeug.utils import secure_filename
 
 # This project
 from .core.preprocess import parse_usfm
+from .core.wb_analyze import get_wb_analysis
 
 #
 # Singletons
@@ -66,11 +67,14 @@ def upload_file():
             )
             file.save(filepath)
 
-            # Parse uploaded file
-            analysis_results = parse_usfm(filepath)
+            # Parse uploaded USFM file
+            verses, ref_id_dict = parse_usfm(filepath)
+
+            # Run wildebeest-analysis
+            analysis_results = get_wb_analysis(verses, ref_id_dict)
 
             return flask.render_template(
-                "wildebeest/analysis.html", analysis_results=analysis_results
+                "wildebeest/analysis.html", wb=analysis_results
             )
 
     return flask.redirect(flask.url_for(".get_index"))
