@@ -48,6 +48,12 @@ def get_index():
     )
 
 
+@BP.route("/home")
+def get_home():
+    """Get the home page for the blueprint"""
+    return flask.render_template("word_checker/home.html")
+
+
 @BP.route("/api/v1/spell-checker")
 def get_spell_suggestions():
     spell_checker = SpellChecker(data="")
