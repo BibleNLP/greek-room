@@ -10,12 +10,15 @@ e.g. spellings and word suggestions.
 
 # Core python imports
 import logging
+import time
+from pathlib import Path
 
 # 3rd party imports
 import flask
+from werkzeug.utils import secure_filename
 
 # This project
-from .core.utils import TSVDataExtractor
+from .core.utils import TSVDataExtractor, USFMDataExtractor
 from .core.spell_checker import SpellChecker
 
 #
@@ -51,7 +54,52 @@ def get_index():
 @BP.route("/home")
 def get_home():
     """Get the home page for the blueprint"""
-    return flask.render_template("word_checker/home.html")
+    upload_dir = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])
+    listing = [entry.name for entry in upload_dir.iterdir()]
+
+    tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
+    return flask.render_template(
+        "word_checker/scripture.html",
+        scripture_data=tsv_extractor.data,
+        listing=listing,
+    )
+
+
+@BP.route("/scripture", methods=["GET", "POST"])
+def get_scripture_content():
+    """Get HTML formatted scripture content"""
+    pass
+
+
+@BP.route("/upload", methods=["GET", "POST"])
+def upload_file():
+    if flask.request.method == "POST":
+
+        # check if the post request has the file part
+        if "file" not in flask.request.files:
+            flash("No file part")
+            return flask.redirect(flask.request.url)
+        file = flask.request.files["file"]
+
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == "":
+            return flask.redirect(flask.request.url)
+        if file:
+            filename = f"{round(time.time())}_{secure_filename(file.filename)}"
+            filepath = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"]) / Path(
+                filename
+            )
+            file.save(filepath)
+
+            # Parse uploaded USFM file
+            # verses, ref_id_dict = parse_usfm(filepath)
+
+            # return flask.render_template(
+            #     "wildebeest/analysis.html", wb=analysis_results
+            # )
+
+    return flask.redirect(flask.url_for(".get_home"))
 
 
 @BP.route("/api/v1/spell-checker")

@@ -11,6 +11,9 @@ from collections import defaultdict
 # This project
 from web.ephesus.constants import BookCodes
 
+# Third party
+from usfm_grammar import USFMParser, Filter
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -76,6 +79,63 @@ class TSVDataExtractor(DataExtractor):
 
         except Exception as e:
             _LOGGER.exception("Could not extract TSV data", e)
+
+    def pretty_print(self):
+        output_lines = []
+        for book in self.data:
+            for chapter in self.data[book]:
+                output_lines.append("")
+                for verse in self.data[book][chapter]:
+                    output_lines.append(
+                        f"{book:<3s} {chapter:>3s} : {verse:<3s} {self.data[book][chapter][verse]}"
+                    )
+
+        return "\n".join(output_lines)
+
+    def bcvv_iterator(self):
+        """A book-chapter-versenumber-verse iterator"""
+        for book in self.data:
+            for chapter in self.data[book]:
+                for verse in self.data[book][chapter]:
+                    yield book, chapter, verse, self.data[book][chapter][verse]
+
+
+class USFMDataExtractor(DataExtractor):
+    """
+    Process Scriptural data in USFM format
+    """
+
+    def __init__(self, input_filepath):
+        """Initialize the extractor"""
+        _LOGGER.debug("Initializing USFMDataExtractor")
+        self.input_ = input_filepath
+        self.data = defaultdict(lambda: defaultdict(lambda: defaultdict(str)))
+
+        self.extract_data()
+
+        _LOGGER.debug("Finished initializing USFMDataExtractor")
+
+    def extract_data(self):
+        """
+        Extract the scripture content from a USFM file
+        and store them in a dict for easy access.
+        """
+        _LOGGER.debug("Starting work to extract data from USFM file")
+        try:
+            file_content = open(
+                input_filepath, encoding="utf-8", errors="surrogateescape"
+            ).read()
+            usfm_parser = USFMParser(file_content)
+
+            # Get verses list from USFM
+            verses = usfm_parser.to_list([Filter.SCRIPTURE_TEXT])
+
+            for entry in verses[1:]:
+                self.data[entry[0]][entry[1]][entry[2]] = entry[3].strip()
+
+            _LOGGER.debug("Finished work to extract data from USFM file")
+        except Exception as e:
+            _LOGGER.exception("Could not extract USFM data", e)
 
     def pretty_print(self):
         output_lines = []

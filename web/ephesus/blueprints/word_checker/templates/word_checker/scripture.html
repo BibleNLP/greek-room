@@ -1,0 +1,30 @@
+{% extends "word_checker/home.html" %} {% block right_content %}
+<div id="scripture-content">
+  {% for book in scripture_data %} {% for chapter in scripture_data[book] %}
+  <div>
+    <h2>{{ book }} {{ chapter }}</h2>
+    {% for verse in scripture_data[book][chapter] %}
+    <div>
+      <span class="bold verse-number">{{ verse }}</span>
+      <span class="verse" contenteditable="true">
+        {{ scripture_data[book][chapter][verse] }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %} {% endfor %}
+</div>
+{% endblock %} {% block left_content %}
+<a class="button" href="#popup1">&plus;</a>
+
+<div class="listing">
+  <ul>
+    {% for filename in listing %}
+    <li><a href="#">{{ filename }}</a></li>
+
+    <!-- <li class="selected"><a href="#">Item 1</a></li> -->
+    <!-- <li><a href="#">Item 2</a></li> -->
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

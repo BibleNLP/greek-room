@@ -6,11 +6,11 @@
     <link rel="stylesheet" type="text/css" href="static/voithos.css" />
   </head>
   <body>
-    <h1>Voithos</h1>
+    <h1 class="center">Voithos</h1>
 
     <div id="popup1" class="overlay">
       <div class="popup">
-        <h3>Load USFM File</h3>
+        <h3>Upload USFM File</h3>
         <a class="close" href="#">&times;</a>
         <div class="content">
           <form action="upload" method="POST" enctype="multipart/form-data">
@@ -23,10 +23,10 @@
 
     <div class="flexbox">
       <div class="left">
-        <a class="button" href="#popup1">&plus;</a>
+        <div class="content">{% block left_content %}{% endblock %}</div>
       </div>
       <div class="right">
-        <div id="content" class="center">{% block content %}{% endblock %}</div>
+        <div class="content">{% block right_content %}{% endblock %}</div>
       </div>
     </div>
 
