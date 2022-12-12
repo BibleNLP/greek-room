@@ -11,6 +11,7 @@ e.g. spellings and word suggestions.
 # Core python imports
 import logging
 import time
+import secrets
 from pathlib import Path
 
 # 3rd party imports
@@ -55,7 +56,10 @@ def get_index():
 def get_home():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])
-    listing = [entry.name for entry in upload_dir.iterdir()]
+    listing = [
+        (entry.name, entry.stat().st_birthtime) for entry in upload_dir.iterdir()
+    ]
+    listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
 
     tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
     return flask.render_template(
@@ -86,10 +90,15 @@ def upload_file():
         if file.filename == "":
             return flask.redirect(flask.request.url)
         if file:
-            filename = f"{round(time.time())}_{secure_filename(file.filename)}"
-            filepath = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"]) / Path(
-                filename
+            # Save file in a new randomly named dir
+            random_id = secrets.token_urlsafe(6)
+            # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
+            dirpath = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"]) / Path(
+                random_id
             )
+            dirpath.mkdir()
+
+            filepath = dirpath / Path(secure_filename(file.filename))
             file.save(filepath)
 
             # Parse uploaded USFM file
