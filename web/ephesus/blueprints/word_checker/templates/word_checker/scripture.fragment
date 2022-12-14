@@ -1,0 +1,17 @@
+{% if scripture_data|length == 0 %}
+<p>No data found.</p>
+{% else %}
+{% for book in scripture_data %} {% for chapter in scripture_data[book] %}
+<div>
+  <h2>{{ book }} {{ chapter }}</h2>
+  {% for verse in scripture_data[book][chapter] %}
+  <div>
+    <span class="bold verse-number">{{ verse }}</span>
+    <span class="verse" contenteditable="true">
+      {{ scripture_data[book][chapter][verse] }}
+    </span>
+  </div>
+  {% endfor %}
+</div>
+{% endfor %} {% endfor %}
+{% endif %}

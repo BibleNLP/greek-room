@@ -19,7 +19,7 @@ import flask
 from werkzeug.utils import secure_filename
 
 # This project
-from .core.utils import TSVDataExtractor, USFMDataExtractor
+from .core.utils import TSVDataExtractor, USFMDataExtractor, parse_input
 from .core.spell_checker import SpellChecker
 
 #
@@ -57,7 +57,9 @@ def get_home():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])
     listing = [
-        (entry.name, entry.stat().st_birthtime) for entry in upload_dir.iterdir()
+        (entry.name, entry.stat().st_birthtime)
+        for entry in upload_dir.iterdir()
+        if not entry.name.startswith(".")
     ]
     listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
 
@@ -69,10 +71,20 @@ def get_home():
     )
 
 
-@BP.route("/scripture", methods=["GET", "POST"])
-def get_scripture_content():
-    """Get HTML formatted scripture content"""
-    pass
+@BP.route("api/v1/scripture/<resource_id>", methods=["GET", "POST"])
+def process_scripture(resource_id):
+    """Get or set scripture content from disk"""
+
+    tsv_extractor = TSVDataExtractor(
+        f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)}'
+    )
+
+    if flask.request.args.get("formatted") == "true":
+        return flask.render_template(
+            "word_checker/scripture.fragment", scripture_data=tsv_extractor.data
+        )
+
+    return flask.jsonify(tsv_extractor.data)
 
 
 @BP.route("/upload", methods=["GET", "POST"])
@@ -91,22 +103,18 @@ def upload_file():
             return flask.redirect(flask.request.url)
         if file:
             # Save file in a new randomly named dir
-            random_id = secrets.token_urlsafe(6)
+            resource_id = secrets.token_urlsafe(6)
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
             dirpath = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"]) / Path(
-                random_id
+                resource_id
             )
             dirpath.mkdir()
 
             filepath = dirpath / Path(secure_filename(file.filename))
             file.save(filepath)
 
-            # Parse uploaded USFM file
-            # verses, ref_id_dict = parse_usfm(filepath)
-
-            # return flask.render_template(
-            #     "wildebeest/analysis.html", wb=analysis_results
-            # )
+            # Parse uploaded file
+            parse_input(filepath, resource_id)
 
     return flask.redirect(flask.url_for(".get_home"))
 

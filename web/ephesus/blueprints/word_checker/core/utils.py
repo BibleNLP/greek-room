@@ -67,6 +67,9 @@ class TSVDataExtractor(DataExtractor):
         """
         try:
             input_directory_path = Path(self.input_directory)
+            if len(list(input_directory_path.glob("**/*.tsv"))) == 0:
+                _LOGGER.info(f"Could not find any TSV files in {self.input_directory}")
+                return
             for tsv_file in input_directory_path.glob("**/*.tsv"):
                 with tsv_file.open() as tsv_filehandler:
                     for idx, line in enumerate(tsv_filehandler):
@@ -108,7 +111,7 @@ class USFMDataExtractor(DataExtractor):
     def __init__(self, input_filepath):
         """Initialize the extractor"""
         _LOGGER.debug("Initializing USFMDataExtractor")
-        self.input_ = input_filepath
+        self.input_filepath = input_filepath
         self.data = defaultdict(lambda: defaultdict(lambda: defaultdict(str)))
 
         self.extract_data()
@@ -123,15 +126,16 @@ class USFMDataExtractor(DataExtractor):
         _LOGGER.debug("Starting work to extract data from USFM file")
         try:
             file_content = open(
-                input_filepath, encoding="utf-8", errors="surrogateescape"
+                self.input_filepath, encoding="utf-8", errors="surrogateescape"
             ).read()
             usfm_parser = USFMParser(file_content)
 
             # Get verses list from USFM
             verses = usfm_parser.to_list([Filter.SCRIPTURE_TEXT])
+            _LOGGER.info(verses)
 
             for entry in verses[1:]:
-                self.data[entry[0]][entry[1]][entry[2]] = entry[3].strip()
+                self.data[entry[0]][entry[1]][entry[2]] = entry[3].strip('"').strip()
 
             _LOGGER.debug("Finished work to extract data from USFM file")
         except Exception as e:
@@ -155,3 +159,13 @@ class USFMDataExtractor(DataExtractor):
             for chapter in self.data[book]:
                 for verse in self.data[book][chapter]:
                     yield book, chapter, verse, self.data[book][chapter][verse]
+
+
+def parse_input(filepath, resource_id):
+    """Parse and store the uploaded input file as TSV"""
+    if filepath.suffix.lower() in [".sfm", ".usfm"]:
+        parser = USFMDataExtractor(str(filepath))
+
+    with open(f"{filepath.parent / resource_id}.tsv", "w") as tsv_file:
+        for book, chapter, verse, text in parser.bcvv_iterator():
+            tsv_file.write(f"{book}\t{chapter}\t{verse}\t{text}\n")
