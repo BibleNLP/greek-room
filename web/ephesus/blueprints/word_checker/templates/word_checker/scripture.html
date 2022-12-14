@@ -1,12 +1,20 @@
 {% extends "word_checker/home.html" %} {% block right_content %}
-<div id="scripture-content"></div>
+<div id="scripture-content">Click on a resource link to load data.</div>
 {% endblock %} {% block left_content %}
 <a class="button" href="#popup1">&plus;</a>
 
 <div class="listing">
   <ul>
-    {% for filename in listing %}
-    <li><a href="#">{{ filename }}</a></li>
+    {% for dir in listing %}
+    <li>
+      <button
+        class="link"
+        data-url="{{ url_for('.process_scripture', resource_id=dir, formatted='true') }}"
+        name="resourceId"
+      >
+        {{ dir }}
+      </button>
+    </li>
     <!-- <li class="selected"><a href="#">Item 1</a></li> -->
     {% endfor %}
   </ul>

@@ -41,6 +41,18 @@ body {
   padding-left: 10px;
 }
 
+.link {
+  background: none;
+  border: none;
+  color: blue;
+}
+
+.link:hover {
+  background: none;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Pop up styles */
 /* .box { */
 /*   position: fixed; */

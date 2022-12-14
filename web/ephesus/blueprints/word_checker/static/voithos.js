@@ -1,12 +1,7 @@
-async function getScriptureContent(formatted = true) {
-  const baseURL =
-    window.location.origin +
-    "/" +
-    window.location.pathname.slice(1).split("/")[0];
-  let URL = baseURL + "/api/v1/scripture/9Qvsvb27";
-  if (formatted) {
-    URL += "?formatted=true";
-  }
+// Method to get formatted scripture content from the backend
+async function getScriptureContent(element) {
+  const baseURL = window.location.origin;
+  const URL = baseURL + element.dataset.url;
 
   const response = await fetch(URL);
   if (response.ok) {
@@ -17,14 +12,20 @@ async function getScriptureContent(formatted = true) {
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-  getScriptureContent()
-    .then((content) => {
-      let scriptureContent = document.getElementById("scripture-content");
-      scriptureContent.innerHTML = content;
-    })
-    .catch((err) => {
-      let scriptureContent = document.getElementById("scripture-content");
-      scriptureContent.innerHTML = err;
+document.addEventListener("DOMContentLoaded", () => {
+  // Apply onclick listener for each of the resource links on the left pane
+  resourceLinks = document.getElementsByClassName("link");
+  [].forEach.call(resourceLinks, (link) => {
+    link.addEventListener("click", (event) => {
+      getScriptureContent(event.target)
+        .then((content) => {
+          let scriptureContent = document.getElementById("scripture-content");
+          scriptureContent.innerHTML = content;
+        })
+        .catch((err) => {
+          let scriptureContent = document.getElementById("scripture-content");
+          scriptureContent.innerHTML = err;
+        });
     });
+  });
 });
