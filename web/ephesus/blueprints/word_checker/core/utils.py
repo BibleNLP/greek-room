@@ -3,8 +3,9 @@ Utilities in service of the word checker prototype
 """
 
 # Core python imports
-import logging
 import abc
+import json
+import logging
 from pathlib import Path
 from collections import defaultdict
 
@@ -161,11 +162,59 @@ class USFMDataExtractor(DataExtractor):
                     yield book, chapter, verse, self.data[book][chapter][verse]
 
 
+class JSONDataExtractor(DataExtractor):
+    """
+    Process Scriptural data in JSON format
+    """
+
+    def __init__(self, input_directory):
+        """Initialize the extractor with the input directory"""
+        self.input_directory = input_directory
+        self.data = defaultdict(lambda: defaultdict(lambda: defaultdict(str)))
+
+        self.extract_data()
+
+    def extract_data(self):
+        """
+        Extract the scripture content from .json files and
+        store them in a dict for easy access.
+        """
+        try:
+            input_directory_path = Path(self.input_directory)
+            if len(list(input_directory_path.glob("**/*.json"))) == 0:
+                _LOGGER.info(f"Could not find any JSON files in {self.input_directory}")
+                return
+            for json_file in input_directory_path.glob("**/*.json"):
+                with json_file.open() as json_filehandler:
+                    self.data = {**self.data, **json.load(json_filehandler)}
+
+        except Exception as e:
+            _LOGGER.exception("Could not extract JSON data", e)
+
+    def pretty_print(self):
+        output_lines = []
+        for book in self.data:
+            for chapter in self.data[book]:
+                output_lines.append("")
+                for verse in self.data[book][chapter]:
+                    output_lines.append(
+                        f"{book:<3s} {chapter:>3s} : {verse:<3s} {self.data[book][chapter][verse]}"
+                    )
+
+        return "\n".join(output_lines)
+
+    def bcvv_iterator(self):
+        """A book-chapter-versenumber-verse iterator"""
+        for book in self.data:
+            for chapter in self.data[book]:
+                for verse in self.data[book][chapter]:
+                    yield book, chapter, verse, self.data[book][chapter][verse]
+
+
 def parse_input(filepath, resource_id):
-    """Parse and store the uploaded input file as TSV"""
+    """Parse and store the uploaded input file as JSON"""
     if filepath.suffix.lower() in [".sfm", ".usfm"]:
         parser = USFMDataExtractor(str(filepath))
 
-    with open(f"{filepath.parent / resource_id}.tsv", "w") as tsv_file:
-        for book, chapter, verse, text in parser.bcvv_iterator():
-            tsv_file.write(f"{book}\t{chapter}\t{verse}\t{text}\n")
+    with open(f"{filepath.parent / resource_id}.json", "w") as json_file:
+        json.dump(parser.data, json_file)

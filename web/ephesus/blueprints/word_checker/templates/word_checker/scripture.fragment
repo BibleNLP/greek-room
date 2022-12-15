@@ -7,7 +7,10 @@
   {% for verse in scripture_data[book][chapter] %}
   <div>
     <span class="bold verse-number">{{ verse }}</span>
-    <span class="verse" contenteditable="true">
+    <span data-book="{{ book }}"
+          data-chapter="{{ chapter }}"
+          data-verse="{{ verse }}"
+          class="verse" contenteditable="true">
       {{ scripture_data[book][chapter][verse] }}
     </span>
   </div>

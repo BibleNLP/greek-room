@@ -19,7 +19,12 @@ import flask
 from werkzeug.utils import secure_filename
 
 # This project
-from .core.utils import TSVDataExtractor, USFMDataExtractor, parse_input
+from .core.utils import (
+    JSONDataExtractor,
+    TSVDataExtractor,
+    USFMDataExtractor,
+    parse_input,
+)
 from .core.spell_checker import SpellChecker
 
 #
@@ -75,16 +80,16 @@ def get_home():
 def process_scripture(resource_id):
     """Get or set scripture content from disk"""
 
-    tsv_extractor = TSVDataExtractor(
+    json_extractor = JSONDataExtractor(
         f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)}'
     )
 
     if flask.request.args.get("formatted") == "true":
         return flask.render_template(
-            "word_checker/scripture.fragment", scripture_data=tsv_extractor.data
+            "word_checker/scripture.fragment", scripture_data=json_extractor.data
         )
 
-    return flask.jsonify(tsv_extractor.data)
+    return flask.jsonify(json_extractor.data)
 
 
 @BP.route("/upload", methods=["GET", "POST"])
