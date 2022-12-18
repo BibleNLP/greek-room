@@ -11,6 +11,7 @@ from collections import defaultdict
 
 # This project
 from web.ephesus.constants import BookCodes
+from web.ephesus.exceptions import InternalError
 
 # Third party
 from usfm_grammar import USFMParser, Filter
@@ -218,3 +219,12 @@ def parse_input(filepath, resource_id):
 
     with open(f"{filepath.parent / resource_id}.json", "w") as json_file:
         json.dump(parser.data, json_file)
+
+
+def update_file_content(json_content, filepath):
+    """Write updated JSON content back to file"""
+    if not json_content or len(json_content) == 0:
+        raise InternalError()
+
+    with open(filepath, "w") as json_file:
+        json.dump(json_content, json_file)

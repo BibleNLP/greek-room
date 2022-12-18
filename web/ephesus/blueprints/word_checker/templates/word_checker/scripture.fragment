@@ -10,9 +10,7 @@
     <span data-book="{{ book }}"
           data-chapter="{{ chapter }}"
           data-verse="{{ verse }}"
-          class="verse" contenteditable="true">
-      {{ scripture_data[book][chapter][verse] }}
-    </span>
+          class="verse" contenteditable="true">{{ scripture_data[book][chapter][verse] }}</span>
   </div>
   {% endfor %}
 </div>

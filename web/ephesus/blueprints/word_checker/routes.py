@@ -24,6 +24,7 @@ from .core.utils import (
     TSVDataExtractor,
     USFMDataExtractor,
     parse_input,
+    update_file_content,
 )
 from .core.spell_checker import SpellChecker
 
@@ -79,6 +80,13 @@ def get_home():
 @BP.route("api/v1/scripture/<resource_id>", methods=["GET", "POST"])
 def process_scripture(resource_id):
     """Get or set scripture content from disk"""
+    if flask.request.method == "POST":
+        # _LOGGER.info(flask.request.json)
+        update_file_content(
+            flask.request.json,
+            f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)/Path(resource_id)}.json',
+        )
+        return {"success": True}, 200
 
     json_extractor = JSONDataExtractor(
         f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)}'
@@ -92,7 +100,7 @@ def process_scripture(resource_id):
     return flask.jsonify(json_extractor.data)
 
 
-@BP.route("/upload", methods=["GET", "POST"])
+@BP.route("/upload", methods=["POST"])
 def upload_file():
     if flask.request.method == "POST":
 

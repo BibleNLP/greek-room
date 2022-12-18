@@ -33,6 +33,10 @@ body {
   font-weight: bold;
 }
 
+.underline {
+  text-decoration: underline;
+}
+
 .verse-number {
   padding-right: 1em;
 }
