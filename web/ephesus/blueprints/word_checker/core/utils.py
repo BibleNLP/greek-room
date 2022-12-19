@@ -221,7 +221,7 @@ def parse_input(filepath, resource_id):
         json.dump(parser.data, json_file)
 
 
-def update_file_content(json_content, filepath):
+def update_file_content(filepath, json_content):
     """Write updated JSON content back to file"""
     if not json_content or len(json_content) == 0:
         raise InternalError()

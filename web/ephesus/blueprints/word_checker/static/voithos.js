@@ -78,7 +78,7 @@ function debounce(task, ms) {
       await t.promise;
       await task(...args);
     } catch (_) {
-      console.log("cleaning up cancelled promise");
+      //console.log("cleaning up cancelled promise");
     }
   };
 }

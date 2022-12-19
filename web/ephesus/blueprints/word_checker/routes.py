@@ -83,8 +83,8 @@ def process_scripture(resource_id):
     if flask.request.method == "POST":
         # _LOGGER.info(flask.request.json)
         update_file_content(
-            flask.request.json,
             f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)/Path(resource_id)}.json',
+            flask.request.json,
         )
         return {"success": True}, 200
 
