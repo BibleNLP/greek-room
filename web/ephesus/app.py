@@ -89,6 +89,10 @@ def create_app():
     # initialize the app with the SQLAlchemy extension
     db.init_app(app)
 
+    # Create tables in DB
+    with app.app_context():
+        db.create_all()
+
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):
         _LOGGER.info("Routing rules:\n%s", str(app.url_map))
