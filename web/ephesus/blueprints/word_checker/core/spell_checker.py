@@ -11,21 +11,55 @@ import logging
 # 3rd party imports
 import flask
 
+# Import from this project
+from web.ephesus.extensions import db
+from web.ephesus.model.voithos import FlaggedTokens, Suggestions
 
 _LOGGER = logging.getLogger(__name__)
 
 
+def get_suggestions_for_resource(resource_id=None):
+    """Query DB to get all relevant suggestions for a specific `resource_id`"""
+    flagged_tokens = db.session.scalars(db.select(FlaggedTokens)).all()
+    suggestions = []
+    for flagged_token_row in flagged_tokens:
+        per_token_suggestions = []
+        for suggestions_row in flagged_token_row.suggestions:
+            per_token_suggestions.append(
+                {
+                    "suggestion_id": suggestions_row.id,
+                    "lang_code": suggestions_row.lang_code,
+                    "suggestion": suggestions_row.suggestion,
+                    "confidence": suggestions_row.confidence,
+                    "suggestion_type": suggestions_row.suggestion_type.name,
+                    "user_decision": suggestions_row.user_decision.name,
+                    "suggestion_source": suggestions_row.suggestion_source.name,
+                }
+            )
+
+        suggestions.append(
+            {
+                "flagged_token_id": flagged_token_row.id,
+                "lang_code": flagged_token_row.lang_code,
+                "flagged_token": flagged_token_row.token,
+                "suggestions": per_token_suggestions,
+            }
+        )
+
+    return suggestions
+
+
 @dataclass
-class SpellSuggestion:
+class Suggestion:
     """
-    Class for keeping track of a single spelling
-    error and the suggested corrections
+    Class for keeping track of a single
+    flagged token and the suggested corrections/predictions
     """
 
     # The token (1 or more words) that is suspect
-    error_token: str = None
+    flagged_token: str = None
 
-    # The list of suggestions for corrections.
+    # The list of suggestions for corrections/predictions.
     # This is tuple of (token, probability)
     # ordered descending by probability.
     suggestions: list[tuple] = field(default_factory=list)

@@ -13,7 +13,7 @@ from web.ephesus.extensions import db
 class SuggestionType(enum.Enum):
     """Different types of Suggestions possible"""
 
-    SPELL = 1
+    SPELLING = 1
     CONSISTENCY = 2
     PREDICTION = 3
 
@@ -71,7 +71,7 @@ class Suggestions(db.Model):
         self,
         lang_code,
         suggestion,
-        suggestion_type=SuggestionType.SPELL,
+        suggestion_type=SuggestionType.SPELLING,
         confidence=0.0,
         user_decision=UserDecision.UNDECIDED,
         suggestion_source=SuggestionSource.AI,

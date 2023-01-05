@@ -1,3 +1,5 @@
+// Javascript for the Voithos page
+
 // Method to get formatted scripture content from the backend
 async function getScriptureContent(element, formatted = true) {
   var URL = window.location.origin + element.dataset.url;
@@ -93,6 +95,7 @@ function deferred(ms) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialize state
   let contentState = undefined;
 
   // Apply onclick listener for each of the resource links on the left pane

@@ -12,6 +12,7 @@ e.g. spellings and word suggestions.
 import logging
 import time
 import secrets
+from pprint import pprint
 from pathlib import Path
 
 # 3rd party imports
@@ -26,7 +27,8 @@ from .core.utils import (
     parse_input,
     update_file_content,
 )
-from .core.spell_checker import SpellChecker
+from .core.spell_checker import get_suggestions_for_resource
+
 
 #
 # Singletons
@@ -132,8 +134,7 @@ def upload_file():
     return flask.redirect(flask.url_for(".get_home"))
 
 
-@BP.route("/api/v1/spell-checker")
-def get_spell_suggestions():
-    spell_checker = SpellChecker(data="")
-    _LOGGER.debug(spell_checker.get_spell_suggestions())
-    return {"spellSuggestions": spell_checker.get_spell_suggestions()}
+@BP.route("/api/v1/suggestions/<resource_id>")
+def get_suggestions(resource_id):
+    """Get spell/consistency/prediction suggestions for the `resource_id`"""
+    return get_suggestions_for_resource(), 200

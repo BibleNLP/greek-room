@@ -17,7 +17,7 @@ seed_data = [
         "suggestion": {
             "lang_code": "eng",
             "suggestion": "confident",
-            "suggestion_type": SuggestionType.SPELL,
+            "suggestion_type": SuggestionType.SPELLING,
             "confidence": 0.7,
             "user_decision": UserDecision.UNDECIDED,
             "suggestion_source": SuggestionSource.AI,
