@@ -70,6 +70,31 @@ function serializeHTMLToJSON() {
   });
 }
 
+// Method to get suggestions data for a resource
+async function getSuggestions(element) {
+  var URL = window.location.origin + "/word_checker/api/v1/suggestions/" + element.dataset.resourceId;
+  //var URL = window.location.origin + element.dataset.url;
+
+  const response = await fetch(URL);
+  if (response.ok) {
+    let body = await response.json();
+    return Promise.resolve(body);
+  } else {
+    return Promise.reject("Unable to retrieve data.");
+  }
+}
+
+async function getSpellingSuggestions(resourceId) {
+  let url = "api/v1/spell-checker";
+
+  try {
+    let res = await fetch(url);
+    return await res.json();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // Debounce input
 function debounce(task, ms) {
   let t = { promise: null, cancel: (_) => void 0 };
@@ -120,13 +145,17 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log(contentState);
         });
 
-      // Get content to display on right pane
+      // Get HTML scripture content to display on right pane
       getScriptureContent(event.target)
-        .then((content) => {
+        .then(content => {
           let scriptureContent = document.getElementById("scripture-content");
           scriptureContent.innerHTML = content;
+          return getSuggestions(event.target);
         })
-        .then(() => {
+        .then(suggestions => {
+
+          console.log(suggestions);
+
           // Apply onblur listeners for each verse for writing to backend
           const verses = document.getElementsByClassName("verse");
           [].forEach.call(verses, (verse) => {

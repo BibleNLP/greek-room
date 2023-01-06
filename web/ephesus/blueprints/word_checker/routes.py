@@ -49,6 +49,9 @@ BP = flask.Blueprint(
 # Routes
 #
 
+# Global variable to support versioning APIs
+API_ROUTE_PREFIX = "api/v1"
+
 
 @BP.route("/")
 @BP.route("/index.html")
@@ -79,7 +82,7 @@ def get_home():
     )
 
 
-@BP.route("api/v1/scripture/<resource_id>", methods=["GET", "POST"])
+@BP.route(f"{API_ROUTE_PREFIX}/scripture/<resource_id>", methods=["GET", "POST"])
 def process_scripture(resource_id):
     """Get or set scripture content from disk"""
     if flask.request.method == "POST":
@@ -134,7 +137,19 @@ def upload_file():
     return flask.redirect(flask.url_for(".get_home"))
 
 
-@BP.route("/api/v1/suggestions/<resource_id>")
-def get_suggestions(resource_id):
+@BP.route(
+    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>",
+    defaults={"book": None, "chapter": None, "verse": None},
+)
+@BP.route(
+    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>",
+    defaults={"chapter": None, "verse": None},
+)
+@BP.route(
+    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>/<chapter>",
+    defaults={"verse": None},
+)
+@BP.route(f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>/<chapter>/<verse>")
+def get_suggestions(resource_id, book, chapter, verse):
     """Get spell/consistency/prediction suggestions for the `resource_id`"""
-    return get_suggestions_for_resource(), 200
+    return get_suggestions_for_resource(resource_id, book, chapter, verse), 200

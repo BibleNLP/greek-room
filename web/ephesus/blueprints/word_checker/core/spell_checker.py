@@ -18,7 +18,7 @@ from web.ephesus.model.voithos import FlaggedTokens, Suggestions
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_suggestions_for_resource(resource_id=None):
+def get_suggestions_for_resource(resource_id, book, chapter, verse):
     """Query DB to get all relevant suggestions for a specific `resource_id`"""
     flagged_tokens = db.session.scalars(db.select(FlaggedTokens)).all()
     suggestions = []
