@@ -120,21 +120,30 @@ function deferred(ms) {
 }
 
 // Method to highlight (underline) flaggedTokens in the UI
-function higlightTokens(suggestions) {
-  let tokenRegExp = undefined;
-  suggestions.forEach((suggestion, index) => {
-    console.log(suggestion.flagged_token);
+function highlightTokens(suggestions) {
+  let tokenPattern = undefined;
+  Object.entries(suggestions).forEach(([flaggedTokenId, suggestion], index) => {
+    console.log(suggestion.flaggedToken);
     if (index === 0) {
-      tokenRegExp = '\\b(' + suggestion.flagged_token + ')\\b(?!<\/span>)';
+      tokenPattern = `\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b(?!<\/span>)`;
     }
     else {
-      tokenRegExp += '|\\b(' + suggestion.flagged_token + ')\\b(?!<\/span>)';
+      tokenPattern += `|\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b(?!<\/span>)`;
     }
   });
+  tokenRegExp = new RegExp(tokenPattern, 'ig');
 
   const verses = document.getElementsByClassName("verse");
   [].forEach.call(verses, (verse) => {
-    verse.innerHTML = verse.innerHTML.trim().replaceAll(new RegExp(tokenRegExp, 'ig'), match => '<span class="underline flag-red">' + match + '</span>');
+    // This function gets called repeatedly for
+    // every successful match
+    verse.innerHTML = verse.innerHTML.trim().replaceAll(tokenRegExp, (...args) => {
+      // Get last element which is an object
+      // with named capture groups: args.pop()
+      // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
+      [tokenId, flaggedToken] = Object.entries(args.pop()).find(([tokenId, flaggedToken]) => flaggedToken !== undefined);
+      return `<span data-flagged-token-id=${tokenId.split('_').at(-1)} class="underline flag-red">${flaggedToken}</span>`
+    });
   });
 }
 
@@ -175,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(suggestionsData => {
           suggestions = suggestionsData;
           console.log(suggestions);
-          higlightTokens(suggestions);
+          highlightTokens(suggestions);
 
 
           // Apply onblur listeners for each verse for writing to backend
