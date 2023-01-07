@@ -119,9 +119,29 @@ function deferred(ms) {
   return { promise, cancel };
 }
 
+// Method to highlight (underline) flaggedTokens in the UI
+function higlightTokens(suggestions) {
+  let tokenRegExp = undefined;
+  suggestions.forEach((suggestion, index) => {
+    console.log(suggestion.flagged_token);
+    if (index === 0) {
+      tokenRegExp = '\\b(' + suggestion.flagged_token + ')\\b(?!<\/span>)';
+    }
+    else {
+      tokenRegExp += '|\\b(' + suggestion.flagged_token + ')\\b(?!<\/span>)';
+    }
+  });
+
+  const verses = document.getElementsByClassName("verse");
+  [].forEach.call(verses, (verse) => {
+    verse.innerHTML = verse.innerHTML.trim().replaceAll(new RegExp(tokenRegExp, 'ig'), match => '<span class="underline flag-red">' + match + '</span>');
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Initialize state
   let contentState = undefined;
+  let suggestions = undefined;
 
   // Apply onclick listener for each of the resource links on the left pane
   const resourceLinks = document.getElementsByClassName("link");
@@ -152,9 +172,11 @@ document.addEventListener("DOMContentLoaded", () => {
           scriptureContent.innerHTML = content;
           return getSuggestions(event.target);
         })
-        .then(suggestions => {
-
+        .then(suggestionsData => {
+          suggestions = suggestionsData;
           console.log(suggestions);
+          higlightTokens(suggestions);
+
 
           // Apply onblur listeners for each verse for writing to backend
           const verses = document.getElementsByClassName("verse");

@@ -37,6 +37,14 @@ body {
   text-decoration: underline;
 }
 
+.flag-red {
+  text-decoration-color: red;
+  text-decoration-style: wavy;
+}
+
+.verse:focus {
+  outline: none;
+}
 .verse-number {
   padding-right: 1em;
 }
