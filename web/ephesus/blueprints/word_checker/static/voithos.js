@@ -123,7 +123,13 @@ function deferred(ms) {
 function highlightTokens(suggestions) {
   let tokenPattern = undefined;
   Object.entries(suggestions).forEach(([flaggedTokenId, suggestion], index) => {
-    console.log(suggestion.flaggedToken);
+    // The regex is a concatenation of all flaggedTokens
+    // such that they do not end with `</span>` and are
+    // separated by word boundaries (\b). Also, each
+    // match is within a named capture group that is
+    // derived from its flaggedToken ID (taken from DB).
+    // e.g. `index_1` means the match has the
+    // flagged_token_id=1 in DB.
     if (index === 0) {
       tokenPattern = `\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b(?!<\/span>)`;
     }
