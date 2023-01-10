@@ -137,19 +137,10 @@ def upload_file():
     return flask.redirect(flask.url_for(".get_home"))
 
 
-@BP.route(
-    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>",
-    defaults={"book": None, "chapter": None, "verse": None},
-)
-@BP.route(
-    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>",
-    defaults={"chapter": None, "verse": None},
-)
-@BP.route(
-    f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>/<chapter>",
-    defaults={"verse": None},
-)
-@BP.route(f"{API_ROUTE_PREFIX}/suggestions/<resource_id>/<book>/<chapter>/<verse>")
-def get_suggestions(resource_id, book, chapter, verse):
+@BP.route(f"{API_ROUTE_PREFIX}/suggestions/<resource_id>")
+def get_suggestions(resource_id):
     """Get spell/consistency/prediction suggestions for the `resource_id`"""
-    return get_suggestions_for_resource(resource_id, book, chapter, verse), 200
+    return (
+        get_suggestions_for_resource(resource_id, flask.request.args.getlist("filter")),
+        200,
+    )

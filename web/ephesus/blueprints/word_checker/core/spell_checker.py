@@ -5,6 +5,7 @@ and suggest list of possible corrections
 
 # Core Python imports
 from dataclasses import dataclass, field
+from collections import defaultdict
 from pathlib import Path
 import logging
 
@@ -18,8 +19,14 @@ from web.ephesus.model.voithos import FlaggedTokens, Suggestions
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_suggestions_for_resource(resource_id, book, chapter, verse):
+def get_suggestions_for_resource(resource_id, filters=[]):
     """Query DB to get all relevant suggestions for a specific `resource_id`"""
+    filters_dict = defaultdict(list)
+    for entry in filters:
+        bookId, chapterId = entry.split("_")
+        filters_dict[bookId].append(chapterId)
+    _LOGGER.info(filters_dict)
+
     flagged_tokens = db.session.scalars(db.select(FlaggedTokens)).all()
     suggestions = {}
     for flagged_token_row in flagged_tokens:

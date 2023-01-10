@@ -1,5 +1,20 @@
 // Javascript for the Voithos page
 
+function getCursorPosition(editor) {
+  if (window.getSelection()) {
+    var sel = window.getSelection();
+    if (sel.getRangeAt) {
+      var pos = sel.getRangeAt(0).startOffset;
+      var endPos =
+        pos +
+        Array.from(editor.innerHTML.slice(0, pos)).length -
+        editor.innerHTML.slice(0, pos).split("").length;
+      return endPos;
+    }
+  }
+  return null;
+}
+
 // Method to get formatted scripture content from the backend
 async function getScriptureContent(element, formatted = true) {
   var URL = window.location.origin + element.dataset.url;
@@ -77,11 +92,11 @@ function serializeHTMLToJSON() {
 async function getSuggestions(resourceId, filters) {
   let filterParams = "";
   for (let bookId in filters) {
-    filterParams += `filter=${bookId}_${Array.from(
+    filterParams += `?filter=${bookId}_${Array.from(
       filters[bookId].chapters
     ).join(`&filter=${bookId}_`)}`;
   }
-  let URL = `${window.location.origin}/word_checker/api/v1/suggestions/${resourceId}?${filterParams}`;
+  let URL = `${window.location.origin}/word_checker/api/v1/suggestions/${resourceId}${filterParams}`;
 
   const response = await fetch(URL);
   if (response.ok) {
@@ -220,6 +235,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const callback = (mutationList, observer) => {
     console.log(mutationList);
     mutationList.forEach((mutation) => {
+      console.log(
+        getCursorPosition(mutation.target.parentElement.closest("span.verse"))
+      );
       // Find the closest verse span to get
       // current chapter and verse number
       const { book, chapter, verse } =
@@ -288,34 +306,35 @@ document.addEventListener("DOMContentLoaded", () => {
           highlightTokens(suggestions, contentState);
 
           // Apply onblur listeners for each verse for writing to backend
-          const verses = document.getElementsByClassName("verse");
-          [].forEach.call(verses, (verse) => {
-            verse.addEventListener(
-              "input",
-              debounce((event) => {
-                contentState[event.target.dataset.book][
-                  event.target.dataset.chapter
-                ][event.target.dataset.verse] = event.target.innerText.trim();
 
-                // Persist data to backend
-                setScriptureContent(contentState);
+          document.getElementById("scripture-content").addEventListener(
+            "input",
+            debounce((event) => {
+              const verses = document.getElementsByClassName("verse");
+              [].forEach.call(verses, (verse) => {
+                contentState[verse.dataset.book][verse.dataset.chapter][
+                  verse.dataset.verse
+                ] = verse.innerText.trim();
+              });
 
-                getSuggestions(resourceId, dirtyState).then(
-                  (updatedSuggestionsData) => {
-                    suggestions = {
-                      ...suggestionsData,
-                      ...updatedSuggestionsData,
-                    };
-                    console.log(suggestions);
-                    highlightTokens(suggestions, contentState);
+              // Persist data to backend
+              setScriptureContent(contentState);
 
-                    // Reset dirtyState
-                    dirtyState = undefined;
-                  }
-                );
-              }, 3000)
-            );
-          });
+              getSuggestions(resourceId, dirtyState).then(
+                (updatedSuggestionsData) => {
+                  suggestions = {
+                    ...suggestionsData,
+                    ...updatedSuggestionsData,
+                  };
+                  console.log(suggestions);
+                  highlightTokens(suggestions, contentState);
+
+                  // Reset dirtyState
+                  dirtyState = undefined;
+                }
+              );
+            }, 3000)
+          );
         })
         .catch((err) => {
           scriptureContent.innerHTML = err;
