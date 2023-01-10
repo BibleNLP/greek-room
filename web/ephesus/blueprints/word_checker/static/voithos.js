@@ -25,8 +25,8 @@ async function getScriptureContent(element, formatted = true) {
 // Method to persist (POST) scriptural content to backend
 async function setScriptureContent(contentState) {
   const URL =
-        window.location.origin +
-        document.getElementsByClassName("link underline")[0].dataset.url;
+    window.location.origin +
+    document.getElementsByClassName("link underline")[0].dataset.url;
   console.log(URL);
 
   const response = await fetch(URL, {
@@ -71,9 +71,17 @@ function serializeHTMLToJSON() {
 }
 
 // Method to get suggestions data for a resource
-async function getSuggestions(element) {
-  var URL = window.location.origin + "/word_checker/api/v1/suggestions/" + element.dataset.resourceId;
-  //var URL = window.location.origin + element.dataset.url;
+// `filters` is the `dirtyState` variable which
+// provides the subset of {book:Set(chapter)}
+// that were edited and thus need recomputation.
+async function getSuggestions(resourceId, filters) {
+  let filterParams = "";
+  for (let bookId in filters) {
+    filterParams += `filter=${bookId}_${Array.from(
+      filters[bookId].chapters
+    ).join(`&filter=${bookId}_`)}`;
+  }
+  let URL = `${window.location.origin}/word_checker/api/v1/suggestions/${resourceId}?${filterParams}`;
 
   const response = await fetch(URL);
   if (response.ok) {
@@ -81,17 +89,6 @@ async function getSuggestions(element) {
     return Promise.resolve(body);
   } else {
     return Promise.reject("Unable to retrieve data.");
-  }
-}
-
-async function getSpellingSuggestions(resourceId) {
-  let url = "api/v1/spell-checker";
-
-  try {
-    let res = await fetch(url);
-    return await res.json();
-  } catch (error) {
-    console.log(error);
   }
 }
 
@@ -112,52 +109,60 @@ function debounce(task, ms) {
 
 function deferred(ms) {
   let cancel,
-      promise = new Promise((resolve, reject) => {
-        cancel = reject;
-        setTimeout(resolve, ms);
-      });
+    promise = new Promise((resolve, reject) => {
+      cancel = reject;
+      setTimeout(resolve, ms);
+    });
   return { promise, cancel };
 }
 
 // Method to highlight (underline) flaggedTokens in the UI
-// And add capability to show context menu with suggestions
-function highlightTokens(suggestions) {
+// and add capability to show context menu with suggestions
+function highlightTokens(suggestions, contentState) {
   let tokenPattern = undefined;
   Object.entries(suggestions).forEach(([flaggedTokenId, suggestion], index) => {
     // The regex is a concatenation of all flaggedTokens
-    // such that they do not end with `</span>` and are
     // separated by word boundaries (\b). Also, each
     // match is within a named capture group that is
     // derived from its flaggedToken ID (taken from DB).
     // e.g. `index_1` means the match has the
     // flagged_token_id=1 in DB.
     if (index === 0) {
-      tokenPattern = `\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b(?!<\/span>)`;
-    }
-    else {
-      tokenPattern += `|\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b(?!<\/span>)`;
+      tokenPattern = `\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b`;
+    } else {
+      tokenPattern += `|\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b`;
     }
   });
-  tokenRegExp = new RegExp(tokenPattern, 'ig');
+  // console.log(tokenPattern);
+  tokenRegExp = new RegExp(tokenPattern, "ig");
 
   const verses = document.getElementsByClassName("verse");
-  [].forEach.call(verses, (verse) => {
+  [].forEach.call(verses, (verseElement) => {
     // This function gets called repeatedly for
     // every successful match
-    verse.innerHTML = verse.innerHTML.trim().replaceAll(tokenRegExp, (...args) => {
-      // Get last element which is an object
-      // with named capture groups: args.pop()
-      // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
-      [tokenId, flaggedToken] = Object.entries(args.pop()).find(([tokenId, flaggedToken]) => flaggedToken !== undefined);
-      return `<span data-flagged-token-id=${tokenId.split('_').at(-1)} class="underline flag-red">${flaggedToken}</span>`
-    });
+    const { book, chapter, verse } = verseElement.dataset;
+    verseElement.innerHTML = contentState[book][chapter][verse]
+      .trim()
+      .replaceAll(tokenRegExp, (...args) => {
+        // Get last element which is an object
+        // with named capture groups: args.pop()
+        // See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_function_as_the_replacement
+        [tokenId, flaggedToken] = Object.entries(args.pop()).find(
+          ([tokenId, flaggedToken]) => flaggedToken !== undefined
+        );
+        return `<span data-flagged-token-id=${tokenId
+          .split("_")
+          .at(-1)} class="underline flag-red">${flaggedToken}</span>`;
+      });
   });
 
   // Add context menu
   const suggestionsMenu = document.getElementById("suggestions-menu");
-  const underlinedNodes = document.querySelectorAll("#scripture-content .underline");
-  underlinedNodes.forEach(underlinedNode => {
-    underlinedNode.addEventListener("contextmenu", menuEvent => {
+  const underlinedNodes = document.querySelectorAll(
+    "#scripture-content .underline"
+  );
+  underlinedNodes.forEach((underlinedNode) => {
+    underlinedNode.addEventListener("contextmenu", (menuEvent) => {
       menuEvent.preventDefault();
 
       suggestionsMenu.style.top = `${menuEvent.layerY}px`;
@@ -165,19 +170,23 @@ function highlightTokens(suggestions) {
 
       // Setup and show the menu
       ////  Clean-up any existing `li` tags in the suggestions-menu
-      suggestionsMenu.querySelectorAll('li').forEach((liElement) => liElement.remove());
+      suggestionsMenu
+        .querySelectorAll("li")
+        .forEach((liElement) => liElement.remove());
       //// Add the relevant suggestions to the suggestions-menu
-      suggestions[menuEvent.target.dataset.flaggedTokenId].suggestions.forEach(suggestionItem => {
-        liElement = document.createElement('li');
-        liElement.classList.add("menu-item");
-        liElement.innerHTML = suggestionItem.suggestion;
-        suggestionsMenu.append(liElement);
-      });
+      suggestions[menuEvent.target.dataset.flaggedTokenId].suggestions.forEach(
+        (suggestionItem) => {
+          liElement = document.createElement("li");
+          liElement.classList.add("menu-item");
+          liElement.innerHTML = suggestionItem.suggestion;
+          suggestionsMenu.append(liElement);
+        }
+      );
 
       suggestionsMenu.classList.remove("hidden");
 
       // Hide the suggestionsMenu when clicking outside of it
-      document.addEventListener("click", element => {
+      document.addEventListener("click", (element) => {
         const isClickedOutside = !suggestionsMenu.contains(element.target);
         if (isClickedOutside) {
           suggestionsMenu.classList.add("hidden");
@@ -188,95 +197,129 @@ function highlightTokens(suggestions) {
   });
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Initialize state
-    let contentState = undefined;
-    let suggestions = undefined;
+  // Initialize state
+  let contentState = undefined;
+  let suggestions = undefined;
+  let resourceId = undefined;
 
-    let scriptureContent = document.getElementById("scripture-content");
+  // Used to hold the chapters and verses for
+  // the content that were edited by the user
+  let dirtyState = undefined;
 
-    // Options for the observer (which mutations to observe)
-    const observerConfig = { characterData: true, characterDataOldValue: true, subtree: true};
+  let scriptureContent = document.getElementById("scripture-content");
 
-    // Callback function to execute when mutations are observed
-    const callback = (mutationList, observer) => {
-      console.log(mutationList);
-      // for (const mutation of mutationList) {
-      //   if (mutation.type === "childList") {
-      //     console.log("Spotted an underline.");
-      //     // console.log(mutation.addedNodes[1]);
-      //     for (const node of mutation.addedNodes) {
-      //       addContextMenu(node, "confidint");
-      //       // if (node instanceof Element) {
-      //       //   addContextMenu(node, "jesus christ");
-      //       // }
-      //     }
-      //   }
-      //}
-    };
+  // Options for the observer (which mutations to observe)
+  const observerConfig = {
+    characterData: true,
+    characterDataOldValue: true,
+    subtree: true,
+  };
 
-    // Create an observer instance linked to the callback function
-    const observer = new MutationObserver(callback);
+  // Callback function to execute when mutations are observed
+  const callback = (mutationList, observer) => {
+    console.log(mutationList);
+    mutationList.forEach((mutation) => {
+      // Find the closest verse span to get
+      // current chapter and verse number
+      const { book, chapter, verse } =
+        mutation.target.parentElement.closest("span.verse").dataset;
+      if (dirtyState === undefined) {
+        dirtyState = {};
+        dirtyState[book] = { chapters: new Set() };
+      }
+      dirtyState[book].chapters.add(chapter);
+    });
+    // for (const mutation of mutationList) {
+    //   if (mutation.type === "childList") {
+    //     console.log("Spotted an underline.");
+    //     // console.log(mutation.addedNodes[1]);
+    //     for (const node of mutation.addedNodes) {
+    //       addContextMenu(node, "confidint");
+    //       // if (node instanceof Element) {
+    //       //   addContextMenu(node, "jesus christ");
+    //       // }
+    //     }
+    //   }
+    //}
+  };
 
+  // Create an observer instance linked to the callback function
+  const observer = new MutationObserver(callback);
 
-    // Apply onclick listener for each of the resource links on the left pane
-    const resourceLinks = document.getElementsByClassName("link");
-    [].forEach.call(resourceLinks, (link) => {
-      link.addEventListener("click", (event) => {
-        // Unselect any existing and highlight selected link
-        Array.from(document.getElementsByClassName("link underline")).forEach(
-          (el) => el.classList.remove("underline")
-        );
+  // Apply onclick listener for each of the resource links on the left pane
+  const resourceLinks = document.getElementsByClassName("link");
+  [].forEach.call(resourceLinks, (link) => {
+    link.addEventListener("click", (event) => {
+      // Set resourceId state
+      resourceId = event.target.dataset.resourceId;
 
-        // Underline selected resource link
-        event.target.classList.add("underline");
+      // Unselect any existing and highlight selected link
+      Array.from(document.getElementsByClassName("link underline")).forEach(
+        (el) => el.classList.remove("underline")
+      );
 
-        // Get JSON content for internal state management
-        // Send formatted=`false` for returning JSON
-        getScriptureContent(event.target, false)
-          .then((content) => {
-            contentState = content;
-          })
-          .then(() => {
-            console.log(contentState);
+      // Underline selected resource link
+      event.target.classList.add("underline");
+
+      // Get JSON content for internal state management
+      // Send formatted=`false` for returning JSON
+      getScriptureContent(event.target, false)
+        .then((content) => {
+          contentState = content;
+        })
+        .then(() => {
+          console.log(contentState);
+        });
+
+      // Get HTML scripture content to display on right pane
+      getScriptureContent(event.target)
+        .then((content) => {
+          scriptureContent.innerHTML = content;
+
+          // Start observing the target node for configured mutations
+          observer.observe(scriptureContent, observerConfig);
+
+          return getSuggestions(resourceId);
+        })
+        .then((suggestionsData) => {
+          suggestions = suggestionsData;
+          console.log(suggestions);
+          highlightTokens(suggestions, contentState);
+
+          // Apply onblur listeners for each verse for writing to backend
+          const verses = document.getElementsByClassName("verse");
+          [].forEach.call(verses, (verse) => {
+            verse.addEventListener(
+              "input",
+              debounce((event) => {
+                contentState[event.target.dataset.book][
+                  event.target.dataset.chapter
+                ][event.target.dataset.verse] = event.target.innerText.trim();
+
+                // Persist data to backend
+                setScriptureContent(contentState);
+
+                getSuggestions(resourceId, dirtyState).then(
+                  (updatedSuggestionsData) => {
+                    suggestions = {
+                      ...suggestionsData,
+                      ...updatedSuggestionsData,
+                    };
+                    console.log(suggestions);
+                    highlightTokens(suggestions, contentState);
+
+                    // Reset dirtyState
+                    dirtyState = undefined;
+                  }
+                );
+              }, 3000)
+            );
           });
-
-        // Get HTML scripture content to display on right pane
-        getScriptureContent(event.target)
-          .then(content => {
-            scriptureContent.innerHTML = content;
-
-            // Start observing the target node for configured mutations
-            observer.observe(scriptureContent, observerConfig);
-
-            return getSuggestions(event.target);
-          })
-          .then(suggestionsData => {
-            suggestions = suggestionsData;
-            console.log(suggestions);
-            highlightTokens(suggestions);
-
-
-            // Apply onblur listeners for each verse for writing to backend
-            const verses = document.getElementsByClassName("verse");
-            [].forEach.call(verses, (verse) => {
-              verse.addEventListener(
-                "input",
-                debounce((event) => {
-                  contentState[event.target.dataset.book][
-                    event.target.dataset.chapter
-                  ][event.target.dataset.verse] = event.target.innerHTML.trim();
-
-                  // Persist data to backend
-                  setScriptureContent(contentState);
-                }, 3000)
-              );
-            });
-          })
-          .catch((err) => {
-            scriptureContent.innerHTML = err;
-          });
-      });
+        })
+        .catch((err) => {
+          scriptureContent.innerHTML = err;
+        });
     });
   });
+});
