@@ -26,6 +26,7 @@ from .core.utils import (
     USFMDataExtractor,
     parse_input,
     update_file_content,
+    sanitize_string,
 )
 from .core.suggestions import get_suggestions_for_resource
 
@@ -69,16 +70,14 @@ def index():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
     listing = [
-        (entry.name, entry.stat().st_birthtime)
+        (entry.name.split("|", maxsplit=1), entry.stat().st_birthtime)
         for entry in upload_dir.iterdir()
         if not entry.name.startswith(".")
     ]
     listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
 
-    tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
     return flask.render_template(
         "voithos/scripture.html",
-        scripture_data=tsv_extractor.data,
         listing=listing,
     )
 
@@ -106,23 +105,29 @@ def process_scripture(resource_id):
     return flask.jsonify(json_extractor.data)
 
 
-@BP.route("/upload", methods=["POST"])
+@BP.route("/create", methods=["POST"])
 def upload_file():
     if flask.request.method == "POST":
 
         # check if the post request has the file part
         if "file" not in flask.request.files:
             flash("No file part")
-            return flask.redirect(flask.request.url)
+            return flask.redirect(flask.url_for(".index"))
         file = flask.request.files["file"]
 
+        # Validate user defined project name
+        ## Note: project is referred to as resource in the code!
+        project_name = sanitize_string(flask.request.form["name"])
+
         # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == "":
-            return flask.redirect(flask.request.url)
+        # empty file without a filename. Also, check for
+        # empty project name field.
+        if file.filename == "" or project_name == "":
+            return flask.redirect(flask.url_for(".index"))
+
         if file:
             # Save file in a new randomly named dir
-            resource_id = secrets.token_urlsafe(6)
+            resource_id = f"{project_name}|{secrets.token_urlsafe(6)}"
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
             dirpath = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"]) / Path(
                 resource_id
@@ -133,7 +138,7 @@ def upload_file():
             file.save(filepath)
 
             # Parse uploaded file
-            parse_input(filepath, resource_id)
+            parse_input(filepath, resource_id, project_name)
 
     return flask.redirect(flask.url_for(".index"))
 

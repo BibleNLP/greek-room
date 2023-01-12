@@ -1,5 +1,5 @@
-{% extends "voithos/home.html" %} {% block right_content %}
-<div id="scripture-content">Click on a resource link to load data.</div>
+{% extends "voithos/index.html" %} {% block right_content %}
+<div id="scripture-content">Click on a project name to load data.</div>
 {% endblock %} {% block left_content %}
 <a class="button" href="#popup1">&plus;</a>
 
@@ -9,11 +9,11 @@
     <li>
       <button
         class="link"
-        data-url="{{ url_for('.process_scripture', resource_id=dir) }}"
-        data-resource-id="{{ dir }}"
+        data-url="{{ url_for('.process_scripture', resource_id=dir[1]) }}"
+        data-resource-id="{{ dir[1] }}"
         name="resourceId"
       >
-        {{ dir }}
+        {{ dir[0] }} ({{ dir[1] }})
       </button>
     </li>
     <!-- <li class="selected"><a href="#">Item 1</a></li> -->

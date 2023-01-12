@@ -10,12 +10,25 @@
 
     <div id="popup1" class="overlay">
       <div class="popup">
-        <h3>Upload USFM File</h3>
+        <h3>Create Project</h3>
         <a class="close" href="#">&times;</a>
         <div class="content">
-          <form action="upload" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <input type="submit" value="Upload" />
+          <form action="create" method="POST" enctype="multipart/form-data">
+            <label for="project-name">Name: </label>
+            <input
+              type="text"
+              id="project-name"
+              name="name"
+              maxlength="15"
+              required
+            />
+            <br />
+            <br />
+            <label for="file-upload">USFM/TSV:</label>
+            <input type="file" id="file-upload" name="file" required />
+            <br />
+            <br />
+            <input type="submit" value="Create" class="create" />
           </form>
         </div>
       </div>

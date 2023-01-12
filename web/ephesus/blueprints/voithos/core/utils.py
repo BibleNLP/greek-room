@@ -6,6 +6,7 @@ Utilities in service of the word checker prototype
 import abc
 import json
 import logging
+import string
 from pathlib import Path
 from collections import defaultdict
 
@@ -17,6 +18,12 @@ from web.ephesus.exceptions import InternalError
 from usfm_grammar import USFMParser, Filter
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def sanitize_string(user_input):
+    """Simple sanitizer for form user input"""
+    whitelist = string.ascii_letters + string.digits + " _.,:-()&"
+    return "".join([letter for letter in user_input][:15])
 
 
 class DataExtractor(metaclass=abc.ABCMeta):
@@ -212,13 +219,13 @@ class JSONDataExtractor(DataExtractor):
                     yield book, chapter, verse, self.data[book][chapter][verse]
 
 
-def parse_input(filepath, resource_id):
+def parse_input(filepath, resource_id, project_name):
     """Parse and store the uploaded input file as JSON"""
     if filepath.suffix.lower() in [".sfm", ".usfm"]:
         parser = USFMDataExtractor(str(filepath))
 
     with open(f"{filepath.parent / resource_id}.json", "w") as json_file:
-        json.dump(parser.data, json_file)
+        json.dump({**parser.data, **{"projectName": project_name}}, json_file)
 
 
 def update_file_content(filepath, json_content):

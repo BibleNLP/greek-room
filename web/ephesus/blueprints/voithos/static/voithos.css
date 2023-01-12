@@ -119,7 +119,7 @@ body {
   margin: 70px auto;
   padding: 5px 5px 10px 10px;
   border: 1px solid black;
-  width: 300px;
+  width: 325px;
   position: relative;
   /* transition: all 5s ease-in-out; */
   background: white;
@@ -146,6 +146,10 @@ body {
 .popup .content {
   max-height: 30%;
   overflow: auto;
+}
+
+.popup .create {
+  float: right;
 }
 
 @media screen and (max-width: 700px) {
