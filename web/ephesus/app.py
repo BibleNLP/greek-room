@@ -14,7 +14,7 @@ from logging.config import dictConfig
 import flask
 
 # This project
-import web.ephesus.blueprints.word_checker
+import web.ephesus.blueprints.voithos
 import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
@@ -50,7 +50,7 @@ _LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
-    web.ephesus.blueprints.word_checker.BP,
+    web.ephesus.blueprints.voithos.BP,
     web.ephesus.blueprints.example.BP,
     web.ephesus.blueprints.root.BP,
     web.ephesus.blueprints.align_dev_viz.BP,

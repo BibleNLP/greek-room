@@ -83,7 +83,7 @@ async function getSuggestions(resourceId, filters) {
       filters[bookId].chapters
     ).join(`&filter=${bookId}_`)}`;
   }
-  let URL = `${window.location.origin}/word_checker/api/v1/suggestions/${resourceId}${filterParams}`;
+  let URL = `${window.location.origin}/voithos/api/v1/suggestions/${resourceId}${filterParams}`;
 
   const response = await fetch(URL);
   if (response.ok) {

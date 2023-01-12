@@ -1,8 +1,8 @@
 """
-Parent module for the "spell checker" Flask blueprint
+Parent module for the "voithos" Flask blueprint
 
-This blueprint is a prototype of the backend for the word-level checks.
-e.g. spellings and word suggestions.
+This blueprint is a prototype of the backend for the token-level checks.
+e.g. spelling, consistency and suggestions.
 """
 #
 # Imports
@@ -27,7 +27,7 @@ from .core.utils import (
     parse_input,
     update_file_content,
 )
-from .core.spell_checker import get_suggestions_for_resource
+from .core.suggestions import get_suggestions_for_resource
 
 
 #
@@ -38,9 +38,9 @@ _LOGGER = logging.getLogger(__name__)
 
 # Blueprint instance
 BP = flask.Blueprint(
-    "word_checker",
+    "voithos",
     __name__,
-    url_prefix="/word_checker",
+    url_prefix="/voithos",
     template_folder="templates",
     static_folder="static",
 )
@@ -53,20 +53,21 @@ BP = flask.Blueprint(
 API_ROUTE_PREFIX = "api/v1"
 
 
+# @BP.route("/")
+# @BP.route("/index.html")
+# def get_index():
+#     """Get the root index for the blueprint"""
+#     tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
+#     return flask.render_template(
+#         "word_checker/index.html", scripture_data=tsv_extractor.data
+#     )
+
+
 @BP.route("/")
 @BP.route("/index.html")
-def get_index():
-    """Get the root index for the blueprint"""
-    tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
-    return flask.render_template(
-        "word_checker/index.html", scripture_data=tsv_extractor.data
-    )
-
-
-@BP.route("/home")
 def get_home():
     """Get the home page for the blueprint"""
-    upload_dir = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])
+    upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
     listing = [
         (entry.name, entry.stat().st_birthtime)
         for entry in upload_dir.iterdir()
@@ -76,7 +77,7 @@ def get_home():
 
     tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
     return flask.render_template(
-        "word_checker/scripture.html",
+        "voithos/scripture.html",
         scripture_data=tsv_extractor.data,
         listing=listing,
     )
@@ -88,18 +89,18 @@ def process_scripture(resource_id):
     if flask.request.method == "POST":
         # _LOGGER.info(flask.request.json)
         update_file_content(
-            f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)/Path(resource_id)}.json',
+            f'{Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])/Path(resource_id)/Path(resource_id)}.json',
             flask.request.json,
         )
         return {"success": True}, 200
 
     json_extractor = JSONDataExtractor(
-        f'{Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"])/Path(resource_id)}'
+        f'{Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])/Path(resource_id)}'
     )
 
     if flask.request.args.get("formatted") == "true":
         return flask.render_template(
-            "word_checker/scripture.fragment", scripture_data=json_extractor.data
+            "voithos/scripture.fragment", scripture_data=json_extractor.data
         )
 
     return flask.jsonify(json_extractor.data)
@@ -123,7 +124,7 @@ def upload_file():
             # Save file in a new randomly named dir
             resource_id = secrets.token_urlsafe(6)
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
-            dirpath = Path(flask.current_app.config["WORD_CHECKER_UPLOAD_DIR"]) / Path(
+            dirpath = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"]) / Path(
                 resource_id
             )
             dirpath.mkdir()
