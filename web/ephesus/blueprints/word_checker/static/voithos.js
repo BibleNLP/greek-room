@@ -180,13 +180,18 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
       suggestionsMenu.classList.remove("hidden");
 
       // Hide the suggestionsMenu when clicking outside of it
-      document.addEventListener("click", (element) => {
-        const isClickedOutside = !suggestionsMenu.contains(element.target);
-        if (isClickedOutside) {
+      function hideMenu(element) {
+        const isClickOutsideMenu = !suggestionsMenu.contains(element.target);
+        if (isClickOutsideMenu) {
           suggestionsMenu.classList.add("hidden");
-          document.removeEventListener("click", arguments.callee);
         }
-      });
+      }
+
+      document.addEventListener("click", hideMenu);
+
+      if (suggestionsMenu.classList.contains("hidden")) {
+        document.removeEventListener("click", hideMenu);
+      }
     });
   });
 }
