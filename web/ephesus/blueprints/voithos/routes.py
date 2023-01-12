@@ -65,7 +65,7 @@ API_ROUTE_PREFIX = "api/v1"
 
 @BP.route("/")
 @BP.route("/index.html")
-def get_home():
+def index():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
     listing = [
@@ -135,7 +135,7 @@ def upload_file():
             # Parse uploaded file
             parse_input(filepath, resource_id)
 
-    return flask.redirect(flask.url_for(".get_home"))
+    return flask.redirect(flask.url_for(".index"))
 
 
 @BP.route(f"{API_ROUTE_PREFIX}/suggestions/<resource_id>")
