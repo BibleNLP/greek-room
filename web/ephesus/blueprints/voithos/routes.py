@@ -11,6 +11,7 @@ e.g. spelling, consistency and suggestions.
 # Core python imports
 import logging
 import time
+import json
 import secrets
 from pprint import pprint
 from pathlib import Path
@@ -27,6 +28,7 @@ from .core.utils import (
     parse_input,
     update_file_content,
     sanitize_string,
+    get_project_listing,
 )
 from .core.suggestions import get_suggestions_for_resource
 
@@ -54,31 +56,22 @@ BP = flask.Blueprint(
 API_ROUTE_PREFIX = "api/v1"
 
 
-# @BP.route("/")
-# @BP.route("/index.html")
-# def get_index():
-#     """Get the root index for the blueprint"""
-#     tsv_extractor = TSVDataExtractor(f'{flask.current_app.config["DATA_PATH"]}/en_ult')
-#     return flask.render_template(
-#         "word_checker/index.html", scripture_data=tsv_extractor.data
-#     )
-
-
 @BP.route("/")
 @BP.route("/index.html")
 def index():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
-    listing = [
-        (entry.name.split("|", maxsplit=1), entry.stat().st_birthtime)
-        for entry in upload_dir.iterdir()
-        if not entry.name.startswith(".")
-    ]
-    listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
+    project_listing = get_project_listing(upload_dir)
+    # listing = [
+    #     (entry.name, entry.stat().st_birthtime)
+    #     for entry in upload_dir.iterdir()
+    #     if not entry.name.startswith(".")
+    # ]
+    # listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
 
     return flask.render_template(
         "voithos/scripture.html",
-        listing=listing,
+        project_listing=project_listing,
     )
 
 
@@ -115,30 +108,35 @@ def upload_file():
             return flask.redirect(flask.url_for(".index"))
         file = flask.request.files["file"]
 
-        # Validate user defined project name
-        ## Note: project is referred to as resource in the code!
+        # Validate user defined project name and language code
         project_name = sanitize_string(flask.request.form["name"])
-
+        lang_code = sanitize_string(flask.request.form["lang-code"])
         # If the user does not select a file, the browser submits an
         # empty file without a filename. Also, check for
         # empty project name field.
-        if file.filename == "" or project_name == "":
+        if file.filename == "" or project_name == "" or lang_code == "":
             return flask.redirect(flask.url_for(".index"))
 
         if file:
             # Save file in a new randomly named dir
-            resource_id = f"{project_name}|{secrets.token_urlsafe(6)}"
+            resource_id = secrets.token_urlsafe(6)
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
             dirpath = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"]) / Path(
                 resource_id
             )
             dirpath.mkdir()
 
-            filepath = dirpath / Path(secure_filename(file.filename))
-            file.save(filepath)
+            # Save metadata
+            with open(f"{dirpath}/metadata.json", "w") as metadata_file:
+                json.dump(
+                    {"projectName": project_name, "langCode": lang_code}, metadata_file
+                )
+
+            parsed_filepath = dirpath / Path(secure_filename(file.filename))
+            file.save(parsed_filepath)
 
             # Parse uploaded file
-            parse_input(filepath, resource_id, project_name)
+            parse_input(parsed_filepath, resource_id)
 
     return flask.redirect(flask.url_for(".index"))
 

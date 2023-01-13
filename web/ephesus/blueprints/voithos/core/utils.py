@@ -8,7 +8,7 @@ import json
 import logging
 import string
 from pathlib import Path
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 # This project
 from web.ephesus.constants import BookCodes
@@ -193,6 +193,10 @@ class JSONDataExtractor(DataExtractor):
                 _LOGGER.info(f"Could not find any JSON files in {self.input_directory}")
                 return
             for json_file in input_directory_path.glob("**/*.json"):
+                # Skip parsing metadata
+                if json_file.name == "metadata.json":
+                    continue
+
                 with json_file.open() as json_filehandler:
                     self.data = {**self.data, **json.load(json_filehandler)}
 
@@ -219,13 +223,13 @@ class JSONDataExtractor(DataExtractor):
                     yield book, chapter, verse, self.data[book][chapter][verse]
 
 
-def parse_input(filepath, resource_id, project_name):
+def parse_input(filepath, resource_id):
     """Parse and store the uploaded input file as JSON"""
     if filepath.suffix.lower() in [".sfm", ".usfm"]:
         parser = USFMDataExtractor(str(filepath))
 
     with open(f"{filepath.parent / resource_id}.json", "w") as json_file:
-        json.dump({**parser.data, **{"projectName": project_name}}, json_file)
+        json.dump(parser.data, json_file)
 
 
 def update_file_content(filepath, json_content):
@@ -235,3 +239,29 @@ def update_file_content(filepath, json_content):
 
     with open(filepath, "w") as json_file:
         json.dump(json_content, json_file)
+
+
+def get_project_listing(base_path):
+    """Get the listing of the projects for use on the UI"""
+    ProjectDetails = namedtuple(
+        "ProjectDetails", ["resource_id", "project_name", "lang_code", "birth_time"]
+    )
+    project_listing = []
+    for resource in base_path.iterdir():
+        if resource.name.startswith("."):
+            continue
+
+        # Read metadata.json
+        with (resource / "metadata.json").open() as metadata_file:
+            metadata = json.load(metadata_file)
+
+        project_listing.append(
+            ProjectDetails(
+                resource.name,
+                metadata["projectName"],
+                metadata["langCode"],
+                resource.stat().st_birthtime,
+            )
+        )
+
+    return sorted(project_listing, reverse=True, key=lambda x: x.birth_time)

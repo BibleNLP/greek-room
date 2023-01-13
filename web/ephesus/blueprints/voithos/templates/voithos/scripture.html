@@ -4,20 +4,25 @@
 <a class="button" href="#popup1">&plus;</a>
 
 <div class="listing">
+  {% if project_listing|length == 0 %}
+  <p>No projects found. <br />Create(+) one to get started!</p>
+  {% else %}
   <ul>
-    {% for dir in listing %}
+    {% for project in project_listing %}
     <li>
       <button
         class="link"
-        data-url="{{ url_for('.process_scripture', resource_id=dir[1]) }}"
-        data-resource-id="{{ dir[1] }}"
+        data-url="{{ url_for('.process_scripture', resource_id=project.resource_id) }}"
+        data-resource-id="{{ project.resource_id }}"
+        data-lang-code="{{ project.lang_code }}"
         name="resourceId"
       >
-        {{ dir[0] }} ({{ dir[1] }})
+        {{ project.project_name }}
       </button>
     </li>
     <!-- <li class="selected"><a href="#">Item 1</a></li> -->
     {% endfor %}
   </ul>
+  {% endif %}
 </div>
 {% endblock %}
