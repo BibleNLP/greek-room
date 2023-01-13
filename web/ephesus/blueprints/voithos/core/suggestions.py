@@ -7,6 +7,7 @@ and suggest list of possible corrections
 from dataclasses import dataclass, field
 from collections import defaultdict
 from pathlib import Path
+import json
 import logging
 
 # 3rd party imports
@@ -19,15 +20,29 @@ from web.ephesus.model.voithos import FlaggedTokens, Suggestions
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_suggestions_for_resource(resource_id, filters=[]):
+def get_suggestions_for_resource(resource_id, filters=[], lang_code=None):
     """Query DB to get all relevant suggestions for a specific `resource_id`"""
+    # Retrieve language code from project
+    # metadata.json, if not passed-in.
+
+    if not lang_code:
+        with open(
+            f'{Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"]) / f"{resource_id}" / "metadata.json"}'
+        ) as metadata_file:
+            lang_code = json.load(metadata_file)["langCode"]
+
+    _LOGGER.debug(f"lang_code used is {lang_code}.")
+
     filters_dict = defaultdict(list)
     for entry in filters:
         bookId, chapterId = entry.split("_")
         filters_dict[bookId].append(chapterId)
     _LOGGER.info(filters_dict)
+    _LOGGER.debug(f"Suggestions filtered by {filters_dict}.")
 
-    flagged_tokens = db.session.scalars(db.select(FlaggedTokens)).all()
+    flagged_tokens = db.session.scalars(
+        db.select(FlaggedTokens).where(FlaggedTokens.lang_code == lang_code)
+    ).all()
     suggestions = {}
     for flagged_token_row in flagged_tokens:
         per_token_suggestions = []

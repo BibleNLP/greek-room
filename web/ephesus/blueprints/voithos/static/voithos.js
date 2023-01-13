@@ -1,7 +1,6 @@
 // Javascript for the Voithos page
 
-import { Cursor } from "./utils.js";
-import { debounce } from "./utils.js";
+import { Cursor, debounce } from "./utils.js";
 
 // Method to get formatted scripture content from the backend
 async function getScriptureContent(element, formatted = true) {
@@ -111,6 +110,12 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
       tokenPattern += `|\\b(?<index_${flaggedTokenId}>${suggestion.flaggedToken})\\b`;
     }
   });
+
+  // Return early if no suggestions found
+  if (tokenPattern === undefined) {
+    return null;
+  }
+
   const tokenRegExp = new RegExp(tokenPattern, "ig");
 
   const verses = document.getElementsByClassName("verse");

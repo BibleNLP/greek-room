@@ -145,6 +145,10 @@ def upload_file():
 def get_suggestions(resource_id):
     """Get spell/consistency/prediction suggestions for the `resource_id`"""
     return (
-        get_suggestions_for_resource(resource_id, flask.request.args.getlist("filter")),
+        get_suggestions_for_resource(
+            resource_id,
+            flask.request.args.getlist("filter"),
+            flask.request.args.get("langCode"),
+        ),
         200,
     )
