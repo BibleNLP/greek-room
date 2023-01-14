@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Voithos</title>
+    <link rel="stylesheet" type="text/css" href="static/voithos.css" />
+  </head>
+  <body spellcheck="false">
+    <h1 class="center">Voithos</h1>
+
+    <div id="popup1" class="overlay">
+      <div class="popup">
+        <h3>Create Project</h3>
+        <a class="close" href="#">&times;</a>
+        <div class="content">
+          <form action="create" method="POST" enctype="multipart/form-data">
+            <label
+              >Name: <input type="text" name="name" maxlength="15" required
+            /></label>
+            <br />
+            <br />
+            <label
+              >Language Code:
+              <input type="text" name="lang-code" maxlength="8" required
+            /></label>
+            <br />
+            <br />
+            <label for="file-upload">USFM/TSV:</label>
+            <input type="file" id="file-upload" name="file" required />
+            <br />
+            <br />
+            <input type="submit" value="Create" class="create" />
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="flexbox">
+      <div class="left">
+        <div class="content">{% block left_content %}{% endblock %}</div>
+      </div>
+      <div class="right">
+        <div class="content">{% block right_content %}{% endblock %}</div>
+      </div>
+    </div>
+
+    <!-- custom context menu -->
+    <ul id="suggestions-menu" class="context-menu hidden">
+      <li class="menu-item">First word</li>
+      <li class="menu-item">Second word</li>
+      <li class="menu-divider"></li>
+      <li class="menu-item">Yet another word</li>
+    </ul>
+
+    <!-- <script type="module" src="static/utils.js"></script> -->
+    <script type="module" src="static/voithos.js"></script>
+  </body>
+</html>

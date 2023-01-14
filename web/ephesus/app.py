@@ -14,11 +14,13 @@ from logging.config import dictConfig
 import flask
 
 # This project
-import web.ephesus.blueprints.word_checker
+import web.ephesus.blueprints.voithos
 import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
+
+from web.ephesus.extensions import db
 
 #
 # Module scoped variables and singletons
@@ -48,7 +50,7 @@ _LOGGER = logging.getLogger(__name__)
 logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
-    web.ephesus.blueprints.word_checker.BP,
+    web.ephesus.blueprints.voithos.BP,
     web.ephesus.blueprints.example.BP,
     web.ephesus.blueprints.root.BP,
     web.ephesus.blueprints.align_dev_viz.BP,
@@ -83,8 +85,13 @@ def create_app():
         )
         app.register_blueprint(blueprint)
 
-    # Register/init extension singletons
-    # TODO - none yet
+    ## Register/init extension singletons
+    # initialize the app with the SQLAlchemy extension
+    db.init_app(app)
+
+    # Create tables in DB
+    with app.app_context():
+        db.create_all()
 
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):
