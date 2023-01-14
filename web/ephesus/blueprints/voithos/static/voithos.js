@@ -46,31 +46,6 @@ async function setScriptureContent(contentState) {
   }
 }
 
-// Method to serialize HTML to JSON for scripture content
-function serializeHTMLToJSON() {
-  const verses = document.getElementsByClassName("verse");
-  let serializedData = {};
-  [].forEach.call(verses, (verse) => {
-    // console.log(verse.dataset);
-    if (!(verse.dataset.book in serializedData)) {
-      serializedData[verse.dataset.book] = {};
-    }
-    if (!(verse.dataset.chapter in serializedData[verse.dataset.book])) {
-      serializedData[verse.dataset.book][verse.dataset.chapter] = {};
-    }
-    if (
-      !(
-        verse.dataset.verse in
-        serializedData[verse.dataset.book][verse.dataset.chapter]
-      )
-    ) {
-      serializedData[verse.dataset.book][verse.dataset.chapter][
-        verse.dataset.verse
-      ] = verse.innerHTML;
-    }
-  });
-}
-
 // Method to get suggestions data for a resource
 // `filters` is the `dirtyState` variable which
 // provides the subset of {book:Set(chapter)}
@@ -150,7 +125,12 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
       });
   });
 
-  if (isRestoreCursor && offset !== undefined) {
+  if (
+    isRestoreCursor &&
+    offset !== undefined &&
+    anchorVerseElement !== undefined &&
+    anchorVerseElement !== null
+  ) {
     Cursor.setCurrentCursorPosition(offset, anchorVerseElement);
     anchorVerseElement.focus();
   }
@@ -160,6 +140,7 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
   const underlinedNodes = document.querySelectorAll(
     "#scripture-content .underline"
   );
+
   underlinedNodes.forEach((underlinedNode) => {
     underlinedNode.addEventListener("contextmenu", (menuEvent) => {
       menuEvent.preventDefault();
@@ -172,6 +153,17 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
       suggestionsMenu
         .querySelectorAll("li")
         .forEach((liElement) => liElement.remove());
+
+      // Replace flaggedToken with suggestion
+      function replaceWithSuggestion(event) {
+        menuEvent.target.dataset.replacementToken = event.target.innerText;
+        // menuEvent.target.parentNode.replaceChild(
+        //   document.createTextNode(event.target.innerText.trim()),
+        //   menuEvent.target
+        // );
+        suggestionsMenu.classList.add("hidden");
+      }
+
       // Add the relevant suggestions to the suggestions-menu
       suggestions[menuEvent.target.dataset.flaggedTokenId].suggestions.forEach(
         (suggestionItem) => {
@@ -179,6 +171,7 @@ function highlightTokens(suggestions, contentState, isRestoreCursor = false) {
           liElement.classList.add("menu-item");
           liElement.innerHTML = suggestionItem.suggestion;
           suggestionsMenu.append(liElement);
+          liElement.addEventListener("click", replaceWithSuggestion);
         }
       );
 
@@ -214,30 +207,93 @@ document.addEventListener("DOMContentLoaded", () => {
   let scriptureContent = document.getElementById("scripture-content");
 
   // MutationObserver setup
-  // Options for the observer (which mutations to observe)
-  const observerConfig = {
+
+  // MutationObserver 1
+  // Observer for handling selected suggestions
+  function suggestionsSelectionHandler(mutationList) {
+    mutationList.forEach((mutation) => {
+      switch (mutation.type) {
+        case "attributes":
+          switch (mutation.attributeName) {
+            // Check if anytime this attribute is set
+            // and use it to replace underlined nodes
+            // with the user-selected suggestions.
+            case "data-replacement-token":
+              mutation.target.parentNode.replaceChild(
+                document.createTextNode(
+                  mutation.target.dataset.replacementToken
+                ),
+                mutation.target
+              );
+              updateContent();
+              break;
+          }
+          break;
+      }
+    });
+  }
+  new MutationObserver(suggestionsSelectionHandler).observe(scriptureContent, {
+    attributeFilter: ["data-replacement-token"],
+    attributeOldValue: true,
+    subtree: true,
+  });
+
+  // MutationObserver 2
+  // Options for the observer for keyboard based char edits
+  const charEditObserverConfig = {
     characterData: true,
     characterDataOldValue: true,
     subtree: true,
   };
 
-  // Callback function to execute when mutations are observed
-  const getDirtyState = (mutationList, observer) => {
+  // Handler for setting dirtyState based on edits
+  const setDirtyState = (mutationList, observer) => {
     mutationList.forEach((mutation) => {
-      // Find the closest verse span to get
-      // current chapter and verse number
-      const { book, chapter, verse } =
-        mutation.target.parentElement.closest("span.verse").dataset;
-      if (dirtyState === undefined) {
-        dirtyState = {};
-        dirtyState[book] = { chapters: new Set() };
+      if (mutation.type === "characterData") {
+        // Find the closest verse span to get
+        // current chapter and verse number
+        const { book, chapter, verse } =
+          mutation.target.parentElement.closest("span.verse").dataset;
+        if (dirtyState === undefined) {
+          dirtyState = {};
+          dirtyState[book] = { chapters: new Set() };
+        }
+        dirtyState[book].chapters.add(chapter);
       }
-      dirtyState[book].chapters.add(chapter);
     });
   };
 
   // Create an observer instance
-  const observer = new MutationObserver(getDirtyState);
+  const charEditObserver = new MutationObserver(setDirtyState);
+
+  // Method to save the current state of the scripture on screen
+  // to the backend. Then refresh and re-render suggestions.
+  function updateContent() {
+    const verses = document.getElementsByClassName("verse");
+    [].forEach.call(verses, (verse) => {
+      contentState[verse.dataset.book][verse.dataset.chapter][
+        verse.dataset.verse
+      ] = verse.innerText.trim();
+    });
+
+    // Persist edited data to backend
+    setScriptureContent(contentState);
+
+    // Get updated suggestions
+    getSuggestions(resourceId, dirtyState).then((updatedSuggestions) => {
+      // Merge in the updated
+      // suggestions into current state
+      suggestions = {
+        ...suggestions,
+        ...updatedSuggestions,
+      };
+      // `true` to restore cursor position after highlighting
+      highlightTokens(suggestions, contentState, true);
+
+      // Reset dirtyState
+      dirtyState = undefined;
+    });
+  }
 
   // Apply onclick listener for each of the resource links on the left pane
   const resourceLinks = document.getElementsByClassName("link");
@@ -265,8 +321,9 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((content) => {
           scriptureContent.innerHTML = content;
 
-          // Start observing the content for text edits
-          observer.observe(scriptureContent, observerConfig);
+          // Start observing the content for
+          // text edits to set dirtyState
+          charEditObserver.observe(scriptureContent, charEditObserverConfig);
 
           // Get the suggestions for the text
           return getSuggestions(resourceId);
@@ -276,43 +333,10 @@ document.addEventListener("DOMContentLoaded", () => {
           suggestions = suggestionsData;
           highlightTokens(suggestions, contentState);
 
-          // Apply onblur listeners for writing to backend
-          // scriptureContent.removeEventListener(
-          //   "input",
-          //   debounce(callback(event), 3000)
-          // );
-
           if (!scriptureContent.hasAttribute("inputListener")) {
             scriptureContent.addEventListener(
               "input",
-              debounce((event) => {
-                const verses = document.getElementsByClassName("verse");
-                [].forEach.call(verses, (verse) => {
-                  contentState[verse.dataset.book][verse.dataset.chapter][
-                    verse.dataset.verse
-                  ] = verse.innerText.trim();
-                });
-
-                // Persist edited data to backend
-                setScriptureContent(contentState);
-
-                // Get updated suggestions
-                getSuggestions(resourceId, dirtyState).then(
-                  (updatedSuggestions) => {
-                    // Merge in the updated
-                    // suggestions into current state
-                    suggestions = {
-                      ...suggestions,
-                      ...updatedSuggestions,
-                    };
-                    // `true` to restore cursor position after highlighting
-                    highlightTokens(suggestions, contentState, true);
-
-                    // Reset dirtyState
-                    dirtyState = undefined;
-                  }
-                );
-              }, 3000)
+              debounce(updateContent, 3000)
             );
             scriptureContent.setAttribute("inputListener", "true");
           }

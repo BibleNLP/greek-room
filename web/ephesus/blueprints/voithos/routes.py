@@ -62,12 +62,6 @@ def index():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
     project_listing = get_project_listing(upload_dir)
-    # listing = [
-    #     (entry.name, entry.stat().st_birthtime)
-    #     for entry in upload_dir.iterdir()
-    #     if not entry.name.startswith(".")
-    # ]
-    # listing = [item[0] for item in sorted(listing, reverse=True, key=lambda x: x[1])]
 
     return flask.render_template(
         "voithos/scripture.html",
