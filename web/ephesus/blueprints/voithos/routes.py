@@ -25,7 +25,7 @@ from .core.utils import (
     JSONDataExtractor,
     TSVDataExtractor,
     USFMDataExtractor,
-    parse_input,
+    parse_upload_file,
     update_file_content,
     sanitize_string,
     get_project_listing,
@@ -130,7 +130,7 @@ def upload_file():
             file.save(parsed_filepath)
 
             # Parse uploaded file
-            parse_input(parsed_filepath, resource_id)
+            parse_upload_file(parsed_filepath, resource_id)
 
     return flask.redirect(flask.url_for(".index"))
 
@@ -141,8 +141,8 @@ def get_suggestions(resource_id):
     return (
         get_suggestions_for_resource(
             resource_id,
-            flask.request.args.getlist("filter"),
             flask.request.args.get("langCode"),
+            flask.request.args.getlist("filter"),
         ),
         200,
     )
