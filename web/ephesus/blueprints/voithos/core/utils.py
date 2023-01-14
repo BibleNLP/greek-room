@@ -86,7 +86,7 @@ class TSVDataExtractor(DataExtractor):
                         if idx == 0 or len(line.strip()) == 0:
                             continue
 
-                        book_code, chapter, verse, text = line.split(maxsplit=3)
+                        book_code, chapter, verse, text = line.split(sep="\t")[:4]
                         self.data[book_code][chapter][verse] = text.strip()
 
         except Exception as e:
@@ -223,10 +223,12 @@ class JSONDataExtractor(DataExtractor):
                     yield book, chapter, verse, self.data[book][chapter][verse]
 
 
-def parse_input(filepath, resource_id):
+def parse_upload_file(filepath, resource_id):
     """Parse and store the uploaded input file as JSON"""
     if filepath.suffix.lower() in [".sfm", ".usfm"]:
         parser = USFMDataExtractor(str(filepath))
+    elif filepath.suffix.lower() in [".tsv"]:
+        parser = TSVDataExtractor(str(filepath.parent))
 
     with open(f"{filepath.parent / resource_id}.json", "w") as json_file:
         json.dump(parser.data, json_file)
