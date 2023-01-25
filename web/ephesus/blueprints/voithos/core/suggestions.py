@@ -15,7 +15,7 @@ import flask
 
 # Import from this project
 from web.ephesus.extensions import db
-from web.ephesus.model.voithos import FlaggedTokens, Suggestions
+from web.ephesus.model.voithos import FlaggedTokens
 
 _LOGGER = logging.getLogger(__name__)
 

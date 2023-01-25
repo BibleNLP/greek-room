@@ -18,7 +18,7 @@ class SuggestionType(enum.Enum):
     PREDICTION = 3
 
 
-class UserDecision(enum.Enum):
+class UserDecisionType(enum.Enum):
     """Choices made by the user on suggestions"""
 
     UNDECIDED = 1
@@ -27,7 +27,7 @@ class UserDecision(enum.Enum):
     HIDE = 4
 
 
-class SuggestionSource(enum.Enum):
+class SuggestionSourceType(enum.Enum):
     """The source for the suggestion"""
 
     HUMAN = 1
@@ -41,9 +41,8 @@ class FlaggedTokens(db.Model):
     lang_code = db.Column(db.String(10))
     token = db.Column(db.Text)
     suggestions = db.relationship(
-        "Suggestions",
-        secondary=lambda: association_table,
-        back_populates="flagged_tokens",
+        "TokenSuggestions",
+        back_populates="flagged_token",
     )
 
     def __init__(self, lang_code, token):
@@ -51,43 +50,53 @@ class FlaggedTokens(db.Model):
         self.token = token
 
 
-class Suggestions(db.Model):
-    """Model to hold suggestions for the FlaggedTokens"""
+class Vocabulary(db.Model):
+    """Model to hold valid words/phrases in multiple languages"""
 
     id = db.Column(db.Integer, primary_key=True)
     lang_code = db.Column(db.String(10))
-    suggestion = db.Column(db.Text)
-    suggestion_type = db.Column(Enum(SuggestionType))
-    confidence = db.Column(db.Float)
-    user_decision = db.Column(Enum(UserDecision))
-    suggestion_source = db.Column(Enum(SuggestionSource))
+    entry = db.Column(db.Text)
     flagged_tokens = db.relationship(
-        "FlaggedTokens",
-        secondary=lambda: association_table,
-        back_populates="suggestions",
+        "TokenSuggestions",
+        back_populates="suggestion",
     )
 
-    def __init__(
-        self,
-        lang_code,
-        suggestion,
-        suggestion_type=SuggestionType.SPELLING,
-        confidence=0.0,
-        user_decision=UserDecision.UNDECIDED,
-        suggestion_source=SuggestionSource.AI,
-    ):
+    def __init__(self, lang_code, entry):
         self.lang_code = lang_code
-        self.suggestion = suggestion
-        self.suggestion_type = suggestion_type
-        self.confidence = confidence
-        self.user_decision = user_decision
-        self.suggestion_source = suggestion_source
+        self.entry = entry
 
 
 # Join table for NxN relationship between
-# FlaggedTokens and Suggestions tables
-association_table = db.Table(
-    "token_suggestions_association",
-    db.Column("flagged_tokens_id", db.ForeignKey(FlaggedTokens.id), primary_key=True),
-    db.Column("suggestion_id", db.ForeignKey(Suggestions.id), primary_key=True),
-)
+# FlaggedTokens and Vocabulary tables
+class TokenSuggestions(db.Model):
+    """Model to connect FlaggedTokens with Vocabulary with metadata"""
+
+    flagged_tokens_id = db.Column(
+        db.Integer, db.ForeignKey(FlaggedTokens.id), primary_key=True
+    )
+    vocabulary_id = db.Column(
+        db.Integer, db.ForeignKey(Vocabulary.id), primary_key=True
+    )
+    user_decision_type = db.Column(Enum(UserDecisionType))
+    suggestion_type = db.Column(Enum(SuggestionType))
+    confidence = db.Column(db.Float, default=0.0)
+    suggestion_source_type = db.Column(Enum(SuggestionSourceType))
+
+    flagged_token = db.relationship("FlaggedTokens", back_populates="suggestions")
+    suggestion = db.relationship("Vocabulary", back_populates="flagged_tokens")
+
+    def __init__(
+        self,
+        flagged_token,
+        suggestion,
+        user_decision_type=UserDecisionType.UNDECIDED,
+        suggestion_type=SuggestionType.SPELLING,
+        confidence=0.0,
+        suggestion_source_type=SuggestionSourceType.AI,
+    ):
+        self.flagged_token = flagged_token
+        self.suggestion = suggestion
+        self.user_decision = user_decision_type
+        self.suggestion_type = suggestion_type
+        self.confidence = confidence
+        self.suggestion_source_type = suggestion_source_type
