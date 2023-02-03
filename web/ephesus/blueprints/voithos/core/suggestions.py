@@ -31,18 +31,16 @@ def get_suggestions_for_resource(resource_id, lang_code=None, filters=[]):
         ) as metadata_file:
             lang_code = json.load(metadata_file)["langCode"]
 
-    _LOGGER.debug(f"lang_code used is {lang_code}.")
-
     filters_dict = defaultdict(list)
     for entry in filters:
         bookId, chapterId = entry.split("_")
         filters_dict[bookId].append(chapterId)
-    _LOGGER.info(filters_dict)
     _LOGGER.debug(f"Suggestions filtered by {filters_dict}.")
 
     flagged_tokens = db.session.scalars(
         db.select(FlaggedTokens).where(FlaggedTokens.lang_code == lang_code)
     ).all()
+
     suggestions = {}
     for flagged_token_row in flagged_tokens:
         per_token_suggestions = []
@@ -50,12 +48,12 @@ def get_suggestions_for_resource(resource_id, lang_code=None, filters=[]):
             per_token_suggestions.append(
                 {
                     "suggestionId": suggestions_row.id,
-                    "langCode": suggestions_row.lang_code,
-                    "suggestion": suggestions_row.suggestion,
+                    "langCode": suggestions_row.suggestion.lang_code,
+                    "suggestion": suggestions_row.suggestion.entry,
                     "confidence": suggestions_row.confidence,
                     "suggestion_type": suggestions_row.suggestion_type.name,
-                    "userDecision": suggestions_row.user_decision.name,
-                    "suggestionSource": suggestions_row.suggestion_source.name,
+                    "userDecision": suggestions_row.user_decision_type.name,
+                    "suggestionSource": suggestions_row.suggestion_source_type.name,
                 }
             )
 

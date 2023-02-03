@@ -71,12 +71,9 @@ class Vocabulary(db.Model):
 class TokenSuggestions(db.Model):
     """Model to connect FlaggedTokens with Vocabulary with metadata"""
 
-    flagged_tokens_id = db.Column(
-        db.Integer, db.ForeignKey(FlaggedTokens.id), primary_key=True
-    )
-    vocabulary_id = db.Column(
-        db.Integer, db.ForeignKey(Vocabulary.id), primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
+    flagged_tokens_id = db.Column(db.Integer, db.ForeignKey(FlaggedTokens.id))
+    vocabulary_id = db.Column(db.Integer, db.ForeignKey(Vocabulary.id))
     user_decision_type = db.Column(Enum(UserDecisionType))
     suggestion_type = db.Column(Enum(SuggestionType))
     confidence = db.Column(db.Float, default=0.0)
@@ -96,7 +93,7 @@ class TokenSuggestions(db.Model):
     ):
         self.flagged_token = flagged_token
         self.suggestion = suggestion
-        self.user_decision = user_decision_type
+        self.user_decision_type = user_decision_type
         self.suggestion_type = suggestion_type
         self.confidence = confidence
         self.suggestion_source_type = suggestion_source_type
