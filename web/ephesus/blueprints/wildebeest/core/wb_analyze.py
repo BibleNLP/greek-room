@@ -10,8 +10,7 @@ from pathlib import Path
 
 
 # TODO: Improve import invocation
-wb_analysis = __import__("wildebeest.wb-analysis")
-
+from wildebeest import wb_analysis
 
 _LOGGER = logging.getLogger(__name__)
 
