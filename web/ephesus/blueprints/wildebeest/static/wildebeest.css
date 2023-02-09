@@ -178,10 +178,10 @@ body {
 /* #ingredients ul { */
 /*   margin-bottom: 2em; */
 /* } */
-ul {
+div.listing > ul {
   display: inline;
 }
-ul li {
+div.listing > ul li {
   list-style: none;
   /* margin: 0em 0.5em; */
 }
