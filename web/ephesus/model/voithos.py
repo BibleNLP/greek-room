@@ -1,4 +1,7 @@
-"""Model for the Voithos (word/spell checker) blueprint"""
+"""
+Model for the Voithos (word/spell checker) blueprint
+"""
+
 ## Imports
 # Core python imports
 import enum

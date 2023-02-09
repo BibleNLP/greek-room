@@ -4,11 +4,11 @@
 <a class="button" href="#popup1">&plus;</a>
 
 <div class="listing">
-  {% if project_listing|length == 0 %}
+  {% if projects_listing|length == 0 %}
   <p>No projects found. <br />Create(+) one to get started!</p>
   {% else %}
   <ul>
-    {% for project in project_listing %}
+    {% for project in projects_listing %}
     <li>
       <button
         class="link"

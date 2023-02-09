@@ -21,14 +21,18 @@ import flask
 from werkzeug.utils import secure_filename
 
 # This project
-from .core.utils import (
+from web.ephesus.common.utils import (
+    sanitize_string,
+    get_projects_listing,
+)
+from web.ephesus.common.ingester import (
     JSONDataExtractor,
     TSVDataExtractor,
     USFMDataExtractor,
+)
+from .core.utils import (
     parse_upload_file,
     update_file_content,
-    sanitize_string,
-    get_project_listing,
 )
 from .core.suggestions import get_suggestions_for_resource
 
@@ -61,11 +65,11 @@ API_ROUTE_PREFIX = "api/v1"
 def index():
     """Get the home page for the blueprint"""
     upload_dir = Path(flask.current_app.config["VOITHOS_UPLOAD_DIR"])
-    project_listing = get_project_listing(upload_dir)
+    projects_listing = get_projects_listing(upload_dir)
 
     return flask.render_template(
         "voithos/scripture.html",
-        project_listing=project_listing,
+        projects_listing=projects_listing,
     )
 
 

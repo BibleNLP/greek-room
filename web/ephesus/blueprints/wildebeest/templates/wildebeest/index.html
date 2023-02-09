@@ -1,21 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Wildebeest</title>
-    <link rel = "stylesheet" type="text/css" href = "static/wildebeest.css"/>
-  </head>
-  <body>
-    <h1>Wildebeest Analyzer</h1>
+{% extends "wildebeest/base.html" %} {% block right_content %}
+<div id="analysis-content">Click on a project name to load data.</div>
+{% endblock %} {% block left_content %}
+<a class="button" href="#popup1">&plus;</a>
 
-    <form action = "upload" method = "POST"
-          enctype = "multipart/form-data">
-      <input type = "file" name = "file" />
-      <input type = "submit" value="Upload"/>
-    </form>
-
-    <div id="content" class="center">{% block content %}{% endblock %}</div>
-
-    <script src="static/wildebeest.js"></script>
-  </body>
-</html>
+<div class="listing">
+  {% if projects_listing|length == 0 %}
+  <p>No projects found. <br />Create(+) one to get started!</p>
+  {% else %}
+  <ul>
+    {% for project in projects_listing %}
+    <li>
+      <button
+        class="link"
+        data-url="{{ url_for('.run_analysis', resource_id=project.resource_id) }}"
+        data-resource-id="{{ project.resource_id }}"
+        data-lang-code="{{ project.lang_code }}"
+        name="resourceId"
+      >
+        {{ project.project_name }}
+      </button>
+    </li>
+    <!-- <li class="selected"><a href="#">Item 1</a></li> -->
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endblock %}
