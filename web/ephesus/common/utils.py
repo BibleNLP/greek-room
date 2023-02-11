@@ -18,7 +18,11 @@ def sanitize_string(user_input):
 
 
 def get_projects_listing(base_path):
-    """Get the listing of the projects for use on the UI"""
+    """
+    Get the listing of the projects for use in the UI.
+    This is derived from reading the metadata.json file
+    assumed to be in sub-directories within the `base_path`.
+    """
     ProjectDetails = namedtuple(
         "ProjectDetails", ["resource_id", "project_name", "lang_code", "birth_time"]
     )
@@ -41,3 +45,12 @@ def get_projects_listing(base_path):
         )
 
     return sorted(project_listing, reverse=True, key=lambda x: x.birth_time)
+
+
+def count_file_lines(file_path):
+    """Return the number of lines in `file_path`"""
+    with file_path.open() as f:
+        for count, _ in enumerate(f):
+            pass
+
+        return count + 1

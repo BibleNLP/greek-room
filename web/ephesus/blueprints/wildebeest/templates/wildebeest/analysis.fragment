@@ -49,8 +49,10 @@ Jump to: <a href="#block">character blocks</a>, <a href="#pattern">tokens with p
     <li> {{ block }} characters
       <table>
         {% for block_entry, entry_details in  details.items() %}
-        <tr><td>&nbsp; &nbsp; &nbsp;</td> <td>{{ block_entry }}</td> <td>&nbsp; {{ entry_details['id'] }}</td> <td>&nbsp; {{entry_details['name']}}</td> <td>&nbsp; count: {{ entry_details['count'] }} &nbsp; example: {{ block_entry }} ({% for ex in entry_details['ex'] %} {{ ex[1] }}, {% endfor %})</td></tr>
-        {% endfor %}
+        <tr><td>&nbsp; &nbsp; &nbsp;</td> <td>{{ block_entry }}</td> <td>&nbsp; {{ entry_details['id'] }}</td> <td>&nbsp; {{entry_details['name']}}</td> <td>&nbsp; count: {{ entry_details['count'] }} &nbsp; example: {{ block_entry }}
+{% set comma = joiner(", ") %}
+({% for ex in entry_details['ex'] %}{{ comma() }}{{ ref_id_dict.get(ex[1], ex[1]) }}{% endfor %})</td></tr>
+{% endfor %}
       </table>
    </li>
     {% endfor %}
@@ -60,7 +62,9 @@ Jump to: <a href="#block">character blocks</a>, <a href="#pattern">tokens with p
   <li> {{ pattern }}</li>
   <table>
     {% for pattern_entry, entry_details in  details.items() %}
-    <tr><td>&nbsp; &nbsp; &nbsp;</td> <td>{{ pattern_entry }}</td> <td><nobr>&nbsp; count: {{ entry_details.get('count') }}</nobr></td> <td><nobr>&nbsp; examples: {% for ex in entry_details['ex'] %} {{ ex[0] }} ({{ ex[1] }}), {% endfor %}</nobr></td></tr>
+    <tr><td>&nbsp; &nbsp; &nbsp;</td> <td>{{ pattern_entry }}</td> <td><nobr>&nbsp; count: {{ entry_details.get('count') }}</nobr></td> <td><nobr>&nbsp; examples:
+{% set comma = joiner(", ") %}
+{% for ex in entry_details['ex'] %}{{ comma() }}{{ ex[0] }} ({{ ref_id_dict.get(ex[1], ex[1]) }}){% endfor %}</nobr></td></tr>
     {% endfor %}
   </table>
   {% endfor %}

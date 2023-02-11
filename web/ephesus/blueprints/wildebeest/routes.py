@@ -75,11 +75,13 @@ def run_analysis(resource_id):
         / Path(resource_id)
         / Path(f"{resource_id}.txt")
     )
-    wb_analysis = get_wb_analysis(data_path)
+    wb_analysis, ref_id_dict = get_wb_analysis(data_path)
 
     if flask.request.args.get("formatted") == "true":
         return flask.render_template(
-            "wildebeest/analysis.fragment", wb_analysis_data=wb_analysis
+            "wildebeest/analysis.fragment",
+            wb_analysis_data=wb_analysis,
+            ref_id_dict=ref_id_dict,
         )
 
     return (wb_analysis, 200)
