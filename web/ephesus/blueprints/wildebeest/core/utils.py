@@ -22,6 +22,5 @@ def parse_uploaded_files(filepath, resource_id):
 
     # If the input is .txt, assume it is
     # already in the NLP verse-wise lined format
-    # based on a default .vrs file.
     if filepath.suffix.lower() in [".txt"]:
         filepath.replace(f"{filepath.parent / resource_id}.txt")

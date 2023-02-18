@@ -6,6 +6,7 @@ Common utitities shared across blueprints
 import json
 import string
 import logging
+from datetime import datetime
 from collections import namedtuple
 
 _LOGGER = logging.getLogger(__name__)
@@ -47,10 +48,20 @@ def get_projects_listing(base_path):
     return sorted(project_listing, reverse=True, key=lambda x: x.birth_time)
 
 
-def count_file_lines(file_path):
+def count_file_content_lines(file_path):
     """Return the number of lines in `file_path`"""
     with file_path.open() as f:
-        for count, _ in enumerate(f):
+        for count, line in enumerate(f):
             pass
 
         return count + 1
+
+
+def is_file_modified(file_path, last_modified):
+    """Checks if `file_path` has a newer modified date than `last_modified`"""
+    if not file_path or last_modified:
+        return False
+
+    return datetime.fromtimestamp(file_path.stat().st_mtime) > datetime.fromtimestamp(
+        last_modified
+    )

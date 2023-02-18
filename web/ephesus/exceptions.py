@@ -9,3 +9,7 @@ class AppException(Exception):
 
 class InternalError(AppException):
     """Blueprint specific errors"""
+
+
+class InputError(AppException):
+    """Error while processing input"""

@@ -13,6 +13,7 @@ import time
 import json
 import secrets
 from pathlib import Path
+from datetime import datetime
 
 # 3rd party imports
 import flask
@@ -115,14 +116,19 @@ def upload_file():
             )
             dirpath.mkdir()
 
+            parsed_filepath = dirpath / Path(secure_filename(file.filename))
+            file.save(parsed_filepath)
+
             # Save metadata
             with open(f"{dirpath}/metadata.json", "w") as metadata_file:
                 json.dump(
-                    {"projectName": project_name, "langCode": lang_code}, metadata_file
+                    {
+                        "projectName": project_name,
+                        "langCode": lang_code,
+                        "wbAnalysisLastModified": datetime.now().timestamp(),
+                    },
+                    metadata_file,
                 )
-
-            parsed_filepath = dirpath / Path(secure_filename(file.filename))
-            file.save(parsed_filepath)
 
             # Parse uploaded file
             parse_uploaded_files(parsed_filepath, resource_id)

@@ -20,34 +20,35 @@ import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
 
-from web.ephesus.extensions import db
+from web.ephesus.extensions import db, cache
 
 #
 # Module scoped variables and singletons
 #
 
 _LOGGER = logging.getLogger(__name__)
-# dictConfig(
-#     {
-#         "version": 1,
-#         "formatters": {
-#             "default": {
-#                 "format": "%(asctime)s] %(levelname)s %(name)s %(module)s:%(lineno)d - %(message)s",
-#             }
-#         },
-#         "handlers": {
-#             "wsgi": {
-#                 "level": "DEBUG",
-#                 "class": "logging.StreamHandler",
-#                 "stream": "ext://sys.stdout",
-#                 "formatter": "default",
-#             },
-#         },
-#         "loggers": {"": {"level": "DEBUG", "handlers": ["wsgi"]}},
-#     }
-# )
+dictConfig(
+    {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "default": {
+                "format": "%(asctime)s] %(levelname)s %(name)s %(module)s:%(lineno)d - %(message)s",
+            }
+        },
+        "handlers": {
+            "wsgi": {
+                "level": "DEBUG",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+                "formatter": "default",
+            },
+        },
+        "loggers": {"": {"level": "DEBUG", "handlers": ["wsgi"]}},
+    }
+)
 
-logging.basicConfig(level="DEBUG")
+# logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
     web.ephesus.blueprints.voithos.BP,
@@ -78,6 +79,10 @@ def create_app():
     )
     app.config.from_pyfile("config.cfg")
 
+    # Set logging level
+    # if app.config["FLASK_ENV"] == "development" or app.config["DEBUG"] == "DEBUG":
+    # app.logger.setLevel(logging.DEBUG)
+
     # Register blueprints
     for blueprint in _BLUEPRINTS:
         _LOGGER.debug(
@@ -86,8 +91,11 @@ def create_app():
         app.register_blueprint(blueprint)
 
     ## Register/init extension singletons
-    # initialize the app with the SQLAlchemy extension
+    # Initialize the app with the SQLAlchemy extension
     db.init_app(app)
+
+    # Initialize app cache
+    cache.init_app(app)
 
     # Create tables in DB
     with app.app_context():
