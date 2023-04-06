@@ -76,13 +76,21 @@ def run_analysis(resource_id):
         / Path(resource_id)
         / Path(f"{resource_id}.txt")
     )
-    wb_analysis, ref_id_dict = get_wb_analysis(data_path)
+
+    vref_file_path = (
+        Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"])
+        / Path(resource_id)
+        / "vref.txt"
+    )
+    vref_file_path = vref_file_path if vref_file_path.exists else None
+
+    wb_analysis, vref_dict = get_wb_analysis(data_path, vref_file_path)
 
     if flask.request.args.get("formatted") == "true":
         return flask.render_template(
             "wildebeest/analysis.fragment",
             wb_analysis_data=wb_analysis,
-            ref_id_dict=ref_id_dict,
+            ref_id_dict=vref_dict,
         )
 
     return (wb_analysis, 200)
