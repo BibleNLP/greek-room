@@ -40,9 +40,6 @@ def get_wb_analysis(input_path, vref_file_path=None):
     _LOGGER.debug(count_file_content_lines(vref_file_path))
     _LOGGER.debug(count_file_content_lines(input_path))
 
-    import pdb
-
-    pdb.set_trace()
     if count_file_content_lines(vref_file_path) != count_file_content_lines(input_path):
         vref_dict = {}
         _LOGGER.info(

@@ -50,9 +50,6 @@ def parse_uploaded_files(filepath, resource_id):
             verses.append(verse)
             vrefs.append(str(vref))
 
-        import pdb
-
-        pdb.set_trace()
         # Write full output to a single file
         with (filepath.parent / f"{resource_id}.txt").open("w") as parsed_file:
             parsed_file.write("\n".join(verses))
