@@ -3,6 +3,9 @@
 # from this project
 import web.ephesus.app as ephesus_app
 from web.ephesus.extensions import db
+from web.ephesus.model.user import (
+    User,
+)
 from web.ephesus.model.voithos import (
     FlaggedTokens,
     Vocabulary,
@@ -12,7 +15,7 @@ from web.ephesus.model.voithos import (
     SuggestionSourceType,
 )
 
-seed_data = [
+voithos_seed_data = [
     {
         "flagged_tokens": [{"lang_code": "eng", "token": "confidint"}],
         "vocabulary": [
@@ -45,10 +48,26 @@ seed_data = [
     }
 ]
 
+user_seed_data = {
+    "users": [
+        {
+            "email": "john@example.com",
+            "password": "0b47c69b1033498d5f33f5f7d97bb6a3126134751629f4d0185c115db44c094e",
+            "name": "John Doe",
+        }
+    ]
+}
+
 app = ephesus_app.create_app()
 
 with app.app_context():
-    for item in seed_data:
+    # Seed users
+    for seed_user in user_seed_data["users"]:
+        user = User(**seed_user)
+        db.session.add(user)
+
+    # Seed data for spell checking
+    for item in voithos_seed_data:
         flagged_tokens = []
         vocabulary = []
 
