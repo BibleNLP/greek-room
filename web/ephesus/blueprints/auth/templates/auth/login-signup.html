@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Greek Room</title>
+    <link rel="stylesheet" type="text/css" href="static/auth.css" />
+  </head>
+  <body>
+    <h2 class="center">Greek Room</h2>
+    <br />
+    <br />
+    <div class="forms-container">
+      <div class="login-form">
+        <h3 class="center">Login</h3>
+
+        {% with messages =
+        get_flashed_messages(category_filter=["login-message"]) %} {% if
+        messages %}
+        <div class="flash">
+          {% for message in messages %}
+          <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <form action="login" method="POST">
+          <label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              maxlength="100"
+              required
+              autofocus
+            />
+          </label>
+          <br />
+          <br />
+          <label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              maxlength="100"
+              required
+            />
+          </label>
+          <br />
+          <br />
+          <input type="submit" value="Login" />
+        </form>
+      </div>
+
+      <div class="separator"></div>
+
+      <div class="signup-form">
+        <h3 class="center">Sign up</h3>
+
+        {% with messages =
+        get_flashed_messages(category_filter=["signup-message"]) %} {% if
+        messages %}
+        <div class="flash">
+          {% for message in messages %}
+          <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <form action="signup" method="POST">
+          <label>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              maxlength="100"
+              required
+              autofocus
+            />
+          </label>
+          <br />
+          <br />
+          <label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              maxlength="200"
+              required
+            />
+          </label>
+          <br />
+          <br />
+          <label>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              maxlength="100"
+              required
+            />
+          </label>
+          <br />
+          <br />
+          <input type="submit" value="Sign up" />
+        </form>
+      </div>
+    </div>
+
+    <script src="static/auth.js"></script>
+  </body>
+</html>

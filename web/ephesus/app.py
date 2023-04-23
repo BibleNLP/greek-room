@@ -14,6 +14,7 @@ from logging.config import dictConfig
 import flask
 
 # This project
+import web.ephesus.blueprints.auth
 import web.ephesus.blueprints.voithos
 import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
@@ -51,6 +52,7 @@ dictConfig(
 # logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
+    web.ephesus.blueprints.auth.BP,
     web.ephesus.blueprints.voithos.BP,
     web.ephesus.blueprints.example.BP,
     web.ephesus.blueprints.root.BP,

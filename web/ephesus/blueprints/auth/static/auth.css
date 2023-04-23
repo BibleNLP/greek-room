@@ -1,0 +1,28 @@
+body {
+  font-size: 1.3em;
+}
+.center {
+  text-align: center;
+}
+.forms-container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+.login-form,
+.signup-form {
+  text-align: right;
+}
+.flash {
+  text-align: left;
+  inline-size: 14em;
+  color: #dd4545;
+}
+.separator {
+  background-color: #ccc8c8;
+  width: 2px;
+  height: 15em;
+}
+input {
+  font-size: 1em;
+}
