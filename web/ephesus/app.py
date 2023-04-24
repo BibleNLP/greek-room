@@ -21,7 +21,7 @@ import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
 
-from web.ephesus.extensions import db, cache
+from web.ephesus.extensions import db, cache, login_manager
 
 #
 # Module scoped variables and singletons
@@ -102,6 +102,9 @@ def create_app():
     # Create tables in DB
     with app.app_context():
         db.create_all()
+
+    # Initialize login manager
+    login_manager.init_app(app)
 
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):

@@ -12,7 +12,15 @@ import logging
 
 # 3rd party imports
 import flask
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import (
+    login_user,
+    logout_user,
+    login_required,
+)
+from werkzeug.security import (
+    generate_password_hash,
+    check_password_hash,
+)
 
 # This project
 from web.ephesus.extensions import db
@@ -39,13 +47,36 @@ BP = flask.Blueprint(
 
 
 @BP.route("/")
-@BP.route("/login")
 @BP.route("/signup")
+@BP.route("/login")
 def login():
     """Get the login page"""
     # flask.flash("Email address already exists in the system.", "signup-message")
     # flask.flash("Email address already exists in the system.", "login-message")
     return flask.render_template("auth/login-signup.html")
+
+
+@BP.route("/login", methods=["POST"])
+def login_submit():
+    # Get form values
+    email = flask.request.form.get("email")
+    password = flask.request.form.get("password")
+    is_remember_me = True if flask.request.form.get("remember-me") else False
+
+    # Validate user by comparing password hash against DB
+    user = User.query.filter(db.func.upper(User.email) == db.func.upper(email)).first()
+
+    # Check for login failure
+    if not user or not check_password_hash(user.password, password):
+        flask.flash(
+            f"Invalid username or password. Try again.",
+            "login-message",
+        )
+        return flask.redirect(flask.url_for("auth.login"))
+
+    # Successfully logged-in
+    login_user(user, remember=is_remember_me)
+    return flask.redirect(flask.url_for("wildebeest.get_index"))
 
 
 @BP.route("/signup", methods=["POST"])
@@ -57,7 +88,7 @@ def signup():
     password = flask.request.form.get("password")
 
     # Check if email already exists in database
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter(db.func.upper(User.email) == db.func.upper(email)).first()
 
     # if a user is found, redirect back to signup page
     if user:
@@ -69,10 +100,11 @@ def signup():
 
     # create a new user.
     # Save only password hash
+    # See https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2
     user = User(
         email=email,
         name=name,
-        password=generate_password_hash(password, method="sha256"),
+        password=generate_password_hash(password, method="pbkdf2:sha512:210000"),
     )
 
     # Add the new user to the database
@@ -89,6 +121,8 @@ def signup():
 
 @BP.route("/logout")
 @BP.route("/logout.html")
+@login_required
 def logout():
     """Logout of the application"""
-    return flask.render_template("auth/login-signup.html")
+    logout_user()
+    return flask.redirect(flask.url_for("auth.login"))

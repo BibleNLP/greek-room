@@ -1,7 +1,10 @@
 """Define extensions for Flask app"""
+
+# 3rd Party imports
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_caching import Cache
+from flask_login import LoginManager
 
 # Create SQLAlchemy extension
 db = SQLAlchemy()
@@ -19,3 +22,16 @@ cache_config = {
 }
 
 cache = Cache(config=cache_config)
+
+# Setup app login manager
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
+
+
+from web.ephesus.model.user import User
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    """flask-login user loader"""
+    return User.query.get(int(user_id))
