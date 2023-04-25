@@ -3,6 +3,23 @@ body {
   height: 100%;
 }
 
+.header {
+  display: flex;
+}
+.title {
+  flex: 8;
+  /* align-self: center; */
+  text-align: center;
+}
+.username {
+  font-weight: bold;
+  display: inline-block;
+}
+.logout {
+  flex: 1;
+  text-align: right;
+  display: inline-block;
+}
 .flexbox {
   display: flex;
   width: 100%;

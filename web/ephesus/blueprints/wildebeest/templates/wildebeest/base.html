@@ -6,7 +6,16 @@
     <link rel="stylesheet" type="text/css" href="static/wildebeest.css" />
   </head>
   <body spellcheck="false">
-    <h1 class="center">Wildebeest</h1>
+    <div class="header">
+      <div class="title">
+        <h1>Wildebeest</h1>
+      </div>
+      <div class="logout">
+        {% if current_user.is_authenticated %}
+        <p class="username">{{ current_user.name }}</p>
+        | {% endif %}<a href="{{ url_for('auth.logout') }}">Logout</a>
+      </div>
+    </div>
 
     <div id="popup1" class="overlay">
       <div class="popup">

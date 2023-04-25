@@ -17,6 +17,7 @@ from datetime import datetime
 
 # 3rd party imports
 import flask
+from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 # This project
@@ -56,6 +57,7 @@ API_ROUTE_PREFIX = "api/v1"
 
 @BP.route("/")
 @BP.route("/index")
+@login_required
 def get_index():
     """Get the root index for the blueprint"""
     upload_dir = Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"])
