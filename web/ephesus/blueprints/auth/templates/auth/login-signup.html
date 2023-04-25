@@ -14,11 +14,19 @@
         <h3 class="center">Login</h3>
 
         {% with messages =
-        get_flashed_messages(category_filter=["login-message"]) %} {% if
+        get_flashed_messages(category_filter=["login-message-success"]) %} {% if
         messages %}
         <div class="flash">
           {% for message in messages %}
-          <p>{{ message }}</p>
+          <p class="success">{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %} {% with messages =
+        get_flashed_messages(category_filter=["login-message-fail"]) %} {% if
+        messages %}
+        <div class="flash">
+          {% for message in messages %}
+          <p class="fail">{{ message }}</p>
           {% endfor %}
         </div>
         {% endif %} {% endwith %}
@@ -63,11 +71,19 @@
         <h3 class="center">Sign up</h3>
 
         {% with messages =
-        get_flashed_messages(category_filter=["signup-message"]) %} {% if
+        get_flashed_messages(category_filter=["signup-message-success"]) %} {%
+        if messages %}
+        <div class="flash">
+          {% for message in messages %}
+          <p class="success">{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %} {% with messages =
+        get_flashed_messages(category_filter=["signup-message-fail"]) %} {% if
         messages %}
         <div class="flash">
           {% for message in messages %}
-          <p>{{ message }}</p>
+          <p class="fail">{{ message }}</p>
           {% endfor %}
         </div>
         {% endif %} {% endwith %}

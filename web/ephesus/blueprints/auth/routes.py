@@ -23,7 +23,7 @@ from werkzeug.security import (
 )
 
 # This project
-from web.ephesus.extensions import db
+from web.ephesus.extensions import db, email as email_handler
 from web.ephesus.model.user import User
 
 #
@@ -51,8 +51,8 @@ BP = flask.Blueprint(
 @BP.route("/login")
 def login():
     """Get the login page"""
-    # flask.flash("Email address already exists in the system.", "signup-message")
-    # flask.flash("Email address already exists in the system.", "login-message")
+    # flask.flash("Email address already exists in the system.", "signup-message-fail")
+    # flask.flash("Email address already exists in the system.", "login-message-success")
     return flask.render_template("auth/login-signup.html")
 
 
@@ -70,7 +70,22 @@ def login_submit():
     if not user or not check_password_hash(user.password, password):
         flask.flash(
             f"Invalid username or password. Try again.",
-            "login-message",
+            "login-message-fail",
+        )
+        return flask.redirect(flask.url_for("auth.login"))
+
+    # Check if user has their email address verified
+    if user and not user.is_email_verified:
+        flask.flash(
+            f"Please verify your email address before attempting to login. We sent a message to '{user.email}' (look in the spam folder, in case you do not see it).",
+            "login-message-fail",
+        )
+        # Send verification email
+        email_handler.send(
+            subject="Greek Room: Verify your email",
+            receivers=email,
+            html_template="auth/verify-email.html",
+            body_params={"token": user.get_email_verification_token()},
         )
         return flask.redirect(flask.url_for("auth.login"))
 
@@ -93,8 +108,8 @@ def signup():
     # if a user is found, redirect back to signup page
     if user:
         flask.flash(
-            f"The user {email} already exists in the system. Try logging in or reset password.",
-            "signup-message",
+            f"{email} already exists in the system. Try logging in or reset password.",
+            "signup-message-fail",
         )
         return flask.redirect(flask.url_for("auth.signup"))
 
@@ -111,10 +126,18 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
+    # Send verification email
+    email_handler.send(
+        subject="Greek Room: Verify your email",
+        receivers=email,
+        html_template="auth/verify-email.html",
+        body_params={"token": user.get_email_verification_token()},
+    )
+
     # Go to login pgae
     flask.flash(
-        f"Successfully created new user.",
-        "signup-message",
+        f"Successfully created new user. Please verify your email address before attempting to login.",
+        "signup-message-success",
     )
     return flask.redirect(flask.url_for("auth.login"))
 
@@ -126,3 +149,27 @@ def logout():
     """Logout of the application"""
     logout_user()
     return flask.redirect(flask.url_for("auth.login"))
+
+
+@BP.route("/verify-email/<token>")
+def verify_email(token):
+    """Verify token for newly signed-up users"""
+    email = User.verify_email_token(token)
+    if email:
+        user = User.query.filter(
+            db.func.upper(User.email) == db.func.upper(email)
+        ).first()
+        user.is_email_verified = True
+        db.session.add(user)
+        db.session.commit()
+        flask.flash(
+            f"Your email has been verified and you can now login to your account.",
+            "login-message-success",
+        )
+        return flask.redirect(flask.url_for("auth.login"))
+
+    flask.flash(
+        f"Invalid or expired registration token. Try logging-in again to receive another verification email.",
+        "login-message-fail",
+    )
+    return flask.redirect(url_for("auth.login"))

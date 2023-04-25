@@ -15,9 +15,16 @@ body {
 }
 .flash {
   text-align: left;
-  inline-size: 14em;
+  inline-size: 16em;
+  font-size: 0.85em;
+}
+.flash > .success {
+  color: #1c731c;
+}
+.flash > .fail {
   color: #dd4545;
 }
+
 .separator {
   background-color: #ccc8c8;
   width: 2px;

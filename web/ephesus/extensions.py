@@ -4,13 +4,14 @@
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_caching import Cache
+from flask_redmail import RedMail
 from flask_login import LoginManager
 
-# Create SQLAlchemy extension
+## Create SQLAlchemy extension
 db = SQLAlchemy()
 
 
-# Creates and returns a cache
+## Creates and returns a cache
 # instance using `cache_config`
 # Create and initialize the app with the caching extension
 cache_config = {
@@ -23,7 +24,10 @@ cache_config = {
 
 cache = Cache(config=cache_config)
 
-# Setup app login manager
+## Create Email extension
+email = RedMail()
+
+## Setup app login manager
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
 
