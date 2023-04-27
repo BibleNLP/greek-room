@@ -34,9 +34,9 @@
         <form action="login" method="POST">
           <label>
             <input
-              type="email"
-              name="email"
-              placeholder="Email address"
+              type="text"
+              name="loginId"
+              placeholder="Username or Email*"
               maxlength="100"
               required
               autofocus
@@ -48,7 +48,7 @@
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Password*"
               maxlength="100"
               required
             />
@@ -93,7 +93,7 @@
             <input
               type="email"
               name="email"
-              placeholder="Email address"
+              placeholder="Email*"
               maxlength="100"
               required
             />
@@ -103,9 +103,10 @@
           <label>
             <input
               type="text"
-              name="name"
-              placeholder="Name"
-              maxlength="200"
+              name="username"
+              placeholder="Username*"
+              pattern="[a-z0-9]{3,50}"
+              oninvalid="this.setCustomValidity('Only lowercase letters and numbers allowed without spaces. Between 3 and 50 characters long.')"
               required
             />
           </label>
@@ -115,7 +116,8 @@
             <input
               type="password"
               name="password"
-              placeholder="Password"
+              placeholder="Password*"
+              minlength="8"
               maxlength="100"
               required
             />
