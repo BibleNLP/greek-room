@@ -20,7 +20,10 @@ import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
-
+from web.ephesus.exceptions import (
+    AppException,
+    internal_server_error,
+)
 from web.ephesus.extensions import (
     db,
     cache,
@@ -89,6 +92,8 @@ def create_app():
     # Set logging level
     # if app.config["FLASK_ENV"] == "development" or app.config["DEBUG"] == "DEBUG":
     # app.logger.setLevel(logging.DEBUG)
+
+    app.register_error_handler(AppException, internal_server_error)
 
     # Register blueprints
     for blueprint in _BLUEPRINTS:
