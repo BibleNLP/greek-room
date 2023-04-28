@@ -107,6 +107,7 @@
               placeholder="Username*"
               pattern="[a-z0-9]{3,50}"
               oninvalid="this.setCustomValidity('Only lowercase letters and numbers allowed without spaces. Between 3 and 50 characters long.')"
+              oninput="this.setCustomValidity('')"
               required
             />
           </label>

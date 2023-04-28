@@ -12,7 +12,7 @@
       </div>
       <div class="logout">
         {% if current_user.is_authenticated %}
-        <p class="username">{{ current_user.name }}</p>
+        <p class="username">{{ current_user.username }}</p>
         | {% endif %}<a href="{{ url_for('auth.logout') }}">Logout</a>
       </div>
     </div>

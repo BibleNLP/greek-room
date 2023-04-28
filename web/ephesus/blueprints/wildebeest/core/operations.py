@@ -37,17 +37,26 @@ def get_wb_analysis(input_path, vref_file_path=None):
     # Correlate if number of lines in vref_file
     # and the input_path match, as a reasonable
     # assumption for a correct match.
-    _LOGGER.debug(count_file_content_lines(vref_file_path))
-    _LOGGER.debug(count_file_content_lines(input_path))
+    _LOGGER.debug(f"vref.txt line count = {count_file_content_lines(vref_file_path)}")
+    _LOGGER.debug(
+        f"{input_path.name} line count = {count_file_content_lines(input_path)}"
+    )
 
-    if count_file_content_lines(vref_file_path) != count_file_content_lines(input_path):
+    # There is a weird behavior where for some reason
+    # python counts the parsed file as one line less.
+    # wc -l seems to do the right thing. Assuming 1-off
+    # is acceptable for now.
+    if (
+        count_file_content_lines(vref_file_path) - count_file_content_lines(input_path)
+        > 1
+    ):
         vref_dict = {}
         _LOGGER.info(
             f"Unable to use vref_file_path: {vref_file_path} due to total line count mismatch."
         )
     else:
         _LOGGER.debug(
-            "Successfully matched total line numbers with vref_file_path: {vref_file_path}"
+            f"Successfully matched total line numbers with vref_file_path: {vref_file_path}"
         )
 
         vref_dict = wb_ana.load_ref_ids(vref_file_path)

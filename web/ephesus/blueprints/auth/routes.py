@@ -65,9 +65,8 @@ def login_submit():
 
     # Check login_id against usernames
     user = User.query.filter(
-        db.func.upper(User.email)
-        == db.func.upper(login_id) | db.func.upper(User.username)
-        == db.func.upper(login_id)
+        (db.func.upper(User.email) == db.func.upper(login_id))
+        | (db.func.upper(User.username) == db.func.upper(login_id))
     ).first()
 
     # Check for login failure
@@ -81,7 +80,7 @@ def login_submit():
     # Check if user has their email address verified
     if user and not user.is_email_verified:
         flask.flash(
-            f"Please verify your email address before attempting to login. We sent a message to '{user.email}' (look in the spam folder, in case you do not see it).",
+            f"Please verify your email address before attempting to login. We sent a message to '{user.email}' (check spam folder too).",
             "login-message-fail",
         )
         # Send verification email
@@ -103,7 +102,7 @@ def signup():
     """Register new user"""
     # Validate and add user to database
     email = flask.request.form.get("email")
-    username = flask.request.form.get("username")
+    username = flask.request.form.get("username").lower()
     password = flask.request.form.get("password")
 
     # Check if email already exists in database
@@ -167,7 +166,7 @@ def verify_email(token):
         db.session.add(user)
         db.session.commit()
         flask.flash(
-            f"Your email has been verified and you can now login to your account.",
+            f"Thank you for verifying your email! Please login to continue.",
             "login-message-success",
         )
         return flask.redirect(flask.url_for("auth.login"))
@@ -183,6 +182,6 @@ def verify_email(token):
 def is_username_exists(username):
     """Return boolean based on existence of username in Database"""
     user = User.query.filter(
-        db.func.upper(User.username) == db.func.upper(username)
+        db.func.lower(User.username) == db.func.lower(username)
     ).first()
     return flask.jsonify({"username": username, "exists": True if user else False})
