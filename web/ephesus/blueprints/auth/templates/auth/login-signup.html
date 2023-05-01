@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <title>Greek Room</title>
-    <link rel="stylesheet" type="text/css" href="static/auth.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('auth.static', filename='auth.css') }}"
+    />
   </head>
   <body>
     <h2 class="center">Greek Room</h2>
@@ -55,7 +59,7 @@
           </label>
           <br />
           <br />
-          <label>
+          <label class="remember-me">
             <input type="checkbox" name="remember-me" />
             Remember me
           </label>
@@ -63,6 +67,23 @@
           <br />
           <input type="submit" value="Login" />
         </form>
+        <br />
+        <hr />
+        <details>
+          <summary>Reset password?</summary>
+          <form action="request-reset-password" method="POST">
+            <label>
+              <input
+                type="text"
+                name="reset-password-loginId"
+                placeholder="Username or Email*"
+                maxlength="100"
+                required
+              />
+            </label>
+            <input type="submit" value="Reset" />
+          </form>
+        </details>
       </div>
 
       <div class="separator"></div>
@@ -130,6 +151,6 @@
       </div>
     </div>
 
-    <script src="static/auth.js"></script>
+    <script src="{{ url_for('auth.static', filename='auth.js') }}"></script>
   </body>
 </html>

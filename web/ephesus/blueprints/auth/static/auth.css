@@ -10,7 +10,8 @@ body {
   align-items: flex-start;
 }
 .login-form,
-.signup-form {
+.signup-form,
+.reset-password-form {
   text-align: right;
 }
 .flash {
@@ -33,4 +34,23 @@ body {
 }
 input {
   font-size: 1em;
+}
+details > summary {
+  cursor: pointer;
+  list-style: none;
+  color: blue;
+  text-decoration: underline;
+  padding-bottom: 0.4em;
+}
+details {
+  text-align: left;
+  font-size: 0.7em;
+}
+.remember-me {
+  font-size: 0.8em;
+}
+hr {
+  background-color: #ccc8c8;
+  border: none;
+  height: 2px;
 }

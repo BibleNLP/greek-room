@@ -23,6 +23,10 @@ from werkzeug.security import (
 )
 
 # This project
+from web.ephesus.blueprints.auth.utils import (
+    is_valid_username,
+    is_valid_password,
+)
 from web.ephesus.extensions import db, email as email_handler, cache
 from web.ephesus.model.user import User
 
@@ -80,7 +84,7 @@ def login_submit():
     # Check if user has their email address verified
     if user and not user.is_email_verified:
         flask.flash(
-            f"Please verify your email address before attempting to login. We sent a message to '{user.email}' (check spam folder too).",
+            f"Please verify your email address before attempting to login. We sent a message to the email on file with a link (check spam folder too).",
             "login-message-fail",
         )
         # Send verification email
@@ -105,13 +109,21 @@ def signup():
     username = flask.request.form.get("username").lower()
     password = flask.request.form.get("password")
 
+    # Basic validation
+    if not is_valid_username(username) or not is_valid_password(password):
+        flask.flash(
+            f"Invalid username or password. Please try again.",
+            "signup-message-fail",
+        )
+        return flask.redirect(flask.url_for("auth.signup"))
+
     # Check if email already exists in database
     user = User.query.filter(db.func.upper(User.email) == db.func.upper(email)).first()
 
     # if a user is found, redirect back to signup page
     if user:
         flask.flash(
-            f"{email} already exists in the system. Try logging in or reset password.",
+            f"This user already exists in the system. Try logging in or reset password.",
             "signup-message-fail",
         )
         return flask.redirect(flask.url_for("auth.signup"))
@@ -154,10 +166,121 @@ def logout():
     return flask.redirect(flask.url_for("auth.login"))
 
 
+@BP.route("/request-reset-password", methods=["POST"])
+def request_reset_password():
+    """Email link for reset password"""
+    if flask.request.method == "POST":
+        login_id = flask.request.form.get("reset-password-loginId")
+        # Check login_id against usernames
+        user = User.query.filter(
+            (db.func.upper(User.email) == db.func.upper(login_id))
+            | (db.func.upper(User.username) == db.func.upper(login_id))
+        ).first()
+
+        if not user:
+            flask.flash(
+                f"We were not able to find this user. Please enter an existing username or email address to reset password.",
+                "login-message-fail",
+            )
+            return flask.redirect(flask.url_for("auth.login"))
+
+        if user:
+            # Send verification email
+            email_handler.send(
+                subject="Greek Room: Reset Password",
+                receivers=user.email,
+                html_template="auth/reset-password-email.html",
+                body_params={"token": user.get_reset_password_token()},
+            )
+            flask.flash(
+                f"We have sent a message to the email address on file with a link with which you can reset your password (check spam folder too).",
+                "login-message-success",
+            )
+            return flask.redirect(flask.url_for("auth.login"))
+
+
+@BP.route("/reset-password", methods=["GET", "POST"])
+def reset_password():
+    """Handle reset password"""
+    if flask.request.method == "GET":
+        token = flask.request.args.get("token")
+
+        # Invalid/expired token
+        email = User.decrypt_email_token(token, salt="reset-password")
+        if not email:
+            flask.flash(
+                f"Invalid or expired link. Please try password reset again.",
+                "login-message-fail",
+            )
+            return flask.redirect(flask.url_for("auth.login"))
+
+        return flask.render_template(
+            "auth/reset-password.html", token=token if token else ""
+        )
+
+    if flask.request.method == "POST":
+        token = flask.request.form.get("token")
+        password = flask.request.form.get("password")
+        email = User.decrypt_email_token(token, salt="reset-password")
+
+        # Invalid/expired token
+        if not email:
+            flask.flash(
+                f"Invalid or expired link. Please try password reset again.",
+                "login-message-fail",
+            )
+            return flask.redirect(flask.url_for("auth.login"))
+
+        # Basic validation
+        if not is_valid_password(password):
+            flask.flash(
+                f"Invalid password. Please try again.",
+                "reset-password-message-fail",
+            )
+            return flask.redirect(flask.url_for("auth.reset_password", token=token))
+
+        # If valid token and corresponding user
+        if email:
+            user = User.query.filter(
+                db.func.upper(User.email) == db.func.upper(email)
+            ).first()
+            _LOGGER.debug(user)
+
+            # If user is not verified, do that first
+            if not user.is_email_verified:
+                # Send verification email
+                email_handler.send(
+                    subject="Greek Room: Verify your email",
+                    receivers=email,
+                    html_template="auth/verify-email.html",
+                    body_params={"token": user.get_email_verification_token()},
+                )
+                flask.flash(
+                    f"Please verify your account first. We just sent a message to '{user.email}' (check spam folder too).",
+                    "reset-password-message-fail",
+                )
+                return flask.redirect(flask.url_for("auth.reset_password"))
+
+            # User is verified and exists
+            # update password hash in DB
+            user.password = generate_password_hash(
+                password, method="pbkdf2:sha512:210000"
+            )
+            db.session.commit()
+
+            flask.flash(
+                f"Successfully reset password for {user.username}. Login to continue.",
+                "login-message-success",
+            )
+            return flask.redirect(flask.url_for("auth.login"))
+
+        return flask.redirect(flask.url_for("auth.reset_password", token=token))
+
+
 @BP.route("/verify-email/<token>")
 def verify_email(token):
     """Verify token for newly signed-up users"""
-    email = User.verify_email_token(token)
+    email = User.decrypt_email_token(token, salt="email-verification")
     if email:
         user = User.query.filter(
             db.func.upper(User.email) == db.func.upper(email)
