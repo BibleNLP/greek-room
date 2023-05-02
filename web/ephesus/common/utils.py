@@ -9,6 +9,11 @@ import logging
 from datetime import datetime
 from collections import namedtuple
 
+# This project
+from web.ephesus.exceptions import (
+    ProjectError,
+)
+
 _LOGGER = logging.getLogger(__name__)
 
 
@@ -32,18 +37,25 @@ def get_projects_listing(base_path):
         if resource.name.startswith("."):
             continue
 
-        # Read metadata.json
-        with (resource / "metadata.json").open() as metadata_file:
-            metadata = json.load(metadata_file)
+        try:
+            # Read metadata.json
+            with (resource / "metadata.json").open() as metadata_file:
+                metadata = json.load(metadata_file)
 
-        project_listing.append(
-            ProjectDetails(
-                resource.name,
-                metadata["projectName"],
-                metadata["langCode"],
-                resource.stat().st_birthtime,
+            project_listing.append(
+                ProjectDetails(
+                    resource.name,
+                    metadata["projectName"],
+                    metadata["langCode"],
+                    resource.stat().st_birthtime,
+                )
             )
-        )
+        except FileNotFoundError as e:
+            _LOGGER.error(
+                f"Unable to find metadata.json but ignoring this for now.",
+                exc_info=True,
+            )
+            pass
 
     return sorted(project_listing, reverse=True, key=lambda x: x.birth_time)
 

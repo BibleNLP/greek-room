@@ -1,13 +1,17 @@
 """Define extensions for Flask app"""
+
+# 3rd Party imports
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_caching import Cache
+from flask_redmail import RedMail
+from flask_login import LoginManager
 
-# Create SQLAlchemy extension
+## Create SQLAlchemy extension
 db = SQLAlchemy()
 
 
-# Creates and returns a cache
+## Creates and returns a cache
 # instance using `cache_config`
 # Create and initialize the app with the caching extension
 cache_config = {
@@ -19,3 +23,19 @@ cache_config = {
 }
 
 cache = Cache(config=cache_config)
+
+## Create Email extension
+email = RedMail()
+
+## Setup app login manager
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
+
+
+from web.ephesus.model.user import User
+
+
+@login_manager.user_loader
+def user_loader(user_id):
+    """flask-login user loader"""
+    return User.query.get(int(user_id))

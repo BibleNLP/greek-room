@@ -1,0 +1,56 @@
+body {
+  font-size: 1.3em;
+}
+.center {
+  text-align: center;
+}
+.forms-container {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+}
+.login-form,
+.signup-form,
+.reset-password-form {
+  text-align: right;
+}
+.flash {
+  text-align: left;
+  inline-size: 16em;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+.flash > .success {
+  color: #1c731c;
+}
+.flash > .fail {
+  color: #dd4545;
+}
+
+.separator {
+  background-color: #ccc8c8;
+  width: 2px;
+  height: 15em;
+}
+input {
+  font-size: 1em;
+}
+details > summary {
+  cursor: pointer;
+  list-style: none;
+  color: blue;
+  text-decoration: underline;
+  padding-bottom: 0.4em;
+}
+details {
+  text-align: left;
+  font-size: 0.7em;
+}
+.remember-me {
+  font-size: 0.8em;
+}
+hr {
+  background-color: #ccc8c8;
+  border: none;
+  height: 2px;
+}

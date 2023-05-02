@@ -17,6 +17,7 @@ from datetime import datetime
 
 # 3rd party imports
 import flask
+from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 # This project
@@ -56,10 +57,16 @@ API_ROUTE_PREFIX = "api/v1"
 
 @BP.route("/")
 @BP.route("/index")
+@login_required
 def get_index():
     """Get the root index for the blueprint"""
-    upload_dir = Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"])
-    projects_listing = get_projects_listing(upload_dir)
+    user_path = Path(flask.current_app.config["USERS_PATH"]) / current_user.username
+
+    # First time login
+    if not user_path.exists():
+        user_path.mkdir(parents=True)
+
+    projects_listing = get_projects_listing(user_path)
 
     return flask.render_template(
         "wildebeest/index.html",
@@ -69,22 +76,25 @@ def get_index():
 
 
 @BP.route(f"{API_ROUTE_PREFIX}/analyze/<resource_id>")
+@login_required
 def run_analysis(resource_id):
     """Get the Wildebeest anlysis results"""
-    data_path = (
-        Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"])
-        / Path(resource_id)
-        / Path(f"{resource_id}.txt")
+    resource_path = (
+        Path(flask.current_app.config["USERS_PATH"])
+        / current_user.username
+        / resource_id
+        / f"{resource_id}.txt"
     )
 
     vref_file_path = (
-        Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"])
-        / Path(resource_id)
+        Path(flask.current_app.config["USERS_PATH"])
+        / current_user.username
+        / resource_id
         / "vref.txt"
     )
     vref_file_path = vref_file_path if vref_file_path.exists else None
 
-    wb_analysis, vref_dict = get_wb_analysis(data_path, vref_file_path)
+    wb_analysis, vref_dict = get_wb_analysis(resource_path, vref_file_path)
 
     if flask.request.args.get("formatted") == "true":
         return flask.render_template(
@@ -97,6 +107,7 @@ def run_analysis(resource_id):
 
 
 @BP.route("/upload", methods=["POST"])
+@login_required
 def upload_file():
     if flask.request.method == "POST":
 
@@ -119,16 +130,20 @@ def upload_file():
             # Save file in a new randomly named dir
             resource_id = secrets.token_urlsafe(6)
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
-            dirpath = Path(flask.current_app.config["WILDEBEEST_UPLOAD_DIR"]) / Path(
-                resource_id
+            project_path = (
+                Path(flask.current_app.config["USERS_PATH"])
+                / current_user.username
+                / resource_id
             )
-            dirpath.mkdir()
+            # Create the project directory
+            # including any missing parents
+            project_path.mkdir(parents=True)
 
-            parsed_filepath = dirpath / Path(secure_filename(file.filename))
+            parsed_filepath = project_path / Path(secure_filename(file.filename))
             file.save(parsed_filepath)
 
             # Save metadata
-            with open(f"{dirpath}/metadata.json", "w") as metadata_file:
+            with open(f"{project_path}/metadata.json", "w") as metadata_file:
                 json.dump(
                     {
                         "projectName": project_name,

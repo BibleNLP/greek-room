@@ -14,13 +14,22 @@ from logging.config import dictConfig
 import flask
 
 # This project
+import web.ephesus.blueprints.auth
 import web.ephesus.blueprints.voithos
 import web.ephesus.blueprints.example
 import web.ephesus.blueprints.root
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
-
-from web.ephesus.extensions import db, cache
+from web.ephesus.exceptions import (
+    AppException,
+    internal_server_error,
+)
+from web.ephesus.extensions import (
+    db,
+    cache,
+    email,
+    login_manager,
+)
 
 #
 # Module scoped variables and singletons
@@ -51,6 +60,7 @@ dictConfig(
 # logging.basicConfig(level="DEBUG")
 
 _BLUEPRINTS = [
+    web.ephesus.blueprints.auth.BP,
     web.ephesus.blueprints.voithos.BP,
     web.ephesus.blueprints.example.BP,
     web.ephesus.blueprints.root.BP,
@@ -83,6 +93,8 @@ def create_app():
     # if app.config["FLASK_ENV"] == "development" or app.config["DEBUG"] == "DEBUG":
     # app.logger.setLevel(logging.DEBUG)
 
+    app.register_error_handler(AppException, internal_server_error)
+
     # Register blueprints
     for blueprint in _BLUEPRINTS:
         _LOGGER.debug(
@@ -100,6 +112,12 @@ def create_app():
     # Create tables in DB
     with app.app_context():
         db.create_all()
+
+    # Initialize email extension
+    email.init_app(app)
+
+    # Initialize login manager
+    login_manager.init_app(app)
 
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):
