@@ -47,7 +47,7 @@ def get_projects_listing(base_path):
                     resource.name,
                     metadata["projectName"],
                     metadata["langCode"],
-                    resource.stat().st_birthtime,
+                    resource.stat().st_ctime,
                 )
             )
         except FileNotFoundError as e:
