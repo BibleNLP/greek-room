@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
     creation_date = db.Column(db.DateTime, default=datetime.utcnow)
     is_email_verified = db.Column(db.Boolean(), default=False)
     status = db.Column(Enum(StatusType), default=StatusType.ACTIVE.name)
-    roles = db.Column(db.JSON, default='["public"]')
+    roles = db.Column(db.JSON, default=["public"])
 
     def get_email_verification_token(self):
         serializer = URLSafeTimedSerializer(
