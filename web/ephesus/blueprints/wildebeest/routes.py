@@ -88,17 +88,13 @@ def get_index():
 def run_analysis(resource_id):
     """Get the Wildebeest anlysis results"""
     resource_path = (
-        Path(flask.current_app.config["USERS_PATH"])
-        / current_user.username
+        Path(flask.current_app.config["PROJECTS_PATH"])
         / resource_id
         / f"{resource_id}.txt"
     )
 
     vref_file_path = (
-        Path(flask.current_app.config["USERS_PATH"])
-        / current_user.username
-        / resource_id
-        / "vref.txt"
+        Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id / "vref.txt"
     )
     vref_file_path = vref_file_path if vref_file_path.exists else None
 
