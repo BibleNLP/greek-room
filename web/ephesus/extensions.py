@@ -10,6 +10,12 @@ from flask_login import LoginManager
 ## Create SQLAlchemy extension
 db = SQLAlchemy()
 
+# Sqlite extension loader
+def load_sqlite_extension(db_conn, unused, ext_path=""):
+    db_conn.enable_load_extension(True)
+    db_conn.load_extension(ext_path)
+    db_conn.enable_load_extension(False)
+
 
 ## Creates and returns a cache
 # instance using `cache_config`

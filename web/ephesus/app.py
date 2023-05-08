@@ -8,9 +8,11 @@ Factory for Flask application
 # Core python imports
 import inspect
 import logging
+from functools import partial
 from logging.config import dictConfig
 
 # 3rd party imports
+from sqlalchemy.event import listen
 import flask
 
 # This project
@@ -29,6 +31,7 @@ from web.ephesus.extensions import (
     cache,
     email,
     login_manager,
+    load_sqlite_extension,
 )
 
 #
@@ -105,6 +108,14 @@ def create_app():
     ## Register/init extension singletons
     # Initialize the app with the SQLAlchemy extension
     db.init_app(app)
+
+    # Load Sqlite JSON1 extension
+    load_sqlite_json1_extension = partial(
+        load_sqlite_extension, ext_path=app.config["SQLITE_JSON1_EXT_PATH"]
+    )
+
+    with app.app_context():
+        listen(db.engine, "connect", load_sqlite_json1_extension)
 
     # Initialize app cache
     cache.init_app(app)

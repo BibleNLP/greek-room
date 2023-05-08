@@ -10,6 +10,9 @@ from datetime import datetime
 from collections import namedtuple
 
 # This project
+from web.ephesus.constants import (
+    ProjectTypes,
+)
 from web.ephesus.exceptions import (
     ProjectError,
 )
@@ -23,7 +26,9 @@ def sanitize_string(user_input):
     return "".join([letter for letter in user_input][:15])
 
 
-def get_projects_listing(base_path):
+def get_projects_listing(
+    username, base_path, roles=[], project_type=ProjectTypes.PROJ_WILDEBEEST
+):
     """
     Get the listing of the projects for use in the UI.
     This is derived from reading the metadata.json file
@@ -33,6 +38,8 @@ def get_projects_listing(base_path):
         "ProjectDetails", ["resource_id", "project_name", "lang_code", "birth_time"]
     )
     project_listing = []
+    # Set ops are more elegant than array ops
+    roles = set(roles)
     for resource in base_path.iterdir():
         if resource.name.startswith("."):
             continue
@@ -42,14 +49,18 @@ def get_projects_listing(base_path):
             with (resource / "metadata.json").open() as metadata_file:
                 metadata = json.load(metadata_file)
 
-            project_listing.append(
-                ProjectDetails(
-                    resource.name,
-                    metadata["projectName"],
-                    metadata["langCode"],
-                    resource.stat().st_ctime,
+            if (
+                username == metadata.get("owner", None)
+                or len(roles.intersection(metadata.get("tags", []))) > 0
+            ):
+                project_listing.append(
+                    ProjectDetails(
+                        resource.name,
+                        metadata["projectName"],
+                        metadata["langCode"],
+                        resource.stat().st_ctime,
+                    )
                 )
-            )
         except FileNotFoundError as e:
             _LOGGER.error(
                 f"Unable to find metadata.json but ignoring this for now.",
