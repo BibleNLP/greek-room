@@ -7,6 +7,7 @@ Factory for Flask application
 
 # Core python imports
 import inspect
+import json
 import logging
 from functools import partial
 from logging.config import dictConfig
@@ -129,6 +130,10 @@ def create_app():
 
     # Initialize login manager
     login_manager.init_app(app)
+
+    # Load in app ACL policy
+    with open(app.config["GREEK_ROOM_ACL_PATH"], "rb") as acl_file:
+        app.config["acl"] = json.load(acl_file)
 
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):

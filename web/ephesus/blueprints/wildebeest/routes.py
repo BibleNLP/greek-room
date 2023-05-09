@@ -24,6 +24,9 @@ from werkzeug.utils import secure_filename
 from web.ephesus.constants import (
     ProjectTypes,
 )
+from web.ephesus.blueprints.auth.utils import (
+    is_project_op_permitted,
+)
 from web.ephesus.common.utils import (
     sanitize_string,
     get_projects_listing,
@@ -92,6 +95,19 @@ def run_analysis(resource_id):
         / resource_id
         / f"{resource_id}.txt"
     )
+
+    # Verify role based permission
+    with (
+        Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id / "metadata.json"
+    ).open("rb") as metadata_file:
+        project_metadata = json.load(metadata_file)
+
+    if not is_project_op_permitted(
+        current_user.username,
+        current_user.roles,
+        project_metadata,
+    ):
+        return flask.jsonify({"message": "Operation not permitted"}), 403
 
     vref_file_path = (
         Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id / "vref.txt"
