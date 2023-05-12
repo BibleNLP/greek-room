@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Greek Room</title>
+    <link
+      href="{{ url_for('auth.static', filename='auth.css') }}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="{{ url_for('auth.static', filename='minimal-table.css') }}"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div class="center">
+      <h1>User Management</h1>
+      {% if users|length == 0 %}
+      <div class="message">
+        <p class="fail">No data found.</p>
+      </div>
+      {% else %}
+      <div class="message">
+        {% with messages =
+        get_flashed_messages(category_filter=["roles-message-success"]) %} {% if
+        messages %} {% for message in messages %}
+        <p class="success">{{ message }}</p>
+        {% endfor %} {% endif %} {% endwith %} {% with messages =
+        get_flashed_messages(category_filter=["roles-message-fail"]) %} {% if
+        messages %} {% for message in messages %}
+        <p class="fail">{{ message }}</p>
+        {% endfor %} {% endif %} {% endwith %}
+      </div>
+      <div class="table-container">
+        <table>
+          <tr>
+            <td><b>Username</b></td>
+            <td><b>Roles</b></td>
+          </tr>
+          {% for row in users %}
+          <tr>
+            <td>{{ row.username }}</td>
+            <td>
+              <button
+                name="edit-roles"
+                class="link"
+                data-username="{{ row.username }}"
+                data-roles='{{ row.roles|tojson }}'
+              >
+                {{ row.roles|tojson }}
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="edit-roles" class="overlay">
+      <div class="popup">
+        <h3>Edit Roles</h3>
+        <a class="close" href="#">&times;</a>
+        <div class="content">
+          <!-- <form -->
+          <!--   action="manage/users/roles" -->
+          <!--   method="POST" -->
+          <!--   enctype="multipart/form-data" -->
+          <!-- > -->
+          <label
+            >Roles assigned to <b>username</b>
+            <input type="text" name="name" required
+          /></label>
+          <br />
+          <br />
+          <button data-url="" class="submit">Update</button>
+          <!-- </form> -->
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('auth.static', filename='auth.js') }}"></script>
+  </body>
+</html>

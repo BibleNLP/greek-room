@@ -15,6 +15,15 @@ class MyEnumMeta(EnumMeta):
 
 
 @unique
+class ProjectTypes(Enum, metaclass=MyEnumMeta):
+    """
+    All project types supported in this application
+    """
+
+    PROJ_WILDEBEEST = "wildebeest"
+
+
+@unique
 class BookCodes(Enum, metaclass=MyEnumMeta):
     """
     Enum of all Bible books.

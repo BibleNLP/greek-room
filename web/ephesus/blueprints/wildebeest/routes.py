@@ -21,6 +21,12 @@ from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 # This project
+from web.ephesus.constants import (
+    ProjectTypes,
+)
+from web.ephesus.blueprints.auth.utils import (
+    is_project_op_permitted,
+)
 from web.ephesus.common.utils import (
     sanitize_string,
     get_projects_listing,
@@ -60,13 +66,18 @@ API_ROUTE_PREFIX = "api/v1"
 @login_required
 def get_index():
     """Get the root index for the blueprint"""
-    user_path = Path(flask.current_app.config["USERS_PATH"]) / current_user.username
+    projects_path = Path(flask.current_app.config["PROJECTS_PATH"])
 
     # First time login
-    if not user_path.exists():
-        user_path.mkdir(parents=True)
+    if not projects_path.exists():
+        projects_path.mkdir(parents=True)
 
-    projects_listing = get_projects_listing(user_path)
+    projects_listing = get_projects_listing(
+        current_user.username,
+        projects_path,
+        roles=current_user.roles,
+        project_type=ProjectTypes.PROJ_WILDEBEEST,
+    )
 
     return flask.render_template(
         "wildebeest/index.html",
@@ -80,17 +91,26 @@ def get_index():
 def run_analysis(resource_id):
     """Get the Wildebeest anlysis results"""
     resource_path = (
-        Path(flask.current_app.config["USERS_PATH"])
-        / current_user.username
+        Path(flask.current_app.config["PROJECTS_PATH"])
         / resource_id
         / f"{resource_id}.txt"
     )
 
+    # Verify role based permission
+    with (
+        Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id / "metadata.json"
+    ).open("rb") as metadata_file:
+        project_metadata = json.load(metadata_file)
+
+    if not is_project_op_permitted(
+        current_user.username,
+        current_user.roles,
+        project_metadata,
+    ):
+        return flask.jsonify({"message": "Operation not permitted"}), 403
+
     vref_file_path = (
-        Path(flask.current_app.config["USERS_PATH"])
-        / current_user.username
-        / resource_id
-        / "vref.txt"
+        Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id / "vref.txt"
     )
     vref_file_path = vref_file_path if vref_file_path.exists else None
 
@@ -130,11 +150,7 @@ def upload_file():
             # Save file in a new randomly named dir
             resource_id = secrets.token_urlsafe(6)
             # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
-            project_path = (
-                Path(flask.current_app.config["USERS_PATH"])
-                / current_user.username
-                / resource_id
-            )
+            project_path = Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id
             # Create the project directory
             # including any missing parents
             project_path.mkdir(parents=True)
@@ -149,6 +165,9 @@ def upload_file():
                         "projectName": project_name,
                         "langCode": lang_code,
                         "wbAnalysisLastModified": datetime.now().timestamp(),
+                        "projectType": "wildebeest",
+                        "tags": "[]",
+                        "owner": current_user.username,
                     },
                     metadata_file,
                 )

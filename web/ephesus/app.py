@@ -7,10 +7,13 @@ Factory for Flask application
 
 # Core python imports
 import inspect
+import json
 import logging
+from functools import partial
 from logging.config import dictConfig
 
 # 3rd party imports
+from sqlalchemy.event import listen
 import flask
 
 # This project
@@ -29,6 +32,7 @@ from web.ephesus.extensions import (
     cache,
     email,
     login_manager,
+    load_sqlite_extension,
 )
 
 #
@@ -106,6 +110,14 @@ def create_app():
     # Initialize the app with the SQLAlchemy extension
     db.init_app(app)
 
+    # Load Sqlite JSON1 extension
+    load_sqlite_json1_extension = partial(
+        load_sqlite_extension, ext_path=app.config["SQLITE_JSON1_EXT_PATH"]
+    )
+
+    with app.app_context():
+        listen(db.engine, "connect", load_sqlite_json1_extension)
+
     # Initialize app cache
     cache.init_app(app)
 
@@ -118,6 +130,10 @@ def create_app():
 
     # Initialize login manager
     login_manager.init_app(app)
+
+    # Load in app ACL policy
+    with open(app.config["GREEK_ROOM_ACL_PATH"], "rb") as acl_file:
+        app.config["acl"] = json.load(acl_file)
 
     # Log the current rules from the app
     if _LOGGER.isEnabledFor(logging.DEBUG):
