@@ -16,6 +16,7 @@ from flask_login import (
     login_user,
     logout_user,
     login_required,
+    current_user,
 )
 from werkzeug.security import (
     generate_password_hash,
@@ -26,9 +27,13 @@ from werkzeug.security import (
 from web.ephesus.blueprints.auth.utils import (
     is_valid_username,
     is_valid_password,
+    is_op_permitted,
 )
 from web.ephesus.extensions import db, email as email_handler, cache
-from web.ephesus.model.user import User
+from web.ephesus.model.user import (
+    User,
+    StatusType,
+)
 
 #
 # Singletons
@@ -244,7 +249,6 @@ def reset_password():
             user = User.query.filter(
                 db.func.upper(User.email) == db.func.upper(email)
             ).first()
-            _LOGGER.debug(user)
 
             # If user is not verified, do that first
             if not user.is_email_verified:
@@ -308,3 +312,85 @@ def is_username_exists(username):
         db.func.lower(User.username) == db.func.lower(username)
     ).first()
     return flask.jsonify({"username": username, "exists": True if user else False})
+
+
+@BP.route("/manage/users")
+@login_required
+def manage_users():
+    """The page for managing all users by an admin-level user"""
+    # Define the access tags for
+    # this function and required ops
+    op_tags = ["admin"]
+    ops = ["read", "write"]
+
+    # Check if operation is permitted
+    # for the logged-in user
+    if not is_op_permitted(current_user.username, current_user.roles, op_tags, ops):
+        return flask.redirect(flask.url_for("wildebeest.get_index"))
+
+    users = (
+        db.session.execute(
+            db.select(User).filter_by(
+                is_email_verified=True, status=StatusType.ACTIVE.name
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    # Check if there are any request args
+    # that tell us to show any messages.
+    if flask.request.args.get("showRolesSuccess") == "true":
+        _LOGGER.debug("in here!")
+        flask.flash(
+            "Successfully updated roles.",
+            "roles-message-success",
+        )
+    elif flask.request.args.get("showRolesFailure") == "true":
+        flask.flash(
+            "Error while trying to update roles.",
+            "roles-message-fail",
+        )
+
+    return flask.render_template("auth/manage-users.html", users=users)
+
+
+@BP.route("/manage/users/<username>/roles", methods=["POST"])
+@login_required
+def update_user_roles(username):
+    """Update roles for a user"""
+
+    # Define the access tags for
+    # this function and required ops
+    op_tags = ["admin"]
+    ops = ["write"]
+
+    # Check if operation is permitted
+    # for the logged-in user
+    if not is_op_permitted(current_user.username, current_user.roles, op_tags, ops):
+        return {"message": "Operation not permitted"}, 403
+
+    # Validate if role is actually JSON
+    if isinstance(flask.request.json, str):
+        return {"message": "Incompatible role format. Needs JSON."}, 400
+
+    # Get user from DB
+    user = db.session.execute(
+        db.select(User).filter_by(
+            username=username, is_email_verified=True, status=StatusType.ACTIVE.name
+        )
+    ).scalar()
+
+    # Bail if not active user found
+    if not user:
+        return {"message": f"No active user '{username}' found."}, 404
+
+    # Check if there is no change in role
+    if set(user.roles) == set(flask.request.json):
+        return {"message": "No update required."}, 204
+
+    # Update user roles in DB
+    user.roles = flask.request.json
+    db.session.commit()
+
+    return {"message": "Successfully updated role for user."}, 200

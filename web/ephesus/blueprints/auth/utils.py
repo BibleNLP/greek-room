@@ -38,6 +38,7 @@ def is_valid_username(username):
     return False
 
 
+# Roles are implemented based on https://tailscale.com/blog/rbac-like-it-was-meant-to-be/
 def is_project_op_permitted(username, roles, project_meta, op="read"):
     """
     A central function for simple role-based
@@ -57,5 +58,36 @@ def is_project_op_permitted(username, roles, project_meta, op="read"):
         for role in roles:
             if role in acl.get(tag, {}).get(op, []):
                 return True
+
+    return False
+
+
+def is_op_permitted(username, user_roles, op_tags, ops=["read"]):
+    """
+    A central function for simple role-based
+    checking for generic app-level operations.
+    Checks if `op is allowed for any role in
+    `op_tags` by `user_roles`.
+    """
+    if not username or not user_roles or not op_tags:
+        return False
+
+    op_tags = set(op_tags)
+    acl = flask.current_app.config["acl"]
+
+    # A list to hold the permission
+    # status for each op (e.g. Read/Write).
+    # This traverses all user roles and
+    # attempts to satisfy all ops.
+    ops_perms = []
+
+    for tag in op_tags.intersection(acl.keys()):
+        for role in user_roles:
+            for op in ops:
+                ops_perms.append(role in acl.get(tag, {}).get(op, []))
+
+                # Check if all ops are permitted
+                if sum(ops_perms) == len(ops):
+                    return True
 
     return False
