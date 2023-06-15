@@ -5,7 +5,7 @@ Thousands of languages around the world still lack Bible translations; most of t
 ## Wildebeest
 This tool checks a text for a wide range of character level problems such as encoding errors, characters in the wrong script, characters in non-canonical forms and spurious control characters. The Wildebeest analysis script provides feedback on likely issues in a text. The Wildebeest normalization script corrects problems that can be fixed with very high confidence. See the **[Wildebeest]({{< ref "/wildebeest" >}} "Wildebeest")** section for more information, including examples from applying Wildebeest to the 1009 translations in the eBible corpus.
 
-## Spell checker
+## Spell Checker
 The Greek Room offers a spell checker based on phonetic string similarity and word alignment, rather than relying on the need of laboriously curated lists of words and morphological rules used in traditional spell checkers. It allows to identify spelling inconsistencies early on in Bible translation projects.
 
 ## Word Alignment
