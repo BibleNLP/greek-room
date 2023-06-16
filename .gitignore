@@ -118,9 +118,6 @@ venv.bak/
 # Rope project settings
 .ropeproject
 
-# mkdocs documentation
-/site
-
 # mypy
 .mypy_cache/
 .dmypy.json
@@ -150,3 +147,7 @@ utilities/log/
 utilities/old/
 utilities/scripts
 
+# Hugo files
+.hugo_build.lock
+public
+themes
