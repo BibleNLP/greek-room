@@ -111,7 +111,7 @@ def print_html_head(f_html, date, e_lang_name, f_lang_name):
                 <tr><td>""" + date + """</td></tr></table></td>
           <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
           <td><table border="0" style="color:#777777;font-size:-1;">
-                <tr><td>Script filter-viz-snt-align.py version 0.0.5</td></tr>
+                <tr><td>Script filter-viz-snt-align.py version 0.0.7</td></tr>
                 <tr><td>By Ulf Hermjakob, USC/ISI</td></tr></table></td>
       </tr>
     </table></td></tr></table><p>
@@ -213,11 +213,29 @@ def int_or_float(s, default):
         return default
 
 
+def log_message(fh, s):
+    if fh:
+        fh.write(s + '\n')
+
+
+def is_in_line(sub_string, line, whole_word_p):
+    if sub_string is None:
+        return True
+    elif whole_word_p:
+        if re.search((r'\b' + sub_string + r'\b'), line):
+            return True
+    else:
+        return (sub_string in line)
+    return False
+
+
 def main():
     date = datetime.datetime.now().strftime('%B %d, %Y at %H:%M')
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--e_search_term', type=str, help='can be regular expression', default=None)
     parser.add_argument('-f', '--f_search_term', type=str, help='can be regular expression', default=None)
+    parser.add_argument('--e_search_terms', type=str, help=argparse.SUPPRESS, default=None)  # |-sep. list
+    parser.add_argument('--f_search_terms', type=str, help=argparse.SUPPRESS, default=None)  # |-sep. list
     parser.add_argument('-t', '--text_filename', type=str, help='format: e ||| f ||| ref')
     parser.add_argument('-v', '--html_filename_dir', type=str, help='visualization input')
     parser.add_argument('-E', '--e_prop', type=str, help='can be regular expression', default=None)
@@ -232,11 +250,24 @@ def main():
     args = parser.parse_args()
 
     form = cgi.FieldStorage()
+    log_filename = form.getvalue('log_filename') or args.log_filename
+    try:
+        f_log = open(log_filename, 'w')
+    except FileNotFoundError:
+        f_log = None
+
+    log_message(f_log, 'Date: ' + date)
+
     e_search_term = form.getvalue('e_search_term') or args.e_search_term
     f_search_term = form.getvalue('f_search_term') or args.f_search_term
+    e_search_term_s = form.getvalue('e_search_terms') or args.e_search_terms
+    f_search_term_s = form.getvalue('f_search_terms') or args.f_search_terms
+    e_search_terms = e_search_term_s.lower().split('|') if e_search_term_s else None
+    f_search_terms = f_search_term_s.lower().split('|') if f_search_term_s else None
+    e_whole_word_p = isinstance(e_search_terms, list) and len(e_search_terms) >= 2
+    f_whole_word_p = isinstance(f_search_terms, list) and len(f_search_terms) >= 2
     text_filename = form.getvalue('text_filename') or args.text_filename
     html_filename_dir = form.getvalue('html_filename_dir') or args.html_filename_dir
-    log_filename = form.getvalue('log_filename') or args.log_filename
     e_prop = form.getvalue('e_prop') or args.e_prop
     f_prop = form.getvalue('f_prop') or args.f_prop
     prop_filename = form.getvalue('prop_filename') or args.prop_filename
@@ -251,11 +282,22 @@ def main():
     e_search_term = e_search_term.lower() if isinstance(e_search_term, str) else None
     f_search_term = f_search_term.lower() if isinstance(f_search_term, str) else None
 
-    if log_filename:
-        f_log = open(log_filename, 'w')
-        f_log.write(date + '\n')
-    else:
-        f_log = None
+    log_message(f_log, 'e_search_term: ' + str(e_search_term))
+    log_message(f_log, 'f_search_term: ' + str(f_search_term))
+    log_message(f_log, 'e_search_terms: ' + str(e_search_term_s))
+    log_message(f_log, 'f_search_terms: ' + str(f_search_term_s))
+    log_message(f_log, 'text_filename: ' + str(text_filename))
+    log_message(f_log, 'html_filename_dir: ' + str(html_filename_dir))
+    log_message(f_log, 'log_filename: ' + str(log_filename))
+    log_message(f_log, 'e_prop: ' + str(e_prop))
+    log_message(f_log, 'f_prop: ' + str(f_prop))
+    log_message(f_log, 'prop_filename: ' + str(prop_filename))
+    log_message(f_log, 'max_number_output_snt: ' + str(max_number_output_snt))
+    log_message(f_log, 'auto_sample_percentage: ' + str(auto_sample_percentage))
+    log_message(f_log, 'sample_percentage: ' + str(sample_percentage))
+    log_message(f_log, 'sample_fraction: ' + str(sample_fraction))
+    log_message(f_log, 'e_lang_name: ' + str(e_lang_name))
+    log_message(f_log, 'f_lang_name: ' + str(f_lang_name))
 
     prop_dict = defaultdict(list)
     if prop_filename:
@@ -272,10 +314,33 @@ def main():
     f_search_term2 = f_search_term if f_search_term else "<i>None</i>"
     e_prop2 = e_prop if e_prop else "<i>None</i>"
     f_prop2 = f_prop if f_prop else "<i>None</i>"
-    sys.stdout.write(e_lang_name + ' search term: ' + e_search_term2 + '<br>\n')
-    sys.stdout.write(f_lang_name + ' search term: ' + f_search_term2 + '<br>\n')
-    sys.stdout.write(e_lang_name + ' meta info restriction: ' + e_prop2 + '<br>\n')
-    sys.stdout.write(f_lang_name + ' meta info restriction: ' + f_prop2 + '<br>\n')
+    if e_search_terms:
+        sys.stdout.write(e_lang_name + ' search terms: ' + ', '.join(e_search_terms) + '<br>\n')
+    elif e_search_term:
+        sys.stdout.write(e_lang_name + ' search term: ' + e_search_term2 + '<br>\n')
+    if f_search_terms:
+        sys.stdout.write(f_lang_name + ' search terms: ' + ', '.join(f_search_terms) + '<br>\n')
+    elif f_search_term:
+        sys.stdout.write(f_lang_name + ' search term: ' + f_search_term2 + '<br>\n')
+    if e_prop:
+        sys.stdout.write(e_lang_name + ' meta info restriction: ' + e_prop2 + '<br>\n')
+    if f_prop:
+        sys.stdout.write(f_lang_name + ' meta info restriction: ' + f_prop2 + '<br>\n')
+    if e_search_terms:
+        primary_search_side = 'e'
+        e_search_terms3 = e_search_terms
+        f_search_terms3 = [f_search_term]
+    elif f_search_terms:
+        primary_search_side = 'f'
+        e_search_terms3 = [e_search_term]
+        f_search_terms3 = f_search_terms
+    else:
+        primary_search_side = None
+        e_search_terms3 = [e_search_term]
+        f_search_terms3 = [f_search_term]
+    log_message(f_log, 'e_search_terms3: ' + ', '.join(map(str, e_search_terms3)))
+    log_message(f_log, 'f_search_terms3: ' + ', '.join(map(str, f_search_terms3)))
+    log_message(f_log, 'Point B0')
     # sys.stdout.write('<font color="#999999">Other input parameters &nbsp; '
     #                  't: %s &nbsp; dir: %s &nbsp; log: %s &nbsp; max: %d</font><br>\n'
     #                  % (text_filename, html_filename_dir, log_filename, max_number_output_snt))
@@ -285,101 +350,139 @@ def main():
         sys.stdout.write('<span style="color:red;">Error: Cannot open ' + text_filename
                          + ' [' + str(error) + ']<span><br>\n')
     else:
-        n_matches = 0
-        viz_file_dict = defaultdict(list)
+        n_match_dict = defaultdict(int)
+        viz_file_dict = defaultdict(list)  # a_name_ids per (viz_file, e_search_term|'')
         viz_file_list = []
+        log_message(f_log, 'Point B1 ' + str(e_search_terms3) + ' :: ' + str(f_search_terms3))
         for line in f_in:
             m3a = re.match(r'(\S|\S.*?\S)\s+\|\|\|\s+(\S|\S.*?\S)\s+\|\|\|\s+(\S|\S.*?\S)\s*$', line)
             if m3a:
                 e = m3a.group(1).lower()
                 f = m3a.group(2).lower()
                 ref = m3a.group(3)
-                e_prop_dict_classes = prop_dict.get(('E', ref))
-                f_prop_dict_classes = prop_dict.get(('F', ref))
-                if (e_search_term is None or e_search_term in e) \
-                        and (f_search_term is None or f_search_term in f) \
-                        and (e_prop is None or substring_of_any_in_list(e_prop, e_prop_dict_classes)) \
-                        and (f_prop is None or substring_of_any_in_list(f_prop, f_prop_dict_classes)):
-                    n_matches += 1
-                    m3b = re.match(r'([A-Z1-9][A-Z][A-Z])\s*(\d+):(\d+)$', ref)
-                    if m3b:
-                        book, chapter_number, verse_number = m3b.group(1), int(m3b.group(2)), int(m3b.group(3))
-                        viz_filename = '%s-%03d.html' % (book, chapter_number)
-                        a_name_id = '%s_%d:%d' % (book, chapter_number, verse_number)
-                        viz_file_dict[viz_filename].append(a_name_id)
-                        if viz_filename not in viz_file_list:
-                            viz_file_list.append(viz_filename)
-                        # sys.stdout.write(viz_filename + ' ' + a_name_id + '<br>\n')
-        plural_ending = '' if n_matches == 1 else 'es'
-        sys.stdout.write('Found ' + str(n_matches) + ' match' + plural_ending)
-        if n_matches > max_number_output_snt:
-            if auto_sample_percentage:
-                sys.stdout.write(', random sample of ' + str(max_number_output_snt) + ' shown')
+                e_prop_dict_classes = prop_dict.get(('e', ref))
+                f_prop_dict_classes = prop_dict.get(('f', ref))
+                for e_search_term3 in e_search_terms3:
+                    for f_search_term3 in f_search_terms3:
+                        if primary_search_side == 'e':
+                            k = e_search_term3
+                        elif primary_search_side == "f":
+                            k = f_search_term3
+                        else:
+                            k = ''
+                        if is_in_line(e_search_term3, e, e_whole_word_p) \
+                                and is_in_line(f_search_term3, f, f_whole_word_p) \
+                                and (e_prop is None or substring_of_any_in_list(e_prop, e_prop_dict_classes)) \
+                                and (f_prop is None or substring_of_any_in_list(f_prop, f_prop_dict_classes)):
+                            n_match_dict[k] += 1
+                            m3b = re.match(r'([A-Z1-9][A-Z][A-Z])\s*(\d+):(\d+)$', ref)
+                            if m3b:
+                                book, chapter_number, verse_number = m3b.group(1), int(m3b.group(2)), int(m3b.group(3))
+                                viz_filename = '%s-%03d.html' % (book, chapter_number)
+                                a_name_id = '%s_%d:%d' % (book, chapter_number, verse_number)
+                                viz_file_dict[(viz_filename, k)].append(a_name_id)
+                                if viz_filename not in viz_file_list:
+                                    viz_file_list.append(viz_filename)
+                                # sys.stdout.write(viz_filename + ' ' + a_name_id + '<br>\n')
+        if primary_search_side is None:
+            n_matches = n_match_dict['']
+            plural_ending = '' if n_matches == 1 else 'es'
+            sys.stdout.write('Found ' + str(n_matches) + ' match' + plural_ending)
+            if n_matches > max_number_output_snt:
+                if auto_sample_percentage:
+                    sys.stdout.write(', random sample of ' + str(max_number_output_snt) + ' shown')
+                elif sample_percentage < 100:
+                    sys.stdout.write(', random ' + str(sample_percentage) + '% sample up to '
+                                     + str(max_number_output_snt) + ' shown')
+                else:
+                    sys.stdout.write(', first ' + str(max_number_output_snt) + ' shown')
             elif sample_percentage < 100:
-                sys.stdout.write(', random ' + str(sample_percentage) + '% sample up to ' + str(max_number_output_snt)
-                                 + ' shown')
-            else:
-                sys.stdout.write(', first ' + str(max_number_output_snt) + ' shown')
-        elif sample_percentage < 100:
-            sys.stdout.write(', random ' + str(sample_percentage) + '% sample shown')
-        sys.stdout.write('<br><br>\n')
+                sys.stdout.write(', random ' + str(sample_percentage) + '% sample shown')
+            sys.stdout.write('<br><br>\n')
         f_in.close()
-        n_matches_shown = 0
-        n_matches_remaining = n_matches
-        n_matches_remaining_to_be_shown = max_number_output_snt
+        log_message(f_log, 'Point C1 ' + str(n_match_dict))
+        n_matches_shown = defaultdict(int)
+        n_matches_remaining = defaultdict(int)
+        n_matches_remaining_to_be_shown = defaultdict(int)
+        output_dict = defaultdict(str)
+        for k in n_match_dict:
+            n_matches_shown[k] = 0
+            n_matches_remaining[k] = n_match_dict[k]
+            n_matches_remaining_to_be_shown[k] = max_number_output_snt
+            if k != '':
+                plural_ending = '' if n_match_dict[k] == 1 else 'es'
+                output_dict[k] = '<p>\nFound ' + str(n_match_dict[k]) + ' match' + plural_ending \
+                                 + ' for ' + k + ':<br>\n'
+        log_message(f_log, 'Point C2 ' + str(viz_file_list))
         for viz_filename in viz_file_list:
             full_viz_filename = html_filename_dir + '/' + viz_filename
             try:
-                f_in = open(full_viz_filename)
+                with open(full_viz_filename) as f_in:
+                    lines = f_in.readlines()
             except BaseException as error:
                 sys.stdout.write('<span style="color:red;">Error: Cannot open ' + full_viz_filename
                                  + ' [' + str(error) + ']<span><br>\n')
             else:
-                active = False
-                selected = False
-                active_line_index = 0
-                a_name_ids = viz_file_dict[viz_filename]
-                next_a_name_id = a_name_ids.pop(0)
-                for line in f_in:
-                    if active and '<a name="' in line:
-                        if selected:
-                            n_matches_shown += 1
-                            if n_matches_remaining_to_be_shown:
-                                n_matches_remaining_to_be_shown -= 1
-                        n_matches_remaining -= 1
-                        active = False
-                        if next_a_name_id is None:
-                            break
-                        if n_matches_shown >= max_number_output_snt:
-                            break
-                    if next_a_name_id and '<a name="' + next_a_name_id + '">' in line:
-                        active = True
-                        active_line_index = 0
-                        if auto_sample_percentage and n_matches_remaining > 0:
-                            selected = random.random() < float(n_matches_remaining_to_be_shown) / n_matches_remaining
-                        elif sample_percentage < 100:
-                            r = random.random()
-                            selected = (r < sample_fraction)
+                for e_search_term3 in e_search_terms3:
+                    for f_search_term3 in f_search_terms3:
+                        if primary_search_side == 'e':
+                            k = e_search_term3
+                            n_match_dict[e_search_term3] += 1
+                        elif primary_search_side == 'f':
+                            k = f_search_term3
+                            n_match_dict[f_search_term3] += 1
                         else:
-                            selected = True
+                            k = ''
+                        log_message(f_log, 'Point K ' + str(e_search_term3) + ' :: ' + str(f_search_term3) + ' :: ' + str(viz_filename) + ' ::k ' + str(k) + ' ::c ' + str(n_matches_shown[k]))
+                        active = False
+                        selected = False
+                        active_line_index = 0
+                        a_name_ids = viz_file_dict[(viz_filename, k)]
+                        log_message(f_log, 'Point L ' + str(a_name_ids))
                         next_a_name_id = a_name_ids.pop(0) if a_name_ids else None
-                    if active:
-                        if selected:
-                            if active_line_index or re.match('<span id="', line):
-                                active_line_index += 1
-                            if e_search_term and active_line_index == 1:
-                                line = highlight_search_term_tokens_in_text(line, e_search_term)
-                            elif f_search_term and active_line_index == 2:
-                                line = highlight_search_term_tokens_in_text(line, f_search_term)
-                            sys.stdout.write(line)
-                f_in.close()
-            if n_matches_shown >= max_number_output_snt:
-                break
-        sys.stdout.write(str(n_matches_shown) + ' shown<br><br><br><br>\n')
-    print_html_foot(sys.stdout)
+                        for line in lines:
+                            if active and '<a name="' in line:
+                                if selected:
+                                    if n_matches_remaining_to_be_shown[k]:
+                                        n_matches_shown[k] += 1
+                                        n_matches_remaining_to_be_shown[k] -= 1
+                                n_matches_remaining[k] -= 1
+                                active = False
+                                if next_a_name_id is None:
+                                    break
+                                if n_matches_shown[k] >= max_number_output_snt:
+                                    break
+                            if next_a_name_id and '<a name="' + next_a_name_id + '">' in line:
+                                active = True
+                                active_line_index = 0
+                                if auto_sample_percentage and n_matches_remaining[k] > 0:
+                                    selected = (random.random()
+                                                < float(n_matches_remaining_to_be_shown[k]) / n_matches_remaining[k])
+                                elif sample_percentage < 100:
+                                    r = random.random()
+                                    selected = (r < sample_fraction)
+                                else:
+                                    selected = True
+                                next_a_name_id = a_name_ids.pop(0) if a_name_ids else None
+                            if active:
+                                if selected:
+                                    if active_line_index or re.match('<span id="', line):
+                                        active_line_index += 1
+                                    if e_search_term3 and active_line_index == 1:
+                                        line = highlight_search_term_tokens_in_text(line, e_search_term3)
+                                    elif f_search_term3 and active_line_index == 2:
+                                        line = highlight_search_term_tokens_in_text(line, f_search_term3)
+                                        log_message(f_log, 'Point O ' + re.sub(r'<.*?>', '', line.rstrip()))
+                                    if n_matches_remaining_to_be_shown[k]:
+                                        output_dict[k] += line
+        for k in output_dict:
+            sys.stdout.write(output_dict[k])
+            sys.stdout.write(str(n_matches_shown[k]) + ' shown<br><br><br><br>\n')
 
+    log_message(f_log, 'Point X')
+    print_html_foot(sys.stdout)
+    sys.stdout.flush()
     if f_log:
-        sys.stderr.write('Log: %s\n' % log_filename)
         f_log.close()
 
 
