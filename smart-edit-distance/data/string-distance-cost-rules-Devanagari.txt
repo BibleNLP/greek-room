@@ -1,0 +1,479 @@
+﻿
+## Devanagari (Hindi, Sanskrit, Gujarati, Kashmiri, Konkani, Marathi, Nepali, Punjabi et al.)
+# Independent vowel change
+::s1 अ ::s2 आ ::cost 0.2 ::comment independent short/long a
+::s1 इ ::s2 ई ::cost 0.2 ::comment independent short/long i
+::s1 उ ::s2 ऊ ::cost 0.2 ::comment independent short/long u
+::s1 ऋ ::s2 ॠ ::cost 0.2 ::comment independent short/long vocalic r
+::s1 ए ::s2 ऐ ::cost 0.2 ::comment independent e/ai
+::s1 ए ::s2 ऍ ::cost 0.1 ::comment independent e/candra e
+::s1 ए ::s2 ऎ ::cost 0.2 ::comment independent e/short e
+::s1 ए ::s2 इ ::cost 0.3 ::comment independent e/short i
+::s1 ए ::s2 ई ::cost 0.5 ::comment independent e/long i
+::s1 ऍ ::s2 ऎ ::cost 0.2 ::comment independent candra e/short e
+::s1 ओ ::s2 ऑ ::cost 0.1 ::comment independent o/candra o
+::s1 ओ ::s2 ऒ ::cost 0.1 ::comment independent o/short o
+::s1 ओ ::s2 उ ::cost 0.3 ::comment independent o/short u
+::s1 ओ ::s2 ऊ ::cost 0.5 ::comment independent o/au
+::s1 ऑ ::s2 ऒ  ::cost 0.1 ::comment independent candra o/short o
+::s1 आ ::s2 ए ::cost 0.5 ::comment independent aa/e
+::s1 आ ::s2 ऑ ::cost 0.5 ::comment independent aa/o
+::s1 य् ::s2 ए ::cost 0.5 ::comment independent y/e
+::s1 ये ::s2 ए ::cost 0.3 ::comment independent ye/e ::example जायेगा/जाएगा/will go
+::s1 य ::s2 ए ::cost 0.4 ::comment independent ya/e ::example एंड्रॉयड/एंड्रॉएड/Android
+::s1 य ::s2 इ ::cost 0.4 ::comment independent ya/i ::example इजराइल/इजरायल/Israel
+
+# Vowel sign change
+::s1 ि ::s2 ी ::cost 0.2 ::comment diacritic short/long i
+::s1 ु ::s2 ू ::cost 0.2 ::comment diacritic short/long u
+::s1 ृ ::s2 ॄ ::cost 0.2 ::comment diacritic short/long vocalic r
+::s1 ा ::s2 े ::cost 0.4 ::comment diacritic long a/e ::example रोमानिया/रोमेनिया/Romania
+::s1 े ::s2 ै ::cost 0.2 ::comment diacritic e/ai
+::s1 े ::s2 ॅ ::cost 0.1 ::comment diacritic e/candra e
+::s1 े ::s2 ॆ ::cost 0.1 ::comment diacritic e/short e
+::s1 े ::s2 ि ::cost 0.2 ::comment diacritic e/short i
+::s1 े ::s2 ी ::cost 0.3 ::comment diacritic e/long i
+::s1 ॅ ::s2 ॆ ::cost 0.1 ::comment diacritic candra e/short e
+::s1 ो ::s2 ॉ ::cost 0.1 ::comment diacritic o/candra o
+::s1 ो ::s2 ु ::cost 0.3 ::comment diacritic o/short u
+::s1 ो ::s2 ू ::cost 0.5 ::comment diacritic o/long u
+::s1 ो ::s2 ौ ::cost 0.5 ::comment diacritic o/au
+::s1 ॉ ::s2 ौ ::cost 0.5 ::comment diacritic candra o/au
+::s1 ँ ::s2 ं ::cost 0.2 ::comment diacritic candrabindu/anusvara
+::s1 ाँ ::s2 ों ::cost 0.2 ::right1 [-,$ ] ::right2 [-,$ ] ::comment diacr. aam/om ::example गतिविधियाँ/गतिविधियों/activities
+::s1 ाँ ::s2 ों ::cost 0.4 ::comment diacritic aam/om ::example काँग्रेस/कोंग्रेस/congress
+
+# Independent vowel drop
+::s1 अ ::s2 ::cost 0.4 ::comment short a
+::s1 इ ::s2 ::cost 0.4 ::comment short i
+::s1 उ ::s2 ::cost 0.4 ::comment short u
+::s1 ऋ ::s2 ::cost 0.4 ::comment short vocalic r
+::s1 ए ::s2 ::cost 0.4 ::comment e
+::s1 ऍ ::s2 ::cost 0.4 ::comment candra e
+::s1 ऎ ::s2 ::cost 0.4 ::comment short e
+::s1 आ ::s2 ::cost 0.6 ::comment long a
+::s1 ई ::s2 ::cost 0.6 ::comment long i
+::s1 ऊ ::s2 ::cost 0.6 ::comment long u
+::s1 ॠ ::s2 ::cost 0.6 ::comment long vocalic r
+::s1 ऐ ::s2 ::cost 0.6 ::comment ai
+::s1 ओ ::s2 ::cost 0.6 ::comment o
+::s1 ऑ ::s2 ::cost 0.6 ::comment candra o
+::s1 ऒ ::s2 ::cost 0.4 ::comment short o
+::s1 औ ::s2 ::cost 0.6 ::comment au
+
+# Vowel sign drop
+::s1 ् ::s2 ::cost 0.1 ::comment virama
+::s1 ि ::s2 ::cost 0.2 ::comment diacritic short i
+::s1 ु ::s2 ::cost 0.3 ::comment diacritic short u
+::s1 ृ ::s2 ::cost 0.3 ::comment diacritic short vocalic r
+::s1 े ::s2 ::cost 0.2 ::comment diacritic e
+::s1 ॅ ::s2 ::cost 0.3 ::comment candra e
+::s1 ॆ ::s2 ::cost 0.3 ::comment short e
+::s1 ा ::s2 ::cost 0.3 ::comment diacritic long a
+::s1 ी ::s2 ::cost 0.4 ::comment diacritic long i
+::s1 ू ::s2 ::cost 0.5 ::comment diacritic long u
+::s1 ॄ ::s2 ::cost 0.5 ::comment diacritic long vocalic r
+::s1 ै ::s2 ::cost 0.3 ::comment diacritic ai
+::s1 ो ::s2 ::cost 0.4 ::comment diacritic o
+::s1 ॉ ::s2 ::cost 0.4 ::comment candra o
+::s1 ॊ ::s2 ::cost 0.3 ::comment short o
+::s1 ौ ::s2 ::cost 0.5 ::comment diacritic au
+::s1 ँ ::s2 ::cost 0.5 ::comment candrabindu (m/n), emphatic form of anusvara
+::s1 ं ::s2 ::cost 0.4 ::comment anusvara (m/n)
+::s1 ः ::s2 ::cost 0.4 ::comment visarga (h)
+::s1 ़ ::s2 ::cost 0.3 ::comment nukta (foreign sound)
+
+# Misc. drop
+::s1 ॑ ::s2 ::cost 0.02 ::comment Devanagari stress sign udatta
+::s1 ॒ ::s2 ::cost 0.02 ::comment Devanagari stress sign anudatta
+::s1 ॓ ::s2 ::cost 0.02 ::comment Devanagari grave accent
+::s1 ॔ ::s2 ::cost 0.02 ::comment Devanagari acute accent
+::s1 ॐ ::s2 ::cost 0.2 ::comment Devanagari om (spiritual sound/symbol)
+::s1 ॽ ::s2 ::cost 0.2 ::comment Devanagari letter glottal stop
+
+# Consonant aspiration
+::s1 क ::s2 ख ::cost 0.2 ::comment k,kh
+::s1 ग ::s2 घ ::cost 0.2 ::comment g,gh
+::s1 च ::s2 छ ::cost 0.2 ::comment c,ch
+::s1 ज ::s2 झ ::cost 0.2 ::comment j,jh
+::s1 त ::s2 थ ::cost 0.2 ::comment t,th
+::s1 ट ::s2 ठ ::cost 0.2 ::comment tt,tth
+::s1 द ::s2 ध ::cost 0.2 ::comment d,dh
+::s1 ड ::s2 ढ ::cost 0.2 ::comment dd,ddh
+::s1 प ::s2 फ ::cost 0.4 ::comment p,f/ph
+::s1 ब ::s2 भ ::cost 0.2 ::comment k,kh
+
+# Other consonants
+::s1 त ::s2 ट ::cost 0.2 ::comment t,tt
+::s1 त ::s2 ठ ::cost 0.4 ::comment t,tth
+::s1 थ ::s2 ठ ::cost 0.2 ::comment th,tth
+::s1 थ ::s2 ट ::cost 0.4 ::comment th,tt
+::s1 द ::s2 ड ::cost 0.2 ::comment d,dd
+::s1 द ::s2 ढ ::cost 0.4 ::comment d,ddh
+::s1 ध ::s2 ढ ::cost 0.2 ::comment dh,ddh
+::s1 ध ::s2 ड ::cost 0.2 ::comment dh,dd
+::s1 न ::s2 ण ::cost 0.1 ::comment n,nn
+::s1 न ::s2 ङ ::cost 0.2 ::comment n,ng
+::s1 न ::s2 ञ ::cost 0.3 ::comment n,ny
+::s1 ण ::s2 ङ ::cost 0.2 ::comment nn,ng
+::s1 ण ::s2 ञ ::cost 0.3 ::comment nn,ny
+::s1 ङ ::s2 ञ ::cost 0.3 ::comment ng, ny
+::s1 स ::s2 ष ::cost 0.3 ::comment s,ss
+::s1 स ::s2 श ::cost 0.4 ::comment s,sh
+::s1 ष ::s2 श ::cost 0.2 ::comment ss,sh
+::s1 म् ::s2 ं ::cost 0.2 ::comment m,anusvara ::example ट्रंप/ट्रम्प/Trump
+::s1 म ::s2 ं ::cost 0.4 ::comment m,anusvara
+::s1 न् ::s2 ं ::cost 0.2 ::comment n,anusvara ::example हिन्दी/हिंदी/Hindi
+::s1 न ::s2 ं ::cost 0.4 ::comment na,anusvara ::example इंस्टॉल/इनस्टॉल/install
+::s1 ण् ::s2 ं ::cost 0.2 ::comment nn,anusvara ::example थाईलैण्ड/थाईलैंड/Thailand
+::s1 ब ::s2 व ::cost 0.5 ::comment b,v ::example आतंकबाद/आतंकवाद/terrorism
+::s1 रहे ::s2 रखे ::cost 0.5 ::comment rahe,rakhe ::example रहेगा/रखेगा/will keep
+
+# Consonants and nukta (separate and integrated)
+::s1 फ ::s2 फ़ ::cost 0.05 ::comment ph/f
+::s1 फ ::s2 फ़ ::cost 0.05
+::s1 फ़ ::s2 फ़ ::cost 0.01 ::comment f as 1 or 2 Unicode characters
+::s1 य ::s2 य़ ::cost 0.05 ::comment y/yy
+::s1 य ::s2 य़ ::cost 0.05
+::s1 य़ ::s2 य़ ::cost 0.01
+::s1 क ::s2 क़ ::cost 0.05 ::comment k/q
+::s1 क ::s2 क़ ::cost 0.05
+::s1 क़ ::s2 क़ ::cost 0.01
+::s1 ख ::s2 ख़ ::cost 0.05 ::comment kh/khh
+::s1 ख ::s2 ख़ ::cost 0.05
+::s1 ख़ ::s2 ख़ ::cost 0.01
+::s1 ग ::s2 ग़ ::cost 0.05 ::comment g/ghh
+::s1 ग ::s2 ग़ ::cost 0.05 
+::s1 ग़ ::s2 ग़ ::cost 0.01
+::s1 ज ::s2 ज़ ::cost 0.05 ::comment j/z
+::s1 ज ::s2 ज़ ::cost 0.05
+::s1 ज़ ::s2 ज़ ::cost 0.01
+::s1 ड ::s2 ड़ ::cost 0.05 ::comment dd/dddh
+::s1 ड ::s2 ड़ ::cost 0.05
+::s1 ड़ ::s2 ड़ ::cost 0.01
+::s1 ढ ::s2 ढ़ ::cost 0.05 ::comment ddh/rh
+::s1 ढ ::s2 ढ़ ::cost 0.05
+::s1 ढ़ ::s2 ढ़ ::cost 0.01
+::s1 र ::s2 ऱ ::cost 0.05 ::comment r/rr
+::s1 र ::s2 ऱ ::cost 0.05
+::s1 ऱ ::s2 ऱ ::cost 0.01
+
+# Drop consonants
+::s1 क ::s2 ::cost 1
+::s1 ख ::s2 ::cost 1
+::s1 ग ::s2 ::cost 1
+::s1 घ ::s2 ::cost 1
+::s1 च ::s2 ::cost 1
+::s1 छ ::s2 ::cost 1
+::s1 ज ::s2 ::cost 1
+::s1 झ ::s2 ::cost 1
+::s1 ट ::s2 ::cost 1
+::s1 ठ ::s2 ::cost 1
+::s1 ड ::s2 ::cost 1
+::s1 ढ ::s2 ::cost 1
+::s1 त ::s2 ::cost 1
+::s1 थ ::s2 ::cost 1
+::s1 द ::s2 ::cost 1
+::s1 ध ::s2 ::cost 1
+::s1 प ::s2 ::cost 1
+::s1 फ ::s2 ::cost 1
+::s1 ब ::s2 ::cost 1
+::s1 भ ::s2 ::cost 1
+::s1 ङ ::s2 ::cost 1
+::s1 ञ ::s2 ::cost 1
+::s1 ण ::s2 ::cost 1
+::s1 न ::s2 ::cost 1
+::s1 म ::s2 ::cost 1
+::s1 य ::s2 ::cost 1
+::s1 र ::s2 ::cost 1
+::s1 ल ::s2 ::cost 1
+::s1 व ::s2 ::cost 1
+::s1 श ::s2 ::cost 1
+::s1 ष ::s2 ::cost 1
+::s1 स ::s2 ::cost 1
+::s1 ह ::s2 ::cost 1
+::s1 ऱ ::s2 ::cost 1 ::comment combination of र + ़ 
+::s1 क़ ::s2 ::cost 1 ::comment combination of क + ़ 
+::s1 ख़ ::s2 ::cost 1 ::comment combination of ख + ़ 
+::s1 ग़ ::s2 ::cost 1 ::comment combination of ग + ़
+::s1 ज़ ::s2 ::cost 1 ::comment combination of ज + ़
+::s1 ड़ ::s2 ::cost 1 ::comment combination of ड + ़
+::s1 ढ़ ::s2 ::cost 1 ::comment combination of ढ + ़
+::s1 फ़ ::s2 ::cost 1 ::comment combination of फ + ़
+::s1 य़ ::s2 ::cost 1 ::comment combination of य + ़
+
+# Latin/Devanagri letters
+::s1 अ ::s2 a ::cost 0 ::comment short a
+::s1 इ ::s2 i ::cost 0 ::comment short i
+::s1 उ ::s2 u ::cost 0 ::comment short u
+::s1 ऋ ::s2 r ::cost 0 ::comment short vocalic r
+::s1 ए ::s2 e ::cost 0 ::comment e
+::s1 ऍ ::s2 e ::cost 0 ::comment candra e
+::s1 ऎ ::s2 e ::cost 0 ::comment short e
+::s1 आ ::s2 aa ::cost 0 ::comment long a
+::s1 आ ::s2 a ::cost 0.05
+::s1 ई ::s2 ii ::cost 0 ::comment long i
+::s1 ई ::s2 i ::cost 0.05
+::s1 ई ::s2 e ::cost 0.05
+::s1 ई ::s2 ee ::cost 0.05
+::s1 ई ::s2 ei ::cost 0.05
+::s1 ई ::s2 ie ::cost 0.05
+::s1 ई ::s2 ey ::cost 0.05
+::s1 ऊ ::s2 uu ::cost 0 ::comment long u
+::s1 ऊ ::s2 u ::cost 0.05
+::s1 ऊ ::s2 oo ::cost 0.05
+::s1 ऊ ::s2 ou ::cost 0.05
+::s1 ऊ ::s2 ew ::cost 0.05
+::s1 ॠ ::s2 r ::cost 0 ::comment long vocalic r
+::s1 ऐ ::s2 ai ::cost 0 ::comment ai
+::s1 ओ ::s2 o ::cost 0 ::comment o
+::s1 ऑ ::s2 o ::cost 0 ::comment candra o
+::s1 ऑ ::s2 au ::cost 0.2
+::s1 ऒ ::s2 o ::cost 0 ::comment short o
+::s1 औ ::s2 au ::cost 0 ::comment au
+::s1 ि ::s2 i ::cost 0 ::comment diacritic short i
+::s1 ु ::s2 u ::cost 0 ::comment diacritic short u
+::s1 ृ ::s2 r ::cost 0 ::comment diacritic short vocalic r
+::s1 े ::s2 e ::cost 0 ::comment diacritic e
+::s1 े ::s2 a ::cost 0.1
+::s1 ॅ ::s2 e ::cost 0 ::comment diacritic candra e
+::s1 ॆ ::s2 e ::cost 0 ::comment diacritic short e
+::s1 ा ::s2 aa ::cost 0 ::comment diacritic long a
+::s1 ा ::s2 a ::cost 0.05
+::s1 ी ::s2 ii ::cost 0 ::comment diacritic long i
+::s1 ी ::s2 i ::cost 0.05
+::s1 ी ::s2 e ::cost 0.05
+::s1 ी ::s2 ee ::cost 0.05
+::s1 ी ::s2 ei ::cost 0.05
+::s1 ी ::s2 ie ::cost 0.05
+::s1 ी ::s2 ey ::cost 0.05
+::s1 ी ::s2 y ::cost 0.1
+::s1 ू ::s2 uu ::cost 0 ::comment diacritic long u
+::s1 ू ::s2 u ::cost 0.05
+::s1 ू ::s2 oo ::cost 0.05
+::s1 ू ::s2 ou ::cost 0.05
+::s1 ू ::s2 ew ::cost 0.05
+::s1 ॄ ::s2 r ::cost 0 ::comment diacritic long vocalic r
+::s1 ै ::s2 ai ::cost 0 ::comment diacritic ai
+::s1 ै ::s2 a ::cost 0.1
+::s1 ो ::s2 o ::cost 0 ::comment diacritic o
+::s1 ॉ ::s2 o ::cost 0 ::comment candra o
+::s1 ॊ ::s2 o ::cost 0 ::comment short o
+::s1 ौ ::s2 au ::cost 0 ::comment diacritic au
+::s1 ँ ::s2 m ::cost 0 ::comment candrabindu, emphatic form of anusvara
+::s1 ँ ::s2 n ::cost 0.05
+::s1 ं ::s2 m ::cost 0 ::comment anusvara
+::s1 ं ::s2 n ::cost 0
+::s1 ः ::s2 h ::cost 0 ::comment visarga
+::s1 क ::s2 k ::cost 0
+::s1 क ::s2 c ::cost 0 ::right2 [aou]
+::s1 ख ::s2 kh ::cost 0
+::s1 ख ::s2 k ::cost 0.05
+::s1 ग ::s2 g ::cost 0
+::s1 घ ::s2 gh ::cost 0
+::s1 घ ::s2 g ::cost 0.05
+::s1 च ::s2 c ::cost 0
+::s1 छ ::s2 ch ::cost 0
+::s1 ज ::s2 j ::cost 0
+::s1 झ ::s2 jh ::cost 0
+::s1 ट ::s2 tt ::cost 0
+::s1 ट ::s2 t ::cost 0.05
+::s1 ठ ::s2 tth ::cost 0
+::s1 ठ ::s2 t ::cost 0.05
+::s1 ड ::s2 dd ::cost 0
+::s1 ड ::s2 d ::cost 0.05
+::s1 ढ ::s2 ddh ::cost 0
+::s1 ढ ::s2 d ::cost 0.05
+::s1 त ::s2 t ::cost 0
+::s1 थ ::s2 th ::cost 0
+::s1 थ ::s2 t ::cost 0.05
+::s1 द ::s2 d ::cost 0
+::s1 ध ::s2 dh ::cost 0
+::s1 ध ::s2 d ::cost 0.05
+::s1 प ::s2 p ::cost 0
+::s1 प ::s2 b ::cost 0.4
+::s1 फ ::s2 ph ::cost 0
+::s1 फ ::s2 f ::cost 0.01
+::s1 ब ::s2 b ::cost 0
+::s1 भ ::s2 bh ::cost 0
+::s1 भ ::s2 b ::cost 0.05
+::s1 ङ ::s2 ng ::cost 0
+::s1 ञ ::s2 ny ::cost 0
+::s1 ण ::s2 nn ::cost 0
+::s1 ण ::s2 n ::cost 0.05
+::s1 न ::s2 n ::cost 0
+::s1 म ::s2 m ::cost 0
+::s1 य ::s2 y ::cost 0
+::s1 य ::s2 i ::cost 0.3
+::s1 य ::s2 j ::cost 0.4
+::s1 िय ::s2 ia ::cost 0.1
+::s1 यू ::s2 ew ::cost 0.2
+::s1 य् ::s2 e ::cost 0.2
+::s1 र ::s2 r ::cost 0
+::s1 ल ::s2 l ::cost 0
+::s1 व ::s2 v ::cost 0
+::s1 व ::s2 w ::cost 0.1
+::s1 श ::s2 sh ::cost 0
+::s1 श ::s2 ch ::cost 0.3
+::s1 श ::s2 s ::cost 0.3
+::s1 ष ::s2 ss ::cost 0
+::s1 स ::s2 s ::cost 0
+::s1 ह ::s2 h ::cost 0
+::s1 ऱ ::s2 rr ::cost 0 ::comment combination of र + ़
+::s1 ऱ ::s2 r ::cost 0.05 
+::s1 क़ ::s2 q ::cost 0 ::comment combination of क + ़
+::s1 क़ ::s2 k ::cost 0.05
+::s1 ख़ ::s2 khh ::cost 0 ::comment combination of ख + ़
+::s1 ख़ ::s2 k ::cost 0.05
+::s1 ग़ ::s2 ghh ::cost 0 ::comment combination of ग + ़
+::s1 ग़ ::s2 g ::cost 0.05
+::s1 ज़ ::s2 z ::cost 0 ::comment combination of ज + ़
+::s1 ड़ ::s2 dddh ::cost 0 ::comment combination of ड + ़
+::s1 ड़ ::s2 d ::cost 0.05
+::s1 ढ़ ::s2 rha ::cost 0 ::comment combination of ढ + ़
+::s1 ढ़ ::s2 r ::cost 0.05
+::s1 फ़ ::s2 f ::cost 0 ::comment combination of फ + ़
+::s1 य़ ::s2 yy ::cost 0 ::comment combination of य + ़
+::s1 य़ ::s2 y ::cost 0.05
+
+# Drop Latin letters
+::s1 a ::s2 ::cost 0.05 ::left1 /[abcdfghjklmnpqrstvwxyz]$/
+::s1 a ::s2 ::cost 0.2
+::s1 b ::s2 ::cost 1
+::s1 b ::s2 ::cost 0.05 ::right1 [b]
+::s1 c ::s2 ::cost 1
+::s1 c ::s2 ::cost 0.05 ::right1 [k]
+::s1 d ::s2 ::cost 1
+::s1 d ::s2 ::cost 0.05 ::right1 [d]
+::s1 e ::s2 ::cost 0.1 
+::s1 e ::s2 ::cost 0.1
+::s1 f ::s2 ::cost 1
+::s1 f ::s2 ::cost 0.05 ::right1 [f]
+::s1 g ::s2 ::cost 1
+::s1 g ::s2 ::cost 0.05 ::right1 [g]
+::s1 h ::s2 ::cost 1
+::s1 i ::s2 ::cost 0.3
+::s1 j ::s2 ::cost 1
+::s1 k ::s2 ::cost 1
+::s1 l ::s2 ::cost 1
+::s1 l ::s2 ::cost 0.05 ::right1 [l]
+::s1 m ::s2 ::cost 1
+::s1 m ::s2 ::cost 0.05 ::right1 [m]
+::s1 n ::s2 ::cost 1
+::s1 n ::s2 ::cost 0.05 ::right1 [n]
+::s1 o ::s2 ::cost 0.3
+::s1 p ::s2 ::cost 1
+::s1 p ::s2 ::cost 0.05 ::right1 [p]
+::s1 q ::s2 ::cost 1
+::s1 r ::s2 ::cost 1
+::s1 r ::s2 ::cost 0.05 ::right1 [r]
+::s1 s ::s2 ::cost 1
+::s1 s ::s2 ::cost 0.05 ::right1 [s]
+::s1 t ::s2 ::cost 1
+::s1 t ::s2 ::cost 0.05 ::right1 [t]
+::s1 u ::s2 ::cost 0.3
+::s1 v ::s2 ::cost 1
+::s1 w ::s2 ::cost 1
+::s1 x ::s2 ::cost 1
+::s1 y ::s2 ::cost 0.6
+::s1 z ::s2 ::cost 1
+::s1 z ::s2 ::cost 0.05 ::right1 [z]
+
+# Digits
+::s1 ० ::s2 0 ::cost 0.01
+::s1 १ ::s2 1 ::cost 0.01
+::s1 २ ::s2 2 ::cost 0.01
+::s1 ३ ::s2 3 ::cost 0.01
+::s1 ४ ::s2 4 ::cost 0.01
+::s1 ५ ::s2 5 ::cost 0.01
+::s1 ६ ::s2 6 ::cost 0.01
+::s1 ७ ::s2 7 ::cost 0.01
+::s1 ८ ::s2 8 ::cost 0.01
+::s1 ९ ::s2 9 ::cost 0.01
+::s1 ० ::s2 ::cost 1
+::s1 १ ::s2 ::cost 1
+::s1 २ ::s2 ::cost 1
+::s1 ३ ::s2 ::cost 1
+::s1 ४ ::s2 ::cost 1
+::s1 ५ ::s2 ::cost 1
+::s1 ६ ::s2 ::cost 1
+::s1 ७ ::s2 ::cost 1
+::s1 ८ ::s2 ::cost 1
+::s1 ९ ::s2 ::cost 1
+::s1 0 ::s2 ::cost 1
+::s1 1 ::s2 ::cost 1
+::s1 2 ::s2 ::cost 1
+::s1 3 ::s2 ::cost 1
+::s1 4 ::s2 ::cost 1
+::s1 5 ::s2 ::cost 1
+::s1 6 ::s2 ::cost 1
+::s1 7 ::s2 ::cost 1
+::s1 8 ::s2 ::cost 1
+::s1 9 ::s2 ::cost 1
+
+# Punctuation
+::s1 । ::s2 . ::cost 0.01 ::comment Devanagari danda
+::s1 । ::s2 ::cost 0.1
+::s1 ॥ ::s2 ::cost 0.01 ::comment Devanagari double danda
+::s1 ॥ ::s2 ::cost 0.1
+::s1 ॰ ::s2 ::cost 0.01 ::comment Devanagari abbreviation sign
+::s1 ॰ ::s2 ::cost 0.1
+::s1 ' ::s2 ::cost 0.1
+::s1 ` ::s2 ::cost 0.1
+::s1 ( ::s2 ::cost 0.1
+::s1 ) ::s2 ::cost 0.1
+::s1 , ::s2 ::cost 0.1
+::s1 ; ::s2 ::cost 0.1
+::s1 - ::s2 ::cost 0.1
+::s1 . ::s2 ::cost 0.1
+::s1 .. ::s2 ::cost 0.12
+::s1 ... ::s2 ::cost 0.14
+::s1 ? ::s2 ::cost 0.2
+::s1 ! ::s2 ::cost 0.2
+::s1 ‼ ::s2 ::cost 0.2
+::s1 ‼ ::s2 !! ::cost 0.02
+::s1 ‼ ::s2 ! ::cost 0.1
+::s1 / ::s2 ::cost 0.1
+::s1 : ::s2 ::cost 0.1
+::s1 ː ::s2 ::cost 0.1
+::s1 ː ::s2 : ::cost 0.1
+::s1 « ::s2 ::cost 0.1
+::s1 » ::s2 ::cost 0.1
+::s1 – ::s2 ::cost 0.1
+::s1 – ::s2 - ::cost 0.05
+::s1 — ::s2 ::cost 0.15
+::s1 — ::s2 - ::cost 0.1
+::s1 — ::s2 – ::cost 0.05
+::s1 ─ ::s2 ::cost 0.2
+::s1 ─ ::s2 - ::cost 0.15
+::s1 ─ ::s2 – ::cost 0.1
+::s1 ─ ::s2 — ::cost 0.05
+::s1 ’ ::s2 ::cost 0.1
+::s1 ʼ ::s2 ::cost 0.1
+::s1 " " ::s2 ::cost 0.1
+::s1 ::s2 " " ::cost 0.1
+::s1 “ ::s2 ::cost 0.1
+::s1 ” ::s2 ::cost 0.1
+::s1 ″ ::s2 ::cost 0.1
+::s1 # ::s2 ::cost 0.3
+::s1 + ::s2 ::cost 0.3
+::s1 * ::s2 ::cost 0.3
+::s1 = ::s2 ::cost 0.3
+::s1 < ::s2 ::cost 0.3
+::s1 > ::s2 ::cost 0.3
+::s1 [ ::s2 ::cost 0.3
+::s1 ] ::s2 ::cost 0.3
+::s1 { ::s2 ::cost 0.3
+::s1 } ::s2 ::cost 0.3
+::s1 | ::s2 ::cost 0.3
+::s1 & ::s2 ::cost 0.3
+::s1 _ ::s2 ::cost 0.3
+::s1 • ::s2 ::cost 0.1
+::s1 · ::s2 ::cost 0.1
+::s1 ◦ ::s2 ::cost 0.1
+::s1 ° ::s2 ::cost 0.1
+::s1 … ::s2 ::cost 0.1
+::s1 … ::s2 ... ::cost 0
+::s1 @ ::s2 ::cost 0.3
+::s1 © ::s2 ::cost 0.3
+
