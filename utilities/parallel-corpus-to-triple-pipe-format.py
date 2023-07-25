@@ -5,8 +5,11 @@ import sys
 filename1 = sys.argv[1]
 filename2 = sys.argv[2]
 filename_ref = sys.argv[3] if len(sys.argv) >= 4 and not (sys.argv[3].startswith('-')) else None
-sys.stderr.write(f'filename_ref={filename_ref}\n')
+# sys.stderr.write(f'filename_ref={filename_ref}\n')
 lc_p = ("--lc" in sys.argv or "-lc" in sys.argv)
+noref_p = ("--noref" in sys.argv or "-noref" in sys.argv)
+e_p = ("--e" in sys.argv or "-e" in sys.argv)
+f_p = ("--f" in sys.argv or "-f" in sys.argv)
 
 n_skipped_lines, n_unskipped_lines, n_empty_lines = 0, 0, 0
 
@@ -21,11 +24,15 @@ with open(filename1) as f1, open(filename2) as f2:
         n_tokens1, n_tokens2 = len(tokens1) , len(tokens2)
         ref = f_ref.readline().strip() if f_ref else None
         if n_tokens1 and n_tokens2:
-            ref_clause = f' ||| {ref}' if ref else ""
+            ref_clause = f' ||| {ref}' if ref and not noref_p else ""
             if ((n_tokens1 * 1.5 + 5 > n_tokens2) and (n_tokens2 * 1.5 + 5 > n_tokens1)) \
                     or (ref in ('GEN 1:1', 'JOS 1:1', 'ISA 1:1', 'MAT 1:1', 'ROM 1:1', 'TOB 1:1')):
-                # print(f'{line1} ||| {line2}{ref_clause}')
-                print(f'{line1} ||| {line2}')
+                if e_p:	
+                    print(line1)
+                elif f_p:	
+                    print(line2)
+                else:
+                    print(f'{line1} ||| {line2}{ref_clause}')
                 n_unskipped_lines += 1
             else:
                 n_skipped_lines += 1
@@ -33,5 +40,6 @@ with open(filename1) as f1, open(filename2) as f2:
         else:
             n_empty_lines += 1
 
-sys.stderr.write(f'Skipped {n_skipped_lines}/{n_skipped_lines+n_unskipped_lines} lines.\n')
+if n_skipped_lines:
+    sys.stderr.write(f'Skipped {n_skipped_lines}/{n_skipped_lines+n_unskipped_lines} lines.\n')
 
