@@ -36,5 +36,6 @@ When you hover over a word, additional information becomes available. Below are 
 * fw: function word (e.g. *and* and *the*)
 * sed: smart (phonetic) edit distance; the closer the sed is to 0, the closer the two words are phonetically
 * s: score
+* rom: romanization (conversion to Latin alphabet)
 * []: number in square brackets indicates word position starting at 0: [0] = first word, [1] = second word etc.
 
