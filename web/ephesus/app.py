@@ -13,7 +13,7 @@ from functools import partial
 from logging.config import dictConfig
 
 # 3rd party imports
-from sqlalchemy.event import listen
+from sqlalchemy.event import listen as sqlalchemy_listen
 import flask
 
 # This project
@@ -116,7 +116,7 @@ def create_app():
     )
 
     with app.app_context():
-        listen(db.engine, "connect", load_sqlite_json1_extension)
+        sqlalchemy_listen(db.engine, "connect", load_sqlite_json1_extension)
 
     # Initialize app cache
     cache.init_app(app)
@@ -135,9 +135,9 @@ def create_app():
     with open(app.config["GREEK_ROOM_ACL_PATH"], "rb") as acl_file:
         app.config["acl"] = json.load(acl_file)
 
-    # Log the current rules from the app
-    if _LOGGER.isEnabledFor(logging.DEBUG):
-        _LOGGER.info("Routing rules:\n%s", str(app.url_map))
+    # # Log the current rules from the app- does not log the main app routes; registered later
+    # if _LOGGER.isEnabledFor(logging.DEBUG):
+    #     _LOGGER.info("Routing rules:\n%s", str(app.url_map))
 
     # Return the app instance
     return app
