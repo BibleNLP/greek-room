@@ -20,7 +20,7 @@ import flask
 import web.ephesus.blueprints.auth
 import web.ephesus.blueprints.voithos
 import web.ephesus.blueprints.example
-import web.ephesus.blueprints.root
+import web.ephesus.blueprints.home
 import web.ephesus.blueprints.align_dev_viz
 import web.ephesus.blueprints.wildebeest
 from web.ephesus.exceptions import (
@@ -67,8 +67,8 @@ _BLUEPRINTS = [
     web.ephesus.blueprints.auth.BP,
     web.ephesus.blueprints.voithos.BP,
     web.ephesus.blueprints.example.BP,
-    web.ephesus.blueprints.root.BP,
-    web.ephesus.blueprints.align_dev_viz.BP,
+    web.ephesus.blueprints.home.BP,
+    # web.ephesus.blueprints.align_dev_viz.BP,
     web.ephesus.blueprints.wildebeest.BP,
 ]
 """List of blueprint singletons to load"""

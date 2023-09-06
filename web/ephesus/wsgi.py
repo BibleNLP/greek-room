@@ -13,6 +13,3 @@ import web.ephesus.app as ephesus_app
 #
 
 APP = ephesus_app.create_app()
-
-# Register main app routes
-from web.ephesus import routes

@@ -16,6 +16,7 @@ from flask_login import (
     login_user,
     logout_user,
     login_required,
+    fresh_login_required,
     current_user,
 )
 from werkzeug.security import (
@@ -101,9 +102,16 @@ def login_submit():
         )
         return flask.redirect(flask.url_for("auth.login"))
 
+    # next_param = flask.request.args.get("next")
+    # # url_has_allowed_host_and_scheme should check if the url is safe
+    # # for redirects, meaning it matches the request host.
+    # # See Django's url_has_allowed_host_and_scheme for an example.
+    # if not url_has_allowed_host_and_scheme(next, request.host):
+    #     return flask.abort(400)
+
     # Successfully logged-in
     login_user(user, remember=is_remember_me)
-    return flask.redirect(flask.url_for("wildebeest.get_index"))
+    return flask.redirect(flask.url_for("get_index"))
 
 
 @BP.route("/signup", methods=["POST"])
@@ -315,7 +323,7 @@ def is_username_exists(username):
 
 
 @BP.route("/manage/users")
-@login_required
+@fresh_login_required
 def manage_users():
     """The page for managing all users by an admin-level user"""
     # Define the access tags for
@@ -356,7 +364,7 @@ def manage_users():
 
 
 @BP.route("/manage/users/<username>/roles", methods=["POST"])
-@login_required
+@fresh_login_required
 def update_user_roles(username):
     """Update roles for a user"""
 

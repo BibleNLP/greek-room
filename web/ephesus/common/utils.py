@@ -26,9 +26,7 @@ def sanitize_string(user_input):
     return "".join([letter for letter in user_input][:15])
 
 
-def get_projects_listing(
-    username, base_path, roles=[], project_type=ProjectTypes.PROJ_WILDEBEEST
-):
+def get_projects_listing(username, base_path, roles=[]):
     """
     Get the listing of the projects for use in the UI.
     This is derived from reading the metadata.json file

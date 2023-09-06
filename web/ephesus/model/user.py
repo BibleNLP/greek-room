@@ -13,20 +13,14 @@ from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer
 from itsdangerous.exc import BadSignature, SignatureExpired
 
-# from this project
+# From this project
 from web.ephesus.extensions import db
-
-
-# Enums
-class StatusType(enum.Enum):
-    """Different types of Suggestion Types"""
-
-    ACTIVE = 1  # Regular operational account
-    INACTIVE = 2  # Account deleted by user
-    DISABLED = 3  # To denote action taken by someone other than the account holder
+from web.ephesus.constants import StatusType
 
 
 class User(UserMixin, db.Model):
+    """User model for the app"""
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(50), unique=True)
@@ -37,6 +31,8 @@ class User(UserMixin, db.Model):
     is_email_verified = db.Column(db.Boolean(), default=False)
     status = db.Column(Enum(StatusType), default=StatusType.ACTIVE.name)
     roles = db.Column(db.JSON, default=["public"])
+
+    projects = db.relationship("ProjectAccess", back_populates="user")
 
     def get_email_verification_token(self):
         serializer = URLSafeTimedSerializer(

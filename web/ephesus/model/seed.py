@@ -6,6 +6,7 @@ from web.ephesus.extensions import db
 from web.ephesus.model.user import (
     User,
 )
+from web.ephesus.model.project import Project, ProjectAccess
 from web.ephesus.model.voithos import (
     FlaggedTokens,
     Vocabulary,
@@ -48,53 +49,97 @@ voithos_seed_data = [
     }
 ]
 
-user_seed_data = {
+users_seed_data = {
     "users": [
         {
-            "email": "john@example.com",
-            "password": "0b47c69b1033498d5f33f5f7d97bb6a3126134751629f4d0185c115db44c094e",
-            "name": "John Doe",
-        }
-    ]
+            "email": "bob@email.com",
+            "username": "bob",
+            "password": "pbkdf2:sha512:210000$UKQsOQDc7Ngj5g1w$6364090ba739122c31f034c5600f67d6ac837058b2282f4a68ac64e171bc0d052767540da7e900af40b8bdbf13dac35bae89fea863b1afdbdefb3034af6fb982",
+            "is_email_verified": 1,
+            "status": "ACTIVE",
+            "roles": "[" "public" "]",
+        },
+        {
+            "email": "sam@email.com",
+            "username": "sam",
+            "password": "pbkdf2:sha512:210000$jUzijkvcIXcMGJep$303cfec08ac269c91f102c16e580d4dd3798fd0577c23189eb8e729311a7461e483177d0d1c58b8d5b95da8938c48732eb1ec316da88d1f16b7bce3828f09295",
+            "is_email_verified": 1,
+            "status": "ACTIVE",
+            "roles": "[" "public" "," "admin" "]",
+        },
+    ],
+    "projects": [
+        {
+            "name": "Hindi NT",
+            "lang_code": "hin",
+            "status": "ACTIVE",
+        },
+        {
+            "name": "Urdu NT",
+            "lang_code": "urd",
+            "status": "ACTIVE",
+        },
+    ],
+    "projectAccess": [
+        {
+            "user_id": 1,
+            "project_id": 1,
+        },
+        {
+            "user_id": 1,
+            "project_id": 2,
+        },
+        {"user_id": 2, "project_id": 2, "access_type": "COLLABORATOR"},
+    ],
 }
 
 app = ephesus_app.create_app()
 
 with app.app_context():
-    # Seed users
-    for seed_user in user_seed_data["users"]:
+    # Seed User
+    for seed_user in users_seed_data["users"]:
         user = User(**seed_user)
         db.session.add(user)
 
-    # Seed data for spell checking
-    for item in voithos_seed_data:
-        flagged_tokens = []
-        vocabulary = []
+    # Seed Project
+    for seed_project in users_seed_data["projects"]:
+        project = Project(**seed_project)
+        db.session.add(project)
 
-        # Create FlaggedTokens
-        for flagged_token in item["flagged_tokens"]:
-            flagged_tokens.append(FlaggedTokens(**flagged_token))
+    # Seed ProjectAccess
+    for seed_project_access in users_seed_data["projectAccess"]:
+        project_access = ProjectAccess(**seed_project_access)
+        db.session.add(project_access)
 
-        # Create Vocabulary
-        for vocabulary_entry in item["vocabulary"]:
-            vocabulary.append(Vocabulary(**vocabulary_entry))
+    # # Seed data for spell checking
+    # for item in voithos_seed_data:
+    #     flagged_tokens = []
+    #     vocabulary = []
 
-        # Create TokenSuggestions
-        for suggestion in item["token_suggestions"]:
-            token_suggestion_data = {
-                **{
-                    "flagged_token": flagged_tokens[
-                        suggestion["mapping"]["flagged_token_idx"]
-                    ],
-                    "suggestion": vocabulary[suggestion["mapping"]["vocabulary_idx"]],
-                },
-                **suggestion["association_data"],
-            }
+    #     # Create FlaggedTokens
+    #     for flagged_token in item["flagged_tokens"]:
+    #         flagged_tokens.append(FlaggedTokens(**flagged_token))
 
-            token_suggestion = TokenSuggestions(**token_suggestion_data)
+    #     # Create Vocabulary
+    #     for vocabulary_entry in item["vocabulary"]:
+    #         vocabulary.append(Vocabulary(**vocabulary_entry))
 
-            # Add to DB
-            db.session.add(token_suggestion)
+    #     # Create TokenSuggestions
+    #     for suggestion in item["token_suggestions"]:
+    #         token_suggestion_data = {
+    #             **{
+    #                 "flagged_token": flagged_tokens[
+    #                     suggestion["mapping"]["flagged_token_idx"]
+    #                 ],
+    #                 "suggestion": vocabulary[suggestion["mapping"]["vocabulary_idx"]],
+    #             },
+    #             **suggestion["association_data"],
+    #         }
+
+    #         token_suggestion = TokenSuggestions(**token_suggestion_data)
+
+    #         # Add to DB
+    #         db.session.add(token_suggestion)
 
     # Commit
     db.session.commit()

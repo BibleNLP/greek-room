@@ -23,10 +23,27 @@ class ProjectTypes(Enum, metaclass=MyEnumMeta):
     PROJ_WILDEBEEST = "wildebeest"
 
 
+# Enums
+class StatusType(Enum):
+    """Generic app status types"""
+
+    ACTIVE = 1  # Regular operational status
+    INACTIVE = 2  # Deleted by user
+    DISABLED = 3  # Deleted by someone other than the account owner
+
+
+class ProjectAccessType(Enum):
+    """Types of access a user has on a project"""
+
+    OWNER = 1  # The person who created the project
+    COLLABORATOR = 2  # Has both read/write except some sensitive attributes.
+    VIEWER = 3  # Only allowed to read things. No write.
+
+
 @unique
 class BookCodes(Enum, metaclass=MyEnumMeta):
     """
-    Enum of all Bible books.
+    All Bible books 3-letter codes.
     66 books in all.
     """
 
