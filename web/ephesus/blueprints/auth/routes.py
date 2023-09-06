@@ -30,7 +30,7 @@ from web.ephesus.blueprints.auth.utils import (
     is_valid_password,
     is_op_permitted,
 )
-from web.ephesus.extensions import db, email as email_handler, cache
+from web.ephesus.extensions import db, email as email_handler
 from web.ephesus.model.user import (
     User,
     StatusType,

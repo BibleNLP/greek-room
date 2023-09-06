@@ -2,8 +2,9 @@
 Constants used in this application
 """
 from enum import Enum, unique, EnumMeta
+from collections import namedtuple
 
-
+# Enums
 class MyEnumMeta(EnumMeta):
     def __contains__(cls, item):
         try:
@@ -23,7 +24,6 @@ class ProjectTypes(Enum, metaclass=MyEnumMeta):
     PROJ_WILDEBEEST = "wildebeest"
 
 
-# Enums
 class StatusType(Enum):
     """Generic app status types"""
 
@@ -38,6 +38,12 @@ class ProjectAccessType(Enum):
     OWNER = 1  # The person who created the project
     COLLABORATOR = 2  # Has both read/write except some sensitive attributes.
     VIEWER = 3  # Only allowed to read things. No write.
+
+
+# Wrapper for sending project data to frontend
+ProjectDetails = namedtuple(
+    "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_time"]
+)
 
 
 @unique

@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block right_content %}
+{% extends "home/base.html" %} {% block right_content %}
 <div id="analysis-content">Click on a project name to load data.</div>
 {% endblock %} {% block left_content %}
 <a class="button" href="#popup1">&plus;</a>
@@ -12,7 +12,7 @@
     <li>
       <button
         class="link"
-        data-url="{{ url_for('.run_analysis', resource_id=project.resource_id) }}"
+        data-url="{{ url_for('wildebeest.run_analysis', resource_id=project.resource_id) }}"
         data-resource-id="{{ project.resource_id }}"
         data-lang-code="{{ project.lang_code }}"
         name="resourceId"

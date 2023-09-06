@@ -3,10 +3,7 @@
 # from this project
 import web.ephesus.app as ephesus_app
 from web.ephesus.extensions import db
-from web.ephesus.model.user import (
-    User,
-)
-from web.ephesus.model.project import Project, ProjectAccess
+from web.ephesus.model.user import User, Project, ProjectAccess
 from web.ephesus.model.voithos import (
     FlaggedTokens,
     Vocabulary,
@@ -70,11 +67,13 @@ users_seed_data = {
     ],
     "projects": [
         {
+            "resource_id": "asdf1234",
             "name": "Hindi NT",
             "lang_code": "hin",
             "status": "ACTIVE",
         },
         {
+            "resource_id": "zxcv5678",
             "name": "Urdu NT",
             "lang_code": "urd",
             "status": "ACTIVE",
