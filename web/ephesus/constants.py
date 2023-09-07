@@ -45,6 +45,9 @@ ProjectDetails = namedtuple(
     "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_time"]
 )
 
+# The String to call the 'latest' version of the project
+LATEST_PROJECT_VERSION_NAME = "latest"
+
 
 @unique
 class BookCodes(Enum, metaclass=MyEnumMeta):
