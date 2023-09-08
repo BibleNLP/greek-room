@@ -109,6 +109,14 @@ def login_submit():
     # if not url_has_allowed_host_and_scheme(next, request.host):
     #     return flask.abort(400)
 
+    # Check if user is active
+    if user and user.status != StatusType.ACTIVE.name:
+        flask.flash(
+            f"This user is not active on the system. Please contact an administrator to resovlve this.",
+            "login-message-fail",
+        )
+        return flask.redirect(flask.url_for("auth.login"))
+
     # Successfully logged-in
     login_user(user, remember=is_remember_me)
     return flask.redirect(flask.url_for("get_index"))
