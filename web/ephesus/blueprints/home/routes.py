@@ -12,6 +12,7 @@ import logging
 import secrets
 import shutil
 from pathlib import Path
+import pprint
 
 # 3rd party imports
 import flask
@@ -21,7 +22,11 @@ from werkzeug.utils import secure_filename
 # This project
 from web.ephesus.extensions import db
 from web.ephesus.common.utils import sanitize_string, parse_uploaded_files
-from web.ephesus.constants import ProjectDetails, LATEST_PROJECT_VERSION_NAME
+from web.ephesus.constants import (
+    ProjectDetails,
+    LATEST_PROJECT_VERSION_NAME,
+    ProjectAccessType,
+)
 from web.ephesus.model.user import Project, ProjectAccess
 
 _LOGGER = logging.getLogger(__name__)
@@ -59,12 +64,12 @@ def get_index():
                 item.project.resource_id,
                 item.project.name,
                 item.project.lang_code,
-                item.project.create_time,
+                item.project.create_datetime,
             )
             for item in current_user.projects
         ],
         reverse=True,
-        key=lambda x: x.create_time,
+        key=lambda x: x.create_datetime,
     )
 
     projects_path = Path(flask.current_app.config["PROJECTS_PATH"])
@@ -73,21 +78,39 @@ def get_index():
     # if not projects_path.exists():
     #     projects_path.mkdir(parents=True)
 
-    # projects_listing = get_projects_listing(
-    #     current_user.username,
-    #     projects_path,
-    #     roles=current_user.roles,
-    # )
-
     return flask.render_template(
         "home/index.html",
         projects_listing=projects_listing,
     )
 
 
+@BP.route("/projects/<resource_id>/overview")
+@login_required
+def get_project_overview(resource_id):
+    """Get the basic overview of a project `resource_id`"""
+    # Check if the requested project is accessible to the user
+    # This returns `Project` instance as the first result
+    # and the `ProjectAccess.access_type` as the second result
+    # both in the same tuple.
+    project_details = db.session.execute(
+        (
+            db.select(Project, ProjectAccess.access_type)
+            .join(ProjectAccess)
+            .where(ProjectAccess.user_id == current_user.id)
+            .where(Project.resource_id == resource_id)
+        )
+    ).first()
+
+    return flask.render_template(
+        "home/project_overview.fragment",
+        project=project_details,
+    )
+
+
 @BP.route("/upload", methods=["POST"])
 @login_required
 def upload_file():
+    """Handle upload of files for creating a new project"""
     if flask.request.method == "POST":
 
         # check if the post request has the file part

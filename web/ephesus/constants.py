@@ -42,7 +42,7 @@ class ProjectAccessType(Enum):
 
 # Wrapper for sending project data to frontend
 ProjectDetails = namedtuple(
-    "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_time"]
+    "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_datetime"]
 )
 
 # The String to call the 'latest' version of the project
