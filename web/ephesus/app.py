@@ -33,6 +33,7 @@ from web.ephesus.extensions import (
     email,
     login_manager,
     load_sqlite_extension,
+    Babel,
 )
 
 #
@@ -130,6 +131,9 @@ def create_app():
 
     # Initialize login manager
     login_manager.init_app(app)
+
+    # Initialize Flask-Babel for localizaiong
+    Babel(app)
 
     # Load in app ACL policy
     with open(app.config["GREEK_ROOM_ACL_PATH"], "rb") as acl_file:

@@ -4,7 +4,7 @@ Model for a user in the ephesus web app
 
 ## Imports
 import secrets
-from datetime import datetime
+from datetime import datetime, timezone
 
 # 3rd party imports
 from sqlalchemy import Enum
@@ -19,6 +19,9 @@ from web.ephesus.constants import (
     ProjectAccessType,
     StatusType,
 )
+from web.ephesus.model.common import (
+    TZDateTime,
+)
 
 
 class User(UserMixin, db.Model):
@@ -30,8 +33,14 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(1000))
     name = db.Column(db.String(1000))
     organization = db.Column(db.String(1000))
-    create_datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    update_datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    create_datetime = db.Column(
+        TZDateTime(timezone=True), default=datetime.now(timezone.utc)
+    )
+    update_datetime = db.Column(
+        TZDateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
     is_email_verified = db.Column(db.Boolean(), default=False)
     status = db.Column(Enum(StatusType), default=StatusType.ACTIVE.name)
     roles = db.Column(db.JSON, default=["public"])
@@ -75,9 +84,15 @@ class Project(db.Model):
     name = db.Column(db.String(1000))
     lang_code = db.Column(db.String(10))
     tags = db.Column(db.JSON, default=[])
-    create_datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    update_datetime = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(Enum(StatusType), default=StatusType.ACTIVE.name)
+    create_datetime = db.Column(
+        TZDateTime(timezone=True), default=datetime.now(timezone.utc)
+    )
+    update_datetime = db.Column(
+        TZDateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
 
     # Store arbitary project metadata
     project_metadata = db.Column(db.JSON, default={})
@@ -91,10 +106,16 @@ class ProjectAccess(db.Model):
     """Model to connect Users with Projects based on permissions and store metadata"""
 
     id = db.Column(db.Integer, primary_key=True)
-    create_datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    update_datetime = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     project_id = db.Column(db.Integer, db.ForeignKey(Project.id))
+    create_datetime = db.Column(
+        TZDateTime(timezone=True), default=datetime.now(timezone.utc)
+    )
+    update_datetime = db.Column(
+        TZDateTime(timezone=True),
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
 
     user = db.relationship("User", back_populates="projects")
     project = db.relationship("Project", back_populates="users")

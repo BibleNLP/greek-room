@@ -1,11 +1,11 @@
 """Define extensions for Flask app"""
 
 # 3rd Party imports
-import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_caching import Cache
 from flask_redmail import RedMail
 from flask_login import LoginManager
+from flask_babel import Babel
 
 ## Create SQLAlchemy extension
 db = SQLAlchemy()

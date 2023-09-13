@@ -11,8 +11,8 @@ Used to manage "Home" path routes
 import logging
 import secrets
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
-import pprint
 
 # 3rd party imports
 import flask
@@ -104,6 +104,7 @@ def get_project_overview(resource_id):
     return flask.render_template(
         "home/project_overview.fragment",
         project=project_details,
+        current_datetime=datetime.now(timezone.utc),
     )
 
 

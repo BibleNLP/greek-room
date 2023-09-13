@@ -110,16 +110,16 @@ def login_submit():
     #     return flask.abort(400)
 
     # Check if user is active
-    if user and user.status != StatusType.ACTIVE.name:
+    if user and user.status != StatusType.ACTIVE:
         flask.flash(
-            f"This user is not active on the system. Please contact an administrator to resovlve this.",
+            f"This user is not active on the system. Please contact an administrator to resolve this.",
             "login-message-fail",
         )
         return flask.redirect(flask.url_for("auth.login"))
 
     # Successfully logged-in
     login_user(user, remember=is_remember_me)
-    return flask.redirect(flask.url_for("get_index"))
+    return flask.redirect(flask.url_for("home.get_index"))
 
 
 @BP.route("/signup", methods=["POST"])
