@@ -40,6 +40,14 @@ class ProjectAccessType(Enum):
     VIEWER = 3  # Only allowed to read things. No write.
 
 
+class ProjectAcessRights(Enum):
+    """Rights of access a user has on a project.
+    This is a bit redundant but still useful."""
+
+    READ = 1  # Has the read access on the project
+    WRITE = 2  # Has the write access on the project
+
+
 # Wrapper for sending project data to frontend
 ProjectDetails = namedtuple(
     "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_datetime"]

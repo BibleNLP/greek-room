@@ -17,13 +17,17 @@ from web.ephesus.common.utils import (
     count_file_content_lines,
     is_file_modified,
 )
+from web.ephesus.model.common import (
+    get_project_metadata,
+    set_project_metadata,
+)
 from web.ephesus.extensions import cache
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_wb_analysis(input_path, vref_file_path=None):
+def get_wb_analysis(input_path, resource_id, vref_file_path=None):
     """Run Wildebeest analysis and return JSON results and optionally vref_dict"""
     _LOGGER.debug(f"Started running Wildebeest analysis on file: {input_path}")
 
@@ -32,7 +36,7 @@ def get_wb_analysis(input_path, vref_file_path=None):
         _LOGGER.debug(f"No vref_file provided. Attempting to use default...")
         # Load-in default vref_file
         # Taken from https://github.com/BibleNLP/ebible/blob/96e0c22a6ce6f3f50de60a6ac1ee30a057b9a5c0/metadata/vref.txt
-        vref_file_path = Path(flask.current_app.config["WILDEBEEST_DEFAULT_VREF_FILE"])
+        vref_file_path = Path(flask.current_app.config["GREEK_ROOM_DEFAULT_VREF_FILE"])
 
     # Correlate if number of lines in vref_file
     # and the input_path match, as a reasonable
@@ -62,16 +66,18 @@ def get_wb_analysis(input_path, vref_file_path=None):
         vref_dict = wb_ana.load_ref_ids(vref_file_path)
 
     # Check if we can return from cache
-    ## Get the metadata.json
-    with (input_path.parent / "metadata.json").open() as metadata_file:
-        metadata = json.load(metadata_file)
+    ## Get the project metadata
+    project_metadata = get_project_metadata(resource_id)
 
     ## Get the last_modified_timestamp
-    last_modified = metadata.get(
-        "wbAnalysisLastModified", datetime(2001, 1, 1).timestamp()
+    analysis_last_modified = project_metadata.setdefault("wildebeest", {}).setdefault(
+        "AnalysisLastModified", datetime(2001, 1, 1).timestamp()
     )
 
-    if cache.get(f"{input_path}") and not is_file_modified(input_path, last_modified):
+    # See if we can use a cached response
+    if cache.get(f"{input_path}") and not is_file_modified(
+        input_path, analysis_last_modified
+    ):
         wb_analysis = cache.get(f"{input_path}")
         _LOGGER.debug("Using cached Wildebeest output.")
     else:
@@ -82,9 +88,11 @@ def get_wb_analysis(input_path, vref_file_path=None):
 
         # set the cache and metadata
         cache.set(f"{input_path}", wb_analysis)
-        metadata["wbAnalysisLastModified"] = input_path.stat().st_mtime
-        with (input_path.parent / "metadata.json").open("w") as metadata_file:
-            json.dump(metadata, metadata_file)
+
+        project_metadata["wildebeest"][
+            "AnalysisLastModified"
+        ] = input_path.stat().st_mtime
+        set_project_metadata(resource_id, project_metadata)
 
     _LOGGER.debug(f"Finished running Wildebeest analysis.")
 

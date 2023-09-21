@@ -19,7 +19,7 @@ from web.ephesus.constants import (
     ProjectAccessType,
     StatusType,
 )
-from web.ephesus.model.common import (
+from web.ephesus.model.custom import (
     TZDateTime,
 )
 
@@ -120,6 +120,5 @@ class ProjectAccess(db.Model):
     user = db.relationship("User", back_populates="projects")
     project = db.relationship("Project", back_populates="users")
 
-    access_type = db.Column(
-        Enum(ProjectAccessType), default=ProjectAccessType.OWNER.name
-    )
+    access_type = db.Column(Enum(ProjectAccessType))
+    access_rights = db.Column(db.JSON, default=[])

@@ -119,7 +119,7 @@ def count_file_content_lines(file_path):
 
 def is_file_modified(file_path, last_modified):
     """Checks if `file_path` has a newer modified date than `last_modified`"""
-    if not file_path or last_modified:
+    if not file_path or not last_modified:
         return False
 
     return datetime.fromtimestamp(file_path.stat().st_mtime) > datetime.fromtimestamp(

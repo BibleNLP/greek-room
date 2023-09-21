@@ -8,6 +8,15 @@ import logging
 ## Third party
 import flask
 
+# This project
+from web.ephesus.extensions import db
+from web.ephesus.constants import (
+    ProjectAcessRights,
+    ProjectAccessType,
+)
+from web.ephesus.model.user import User, Project, ProjectAccess
+
+
 # Logger
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,17 +48,32 @@ def is_valid_username(username):
 
 
 # Roles are implemented based on https://tailscale.com/blog/rbac-like-it-was-meant-to-be/
-def is_project_op_permitted(username, roles, project_meta, op="read"):
+def is_project_op_permitted(username, resource_id, op=ProjectAcessRights.READ.name):
     """
     A central function for simple role-based
     checking for project operation
     """
-    if not username or not roles or not project_meta:
+    if not username or not resource_id:
         return False
 
-    if username == project_meta.get("owner", ""):
-        return True
+    row = db.session.execute(
+        db.select(User, ProjectAccess)
+        .join(ProjectAccess)
+        .join(Project)
+        .where(User.username == username)
+        .where(Project.resource_id == resource_id)
+    ).first()
 
+    if row and len(row) == 2:
+        # Check if the user is the project owner
+        if row[1].access_type == ProjectAccessType.OWNER:
+            return True
+    # Failure to retrieve data from DB
+    else:
+        _LOGGER.debug("Could not retrieve user access data from DB")
+        return False
+
+    # TODO: Handle policy based on ACL from DB
     tags = set(project_meta.get("tags", []))
     roles = set(roles)
     acl = flask.current_app.config["acl"]

@@ -72,7 +72,7 @@ def get_index():
         key=lambda x: x.create_datetime,
     )
 
-    projects_path = Path(flask.current_app.config["PROJECTS_PATH"])
+    projects_path = Path(flask.current_app.config["GREEK_ROOM_PROJECTS_DIR"])
 
     # First time login
     # if not projects_path.exists():
@@ -88,6 +88,7 @@ def get_index():
 @login_required
 def get_project_overview(resource_id):
     """Get the basic overview of a project `resource_id`"""
+
     # Check if the requested project is accessible to the user
     # This returns `Project` instance as the first result
     # and the `ProjectAccess.access_type` as the second result
@@ -135,7 +136,7 @@ def upload_file():
                 resource_id = secrets.token_urlsafe(6)
                 # filename = f"{round(time.time())}_{secure_filename(file.filename)}"
                 project_path = (
-                    Path(flask.current_app.config["PROJECTS_PATH"])
+                    Path(flask.current_app.config["GREEK_ROOM_PROJECTS_DIR"])
                     / resource_id
                     / LATEST_PROJECT_VERSION_NAME
                 )
@@ -156,7 +157,9 @@ def upload_file():
                     lang_code=lang_code,
                 )
                 project_access = ProjectAccess(
-                    project=project_db_instance, user=current_user
+                    project=project_db_instance,
+                    user=current_user,
+                    access_type=ProjectAccessType.OWNER.name,
                 )
                 project_db_instance.users.append(project_access)
                 db.session.add(project_db_instance)
