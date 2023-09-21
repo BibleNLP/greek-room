@@ -113,7 +113,7 @@ def create_app():
 
     # Load Sqlite JSON1 extension
     load_sqlite_json1_extension = partial(
-        load_sqlite_extension, ext_path=app.config["SQLITE_JSON1_EXT_PATH"]
+        load_sqlite_extension, ext_path=app.config["SQLITE_JSON1_EXT_FILE"]
     )
 
     with app.app_context():
@@ -136,7 +136,7 @@ def create_app():
     Babel(app)
 
     # Load in app ACL policy
-    with open(app.config["GREEK_ROOM_ACL_PATH"], "rb") as acl_file:
+    with open(app.config["GREEK_ROOM_ACL_FILE"], "rb") as acl_file:
         app.config["acl"] = json.load(acl_file)
 
     # # Log the current rules from the app- does not log the main app routes; registered later
