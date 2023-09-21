@@ -5,7 +5,7 @@
             <tr bgcolor="#BBCCFF">
                 <td><table border="0" cellpadding="3" cellspacing="0">
                         <tr>
-                            <td><b><font class="large" size="+1">&nbsp; Wildebeest Analysis Report</font></b></td>
+                            <td><b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b></td>
                         </tr>
                     </table>
                 </td>
@@ -39,10 +39,9 @@
 </ul>
 <hr>
 <h3>Details</h3>
-Jump to: <a href="#block">character blocks</a>, <a href="#pattern">tokens with patterns</a><br><ul>
+Jump to: <a href="#block">character blocks</a>, <a href="#pattern">tokens with patterns</a><br>
+<ul>
   <li> Non-canonical character combinations: {{ wb_analysis_data.get('non-canonical', {})|length }}
-  <table>
-  </table>
   <li> Character conflict sets: {{ wb_analysis_data.get('char-conflict', {})|length }}
 <a name="block"><p><br><p>
    {% for block, details in  wb_analysis_data.get('block', {}).items() %}

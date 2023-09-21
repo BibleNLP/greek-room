@@ -1,8 +1,11 @@
-console.log("Welcome to the Greek Room!");
+console.log("καλωσορίσατε στο ελληνικό δωμάτιο!");
 
 // Method to get formatted Wildebeest analysis output from the backend
-export async function getProjectOverview(element) {
-  var URL = window.location.origin + element.dataset.url;
+export async function getDataFromElementURL(element, params) {
+  var URL =
+    params === undefined
+      ? window.location.origin + element.dataset.url
+      : window.location.origin + element.dataset.url + params;
 
   const response = await fetch(URL);
   if (response.ok) {
@@ -16,15 +19,16 @@ export async function getProjectOverview(element) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  let detailsPane = document.getElementById("details-pane");
+  const projectsListing = document.querySelector(".listing");
+  const detailsPane = document.getElementById("details-pane");
 
-  // Apply onclick listener for each of the resource links on the left pane
-  const resourceLinks = document.getElementsByClassName("link");
-  [].forEach.call(resourceLinks, (link) => {
-    link.addEventListener("click", (event) => {
-      console.log(event.target.dataset);
+  // Parent event listener for the left pane
+  projectsListing.addEventListener("click", (event) => {
+    // Apply onclick listener for the project links in the left pane
+    const linkTarget = event.target.closest(".link");
+    if (linkTarget) {
       // Set resourceId state
-      const resourceId = event.target.dataset.resourceId;
+      const resourceId = linkTarget.dataset.resourceId;
 
       // Unselect any existing and highlight selected link
       Array.from(document.getElementsByClassName("link underline")).forEach(
@@ -32,12 +36,28 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       // Underline selected resource link
-      event.target.classList.add("underline");
+      linkTarget.classList.add("underline");
 
       // Get HTML Wildebeest analysis content to display on right pane
-      getProjectOverview(event.target).then((content) => {
+      getDataFromElementURL(linkTarget).then((content) => {
         detailsPane.innerHTML = content;
       });
-    });
+    }
+  });
+
+  // Parent even listener for the right pane
+  detailsPane.addEventListener("click", (event) => {
+    // Apply onclick listener for the analysis results links in the right pane
+    const linkTarget = event.target.closest(".link");
+    if (linkTarget) {
+      console.log(linkTarget.dataset);
+      // Set resourceId state
+      const resourceId = linkTarget.dataset.resourceId;
+
+      // Get HTML Wildebeest analysis content to display on right pane
+      getDataFromElementURL(linkTarget).then((content) => {
+        detailsPane.innerHTML = content;
+      });
+    }
   });
 });

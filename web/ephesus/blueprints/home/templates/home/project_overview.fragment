@@ -16,7 +16,15 @@
   <li>
     <strong>Wildebeest</strong>
     <ul>
-      <li>See results</li>
+      <li>
+        <button
+          class="link"
+          data-url="{{ url_for('wildebeest.run_analysis', resource_id=project.Project.resource_id) }}?formatted=true"
+          name="wildebeest-analysis"
+        >
+          See results
+        </button>
+      </li>
     </ul>
   </li>
   <li>
