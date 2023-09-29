@@ -167,7 +167,9 @@ def upload_file():
             _LOGGER.error(f"Unable to create project. {e} Try again with other files.")
 
             # Clean-up partially created project from disk
-            project_root = Path(flask.current_app.config["PROJECTS_PATH"]) / resource_id
+            project_root = (
+                Path(flask.current_app.config["GREEK_ROOM_PROJECTS_DIR"]) / resource_id
+            )
             if project_root.is_dir():
                 _LOGGER.debug("Cleaning-up partially created files from disk")
                 shutil.rmtree(f"{project_root}")

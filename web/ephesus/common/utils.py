@@ -6,6 +6,8 @@ Common utitities shared across blueprints
 import json
 import string
 import logging
+import zipfile
+from pathlib import Path
 from datetime import datetime
 from collections import namedtuple
 
@@ -16,6 +18,13 @@ from web.ephesus.constants import (
 from web.ephesus.exceptions import (
     ProjectError,
     InputError,
+)
+
+# Third party
+from machine.corpora import (
+    UsfmFileTextCorpus,
+    extract_scripture_corpus,
+    ParatextTextCorpus,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,20 +45,45 @@ def parse_uploaded_files(filepath, resource_id):
         if filepath.suffix.lower() in [".txt"]:
             filepath.replace(f"{filepath.parent / resource_id}.txt")
 
-        # Handle Zipped Paratext project uploads
+        # Handle Zipped project uploads
+        # These can either by Paratext Projects or
+        # a simple collection of USFM files
+        # (with .sfm or .usfm extensions).
         elif filepath.suffix.lower() in [".zip"]:
-            extract_path = filepath.parent / "extract"
+            extract_dir = filepath.parent / "extract"
             with zipfile.ZipFile(filepath, "r") as zip_ref:
-                zip_ref.extractall(extract_path)
+                zip_ref.extractall(extract_dir)
 
-            # Read in Paratext project
-            paratext_corpus = ParatextTextCorpus(f"{extract_path}")
+            # Check if this is a Paratext Project
+            # See https://github.com/sillsdev/machine.py/blob/19188e173ffdd3c22f2c4eaa68c581d72f2c86c5/machine/corpora/paratext_text_corpus.py#L55C12-L55C12
+            if (
+                is_generator_valid(extract_dir.glob("*.SFM"))
+                and (extract_dir / "Settings.xml").exists()
+            ):
+                extracted_corpus = ParatextTextCorpus(str(extract_dir))
+
+            # Otherwise check if it uses any of the
+            # other reasonable USFM file extensions
+            elif is_generator_valid(extract_dir.glob("*.SFM")):
+                extracted_corpus = UsfmFileTextCorpus(str(extract_dir))
+            elif is_generator_valid(extract_dir.glob("*.sfm")):
+                extracted_corpus = UsfmFileTextCorpus(
+                    str(extract_dir), file_pattern="*.sfm"
+                )
+            elif is_generator_valid(extract_dir.glob("*.usfm")):
+                extracted_corpus = UsfmFileTextCorpus(
+                    str(extract_dir), file_pattern="*.usfm"
+                )
+            elif is_generator_valid(extract_dir.glob("*.USFM")):
+                extracted_corpus = UsfmFileTextCorpus(
+                    str(extract_dir), file_pattern="*.USFM"
+                )
 
             # Extract into BibleNLP format
             # This returns verse_text, org_versification, corpus_versification. We don't want to map to org for this use-case.
             verses = []
             vrefs = []
-            for verse, _, vref in extract_scripture_corpus(paratext_corpus):
+            for verse, _, vref in extract_scripture_corpus(extracted_corpus):
                 verses.append(verse)
                 vrefs.append(str(vref))
 
@@ -63,6 +97,21 @@ def parse_uploaded_files(filepath, resource_id):
     except Exception as e:
         _LOGGER.error("Error while parsing and saving the data", e)
         raise InputError("Error while processsing the data.")
+
+
+def is_generator_valid(gen):
+    """Utility to check if a generator has any valid value in at-all or not.
+    This is a subsitute for `len` checks for generators"""
+    if not gen:
+        return False
+
+    try:
+        next(gen)
+    except StopIteration as s:
+        return False
+
+    # Seems there is at-least one value
+    return True
 
 
 def get_projects_listing(username, base_path, roles=[]):
