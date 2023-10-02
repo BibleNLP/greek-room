@@ -1,0 +1,47 @@
+{% if project is not none %}
+<h2>{{ project.Project.name }}</h2>
+<hr />
+<p>
+  Language Code: <strong>{{ project.Project.lang_code }}</strong> <br />Created:
+  <strong
+    >{{ (current_datetime - project.Project.create_datetime)|timedeltaformat }}
+    ago</strong
+  >
+  <br />Access Type: <strong>{{ project.access_type.name }}</strong>
+  <br />Contents:
+  <strong>MAT, MRK, LUK</strong>
+</p>
+<h3>Tools</h3>
+<ul>
+  <li>
+    <strong>Wildebeest</strong>
+    <ul>
+      <li>
+        <button
+          class="link"
+          data-url="{{ url_for('wildebeest.run_analysis', resource_id=project.Project.resource_id) }}?formatted=true"
+          name="wildebeest-analysis"
+        >
+          See results
+        </button>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <strong>Spellings</strong>
+    <ul>
+      <li>Status: <strong>Pending</strong></li>
+      <li>See results</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Alignment Visualization</strong>
+    <ul>
+      <li>Status: <strong>Pending</strong></li>
+      <li>See results</li>
+    </ul>
+  </li>
+</ul>
+{% else %}
+<p>Could not find project.</p>
+{% endif %}
