@@ -1,3 +1,6 @@
+import logging
+from logging.config import dictConfig
+
 from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -7,7 +10,15 @@ from .home import routes as home_routes
 from .routers import items
 from .database.setup import SessionLocal, engine
 from .database import models
+from .config import LogConfig
 
+# Get and set logger
+_LOGGER = logging.getLogger(__name__)
+dictConfig(LogConfig().dict())
+
+_LOGGER.debug("hello world!")
+
+# logger = logging.getLogger("mycoolapp")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
