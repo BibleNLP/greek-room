@@ -12,8 +12,8 @@ from .dependencies import get_query_token, get_token_header
 from .wildebeest import routes as wb_routes
 from .home import routes as home_routes
 from .routers import items
-from .database.setup import SessionLocal, engine
-from .database import models
+from .database.setup import SessionLocal, engine, Base
+
 from .config import LogConfig
 
 # Get and set logger
@@ -21,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 dictConfig(LogConfig().dict())
 
 # Create DB instance
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 # Create and configure app instance
 app = FastAPI()

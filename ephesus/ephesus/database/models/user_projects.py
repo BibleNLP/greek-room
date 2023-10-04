@@ -1,3 +1,6 @@
+from typing import (
+    List,
+)
 from sqlalchemy import String, Enum, JSON, ForeignKey
 from sqlalchemy.orm import (
     mapped_column,
@@ -8,12 +11,12 @@ from sqlalchemy.orm import (
 import secrets
 from datetime import datetime, timezone
 
-from .setup import Base
-from ..constants import (
+from ..setup import Base
+from ...constants import (
     StatusType,
     ProjectAccessType,
 )
-from .custom import (
+from ..custom import (
     TZDateTime,
 )
 
@@ -23,7 +26,9 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50))
-    projects = relationship("ProjectAccess", back_populates="user")
+    projects: Mapped[List["Project"]] = relationship(
+        "ProjectAccess", back_populates="user"
+    )
 
 
 class Project(Base):
@@ -39,7 +44,7 @@ class Project(Base):
     )
     name: Mapped[str] = mapped_column(String(1000))
     lang_code: Mapped[str] = mapped_column(String(10))
-    tags: Mapped[JSON] = mapped_column(JSON, default=[])
+    tags: Mapped[JSON | None] = mapped_column(JSON, default=[])
     status: Mapped[Enum] = mapped_column(
         Enum(StatusType), default=StatusType.ACTIVE.name
     )
@@ -56,7 +61,9 @@ class Project(Base):
     # Store arbitary project metadata
     project_metadata: Mapped[JSON] = mapped_column(JSON, default={})
 
-    users = relationship("ProjectAccess", back_populates="project")
+    users: Mapped[List["User"]] = relationship(
+        "ProjectAccess", back_populates="project"
+    )
 
 
 # Join table for NxN relationship between
@@ -80,9 +87,8 @@ class ProjectAccess(Base):
         onupdate=datetime.now(timezone.utc),
     )
 
-    user = relationship("User", back_populates="projects")
-    project = relationship("Project", back_populates="users")
+    user: Mapped[List["User"]] = relationship("User", back_populates="projects")
+    project: Mapped[List["Project"]] = relationship("Project", back_populates="users")
 
-    access_type: Mapped[Enum] = mapped_column(Enum(ProjectAccessType))
-
-    access_rights: Mapped[JSON] = mapped_column(JSON, default=[])
+    access_type: Mapped[Enum | None] = mapped_column(Enum(ProjectAccessType))
+    access_rights: Mapped[JSON | None] = mapped_column(JSON, default=[])
