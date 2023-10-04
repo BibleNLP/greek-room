@@ -1,3 +1,7 @@
+"""
+Main entry point for the Ephesus application
+"""
+# Imports
 import logging
 from logging.config import dictConfig
 
@@ -16,14 +20,12 @@ from .config import LogConfig
 _LOGGER = logging.getLogger(__name__)
 dictConfig(LogConfig().dict())
 
-_LOGGER.debug("hello world!")
-
-# logger = logging.getLogger("mycoolapp")
+# Create DB instance
 models.Base.metadata.create_all(bind=engine)
 
+# Create and configure app instance
 app = FastAPI()
 app.mount("/static", StaticFiles(packages=[("ephesus.home", "static")]), name="static")
-
 
 app.include_router(home_routes.ui_router)
 app.include_router(
