@@ -13,5 +13,3 @@ Word alignment supports applications such as spell-checking and learning word or
 
 ## Research Team
 Dr. Ulf Hermjakob and Joel Mathew; University of Southern California Information Sciences Institute.
-This work is supported by Wycliffe Bible Translators USA.
-
