@@ -14,5 +14,5 @@ We applied the Wildebeest tools to the 1009 translations in the <a href="https:/
 Some of the remaining issues flagged might be perfectly valid translations after all. (E.g. some English Bible translations deliberately contain Hebrew characters in the Psalms.) Other issues will need to be corrected by Bible translators with native speaker competence.
 
 ## Using *Wildebeest*
-**Software installation:** <a href="https://github.com/uhermjakob/wildebeest">Wildebeest on GitHub</a> (includes description, usage,  installation ``pip install wildebeest-nlp``, code)<br>
+**Software installation:** <a target="_GITHUB" href="https://github.com/uhermjakob/wildebeest">Wildebeest on GitHub</a> (includes description, usage,  installation ``pip install wildebeest-nlp``, code)<br>
 **For Bible translators:** see support info under **[Spell Checking]({{< ref "/spell" >}} "Spell Checking")**
