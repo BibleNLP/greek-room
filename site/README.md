@@ -20,7 +20,7 @@ cd /usr/local/src/greek-room/site
 # e.g. `git pull`, etc.
 
 # Run hugo
-hugo
+sudo hugo
 
 # If successful, this will have created (or updated) the
 # ./public direcory which contains the built site
@@ -52,10 +52,10 @@ cp -r public /usr/local/greek-room
 # `public` directory with the updated one
 
 # Make the directory accessible by group
-chown -R :zion_users /usr/local/greek-room/public
+sudo chown -R :zion_users /usr/local/greek-room/public
 
 # Change permissions
-chmod -R 775 /usr/local/greek-room/public
+sudo chmod -R 775 /usr/local/greek-room/public
 ```
 
 This should be enough to update the public website. Sometimes, `nginx` might need refreshing:
