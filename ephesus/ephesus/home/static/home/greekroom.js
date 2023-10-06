@@ -3,9 +3,7 @@ console.log("καλωσορίσατε στο ελληνικό δωμάτιο!");
 // Method to get formatted Wildebeest analysis output from the backend
 export async function getDataFromElementURL(element, params) {
   var URL =
-    params === undefined
-      ? window.location.origin + element.dataset.url
-      : window.location.origin + element.dataset.url + params;
+    params === undefined ? element.dataset.url : element.dataset.url + params;
 
   const response = await fetch(URL);
   if (response.ok) {
@@ -45,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Parent even listener for the right pane
+  // Parent event listener for the right pane
   detailsPane.addEventListener("click", (event) => {
     // Apply onclick listener for the analysis results links in the right pane
     const linkTarget = event.target.closest(".link");

@@ -6,11 +6,17 @@ import logging
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .models import (
-    user_projects as user_projects_model,
+from .models.user_projects import (
+    User,
+    Project,
+    ProjectAccess,
 )
 
+from ..constants import (
+    ProjectDetails,
+)
 from . import schemas
+
 
 # Setup logger
 _LOGGER = logging.getLogger(__name__)
@@ -18,31 +24,56 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_user_projects(db: Session, username: str):
     """Get all projects associated with a username"""
-    statement = select(user_projects_model.User).where(
-        user_projects_model.User.username == username
+    statement = select(User).where(User.username == username)
+    current_user = db.scalars(statement).first()
+    _LOGGER.debug(current_user.projects)
+
+    projects = sorted(
+        [
+            ProjectDetails(
+                item.project.resource_id,
+                item.project.name,
+                item.project.lang_code,
+                item.project.create_datetime,
+            )
+            for item in current_user.projects
+        ],
+        reverse=True,
+        key=lambda x: x.create_datetime,
     )
-    user = db.scalars(statement).first()
-    _LOGGER.debug(user)
 
-    # projects = sorted(
-    #     [
-    #         user_projects_model.ProjectDetails(
-    #             item.project.resource_id,
-    #             item.project.name,
-    #             item.project.lang_code,
-    #             item.project.create_datetime,
-    #         )
-    #         for item in current_user.projects
-    #     ],
-    #     reverse=True,
-    #     key=lambda x: x.create_datetime,
-    # )
+    _LOGGER.debug(projects)
+
+    return projects
 
 
-def get_user_projects(db: Session, username: str):
-    """Get all projects associated with a username"""
-    statement = select(user_projects_model.User).where(
-        user_projects_model.User.username == username
-    )
-    user = db.scalars(statement).first()
-    _LOGGER.debug(user)
+def get_user_project_details(db: Session, resource_id: str, username: str):
+    """Get the overview of `resource_id` project"""
+    # Check if the requested project is accessible to the user
+    # This returns `Project` instance as the first result
+    # and the `ProjectAccess.access_type` as the second result
+    # both in the same tuple.
+    statement = select(User).where(User.username == username)
+    current_user = db.scalars(statement).first()
+
+    project_details = db.execute(
+        (
+            select(Project, ProjectAccess.access_type)
+            .join(ProjectAccess)
+            .where(ProjectAccess.user_id == current_user.id)
+            .where(Project.resource_id == resource_id)
+        )
+    ).first()
+
+    _LOGGER.debug(project_details)
+
+    return project_details
+
+
+# def get_user_projects(db: Session, username: str):
+#     """Get all projects associated with a username"""
+#     statement = select(user_projects_model.User).where(
+#         user_projects_model.User.username == username
+#     )
+#     user = db.scalars(statement).first()
+#     _LOGGER.debug(user)
