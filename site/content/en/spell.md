@@ -60,3 +60,15 @@ For the German LU84NR06 translation, the spell checker also flagged a few pairs 
 
 We have also successfully applied the Greek Room's spell checker on partial translations of the Bible in several Asian minority languages (not public).
 
+## Using Spell Checking
+
+**For Bible translators:** We currently offer spell checking support for Bible translation projects on servers running at USC. Please contact us at support@greekroom.org
+<details><summary>Preferred format of spell checker input</summary>
+<ul>
+  <li>USFM files (as e.g. exported from Paratext)</li>
+  <li>Preferably also the <tt>settings.xml</tt> file for more accurate versification in the Greek Room results</li>
+  <li>You can also supply the entire Paratext folder that contains the above (and possibly other stuff).</li>
+</ul>
+You may attach the input data to the email you send us, or you can provide us with a location from where we can download the data.<br>
+Spell checking and Wildebeest results will typically be provided on a password-protected server.
+</details>
