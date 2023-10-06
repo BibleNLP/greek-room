@@ -12,7 +12,7 @@ The Greek Room offers a spell checker based on phonetic string similarity and wo
 Word alignment supports applications such as spell-checking and learning word order and morphology. Even  more directly, it indicates the strength of translation consistency. With its color-coded word alignment strengths, the Greek Room specifically helps to pinpoint words that are unusual translations, or missing or spurious words. Hovering with the mouse over a word in the source or target language will reveal additional information such as the gloss of a word. Click <a href="/align">here</a> to see some examples, including English-German and English-Hindi.
 
 ## About
-**Research team:** Dr. Ulf Hermjakob and Joel Mathew; University of Southern California &nbsp; Information Sciences Institute<br>
+**Research team:** Dr. Ulf Hermjakob and Joel Mathew; University of Southern California (<a target="_USC" href="https://www.usc.edu">USC</a>) Information Sciences Institute (<a target="_ISI" href="https://www.isi.edu">ISI</a>)<br>
 ***Greek Room* in the news:** 
 <a title="USC Viterbi &nbsp; (June 19, 2023)&#10;&quot;To the Ends of the Earth: Bringing the Bible to Languages Never Before Reached&quot;" target="_NEWS" href="https://viterbischool.usc.edu/news/2023/06/to-the-ends-of-the-earth-bringing-the-bible-to-languages-never-before-reached">USC Viterbi</a>,
 <a title="Washington Post &nbsp; (July 6, 2023)&#10;by Religion News Service &nbsp; (July 5, 2023)&#10;carried by numerous other newspapers as well&#10;&quot;USC researchers use AI to help translate Bible into very rare languages&quot;" target="_NEWS" href="https://www.washingtonpost.com/religion/2023/07/06/usc-researchers-use-ai-help-translate-bible-into-very-rare-languages">Washington Post</a>,
