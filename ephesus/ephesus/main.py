@@ -28,6 +28,7 @@ app = FastAPI()
 app.mount("/static", StaticFiles(packages=[("ephesus.home", "static")]), name="static")
 
 app.include_router(home_routes.ui_router)
+app.include_router(home_routes.api_router)
 app.include_router(
     wb_routes.router,
     prefix="/wildebeest",

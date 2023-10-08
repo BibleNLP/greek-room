@@ -48,11 +48,6 @@ class ProjectAcessRights(Enum):
     WRITE = 2  # Has the write access on the project
 
 
-# Wrapper for sending project data to frontend
-ProjectDetails = namedtuple(
-    "ProjectDetails", ["resource_id", "project_name", "lang_code", "create_datetime"]
-)
-
 # The String to call the 'latest' version of the project
 LATEST_PROJECT_VERSION_NAME = "latest"
 

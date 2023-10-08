@@ -4,11 +4,11 @@
 <a class="button" href="#popup1">&plus;</a>
 
 <div class="listing">
-  {% if projects_listing|length == 0 %}
+  {% if not projects %}
   <p>No projects found. <br />Create(+) one to get started!</p>
   {% else %}
   <ul>
-    {% for project in projects_listing %}
+    {% for project in projects %}
     <li>
       <button
         class="link"
@@ -17,7 +17,7 @@
         data-lang-code="{{ project.lang_code }}"
         name="resourceId"
       >
-        {{ project.project_name }}
+        {{ project.name }}
       </button>
     </li>
     <!-- <li class="selected"><a href="#">Item 1</a></li> -->

@@ -14,7 +14,7 @@ from ..config import get_ephesus_settings
 from ..dependencies import (
     get_db,
 )
-from ..database import crud
+from ..database import crud, schemas
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -28,8 +28,48 @@ templates = Jinja2Templates(directory=str(BASE_PATH / "templates"))
 ## Register custom Jinja2 filters
 templates.env.filters["timedeltaformat"] = format_timedelta
 
+##############
+# API Routes #
+##############
+
+# Create API router instance
+api_router = APIRouter(
+    prefix="/api/v1",
+    tags=["projects"],
+)
+
+
+@api_router.get(
+    "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
+)
+async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)):
+    return crud.get_user_projects(db, username)
+
+
+#############
+# UI Routes #
+#############
+
 # Create UI router instance
 ui_router = APIRouter()
+
+
+@ui_router.get("/", response_class=HTMLResponse)
+async def get_homepage(request: Request, db: Session = Depends(get_db)):
+
+    _LOGGER.debug(f"{ephesus_setting.ephesus_projects_dir}")
+
+    projects = crud.get_user_projects(db, "bob")
+
+    # On first time login
+    # create projects dirs
+    # if not ephesus_setting.ephesus_projects_dir.exists():
+    #     ephesus_setting.ephesus_projects_dir.mkdir(parents=True)
+
+    return templates.TemplateResponse(
+        "home/index.html",
+        {"request": request, "projects": projects},
+    )
 
 
 @ui_router.get("/", response_class=HTMLResponse)

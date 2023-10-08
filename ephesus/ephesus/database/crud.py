@@ -11,10 +11,6 @@ from .models.user_projects import (
     Project,
     ProjectAccess,
 )
-
-from ..constants import (
-    ProjectDetails,
-)
 from . import schemas
 
 
@@ -22,28 +18,17 @@ from . import schemas
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_user_projects(db: Session, username: str):
+def get_user_projects(
+    db: Session, username: str
+) -> list[schemas.ProjectListModel] | None:
     """Get all projects associated with a username"""
-    statement = select(User).where(User.username == username)
-    current_user = db.scalars(statement).first()
-    _LOGGER.debug(current_user.projects)
-
-    projects = sorted(
-        [
-            ProjectDetails(
-                item.project.resource_id,
-                item.project.name,
-                item.project.lang_code,
-                item.project.create_datetime,
-            )
-            for item in current_user.projects
-        ],
-        reverse=True,
-        key=lambda x: x.create_datetime,
-    )
-
-    _LOGGER.debug(projects)
-
+    projects = db.scalars(
+        select(Project)
+        .join(ProjectAccess)
+        .where(Project.id == ProjectAccess.project_id)
+        .join(User)
+        .where(User.username == username)
+    ).all()
     return projects
 
 
