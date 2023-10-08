@@ -29,10 +29,12 @@ seed_data = {
         {
             "user_id": 1,
             "project_id": 1,
+            "access_type": "OWNER",
         },
         {
             "user_id": 1,
             "project_id": 2,
+            "access_type": "OWNER",
         },
         {"user_id": 2, "project_id": 2, "access_type": "COLLABORATOR"},
     ],

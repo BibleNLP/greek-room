@@ -1,13 +1,13 @@
 {% if project is not none %}
-<h2>{{ project.Project.name }}</h2>
+<h2>{{ project["Project"].name }}</h2>
 <hr />
 <p>
-  Language Code: <strong>{{ project.Project.lang_code }}</strong> <br />Created:
+  Language Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
   <strong
-    >{{ (current_datetime - project.Project.create_datetime)|timedeltaformat }}
+    >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
     ago</strong
   >
-  <br />Access Type: <strong>{{ project.access_type.name }}</strong>
+  <br />Access Type: <strong>{{ project["ProjectAccess"].access_type.name }}</strong>
   <br />Contents:
   <strong>MAT, MRK, LUK</strong>
 </p>

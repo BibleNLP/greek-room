@@ -1,4 +1,5 @@
 import logging
+
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -46,6 +47,19 @@ async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)
     return crud.get_user_projects(db, username)
 
 
+# tuple[schemas.ProjectModel, schemas.ProjectAccessModel]
+
+
+@api_router.get(
+    "/users/{username}/projects/{resource_id}",
+    response_model=schemas.ProjectWithAccessModel | None,
+)
+async def get_user_project(
+    resource_id: str, username: str = "bob", db: Session = Depends(get_db)
+):
+    return crud.get_user_project(db, resource_id, username)
+
+
 #############
 # UI Routes #
 #############
@@ -72,37 +86,19 @@ async def get_homepage(request: Request, db: Session = Depends(get_db)):
     )
 
 
-@ui_router.get("/", response_class=HTMLResponse)
-async def get_homepage(request: Request, db: Session = Depends(get_db)):
-
-    _LOGGER.debug(f"{ephesus_setting.ephesus_projects_dir}")
-
-    projects_listing = crud.get_user_projects(db, "bob")
-
-    # On first time login
-    # create projects dirs
-    # if not ephesus_setting.ephesus_projects_dir.exists():
-    #     ephesus_setting.ephesus_projects_dir.mkdir(parents=True)
-
-    return templates.TemplateResponse(
-        "home/index.html",
-        {"request": request, "projects_listing": projects_listing},
-    )
-
-
 @ui_router.get("/projects/{resource_id}/overview", response_class=HTMLResponse)
 async def get_project_overview(
     resource_id: str, request: Request, db: Session = Depends(get_db)
 ):
     """Get the basic overview of `resource_id` project"""
 
-    project_details = crud.get_user_project_details(db, resource_id, "bob")
+    project = crud.get_user_project(db, resource_id, "bob")
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",
         {
             "request": request,
-            "project": project_details,
+            "project": project,
             "current_datetime": datetime.now(timezone.utc),
         },
     )
