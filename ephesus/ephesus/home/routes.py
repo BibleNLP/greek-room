@@ -1,9 +1,17 @@
 import logging
-
-from datetime import datetime, timezone
 from pathlib import Path
+from typing import Annotated
+from datetime import datetime, timezone
 
-from fastapi import APIRouter, Request, Depends
+from fastapi import (
+    APIRouter,
+    Request,
+    Depends,
+    Form,
+    UploadFile,
+    status,
+)
+
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
@@ -44,10 +52,8 @@ api_router = APIRouter(
     "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
 )
 async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)):
+    """Get the list of projects associated with a user"""
     return crud.get_user_projects(db, username)
-
-
-# tuple[schemas.ProjectModel, schemas.ProjectAccessModel]
 
 
 @api_router.get(
@@ -57,15 +63,33 @@ async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)
 async def get_user_project(
     resource_id: str, username: str = "bob", db: Session = Depends(get_db)
 ):
+    """Get the details of a specific project that belongs to a user"""
     return crud.get_user_project(db, resource_id, username)
 
+
+@api_router.post("/users/{username}/projects", status_code=status.HTTP_201_CREATED)
+async def create_user_project(
+    username: str,
+    files: list[UploadFile],
+    project_name: Annotated[str, Form(min_length=3, max_length=50)],
+    lang_code: Annotated[str, Form(min_length=2, max_length=8)],
+    db: Session = Depends(get_db),
+):
+    """Create a user project using uploaded data"""
+
+    return {"hello": "world"}
+
+
+# My favorite project name
 
 #############
 # UI Routes #
 #############
 
 # Create UI router instance
-ui_router = APIRouter()
+ui_router = APIRouter(
+    tags=["UI"],
+)
 
 
 @ui_router.get("/", response_class=HTMLResponse)

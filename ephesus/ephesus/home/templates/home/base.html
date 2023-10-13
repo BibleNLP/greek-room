@@ -22,20 +22,41 @@
         <h3>Create Project</h3>
         <a class="close" href="#">&times;</a>
         <div class="content">
-          <form action="upload" method="POST" enctype="multipart/form-data">
+          <form
+            action="api/v1/users/bob/projects"
+            method="POST"
+            enctype="multipart/form-data"
+          >
             <label
-              >Name: <input type="text" name="name" maxlength="15" required
+              >Name:
+              <input
+                type="text"
+                name="project_name"
+                minlength="3"
+                maxlength="15"
+                required
             /></label>
             <br />
             <br />
             <label
               >Language Code:
-              <input type="text" name="lang-code" maxlength="8" required
+              <input
+                type="text"
+                name="lang_code"
+                minlength="2"
+                maxlength="8"
+                required
             /></label>
             <br />
             <br />
             <label for="file-upload">USFM/TSV:</label>
-            <input type="file" id="file-upload" name="file" required />
+            <input
+              type="file"
+              id="file-upload"
+              name="files"
+              required
+              multiple
+            />
             <br />
             <br />
             <input type="submit" value="Create" class="create" />
