@@ -133,6 +133,7 @@ def create_user_project(
         parse_files(
             (project_path / PROJECT_UPLOAD_DIR_NAME),
             (project_path / PROJECT_CLEAN_DIR_NAME),
+            resource_id,
         )
     except InputError as ine:
         # clean-up

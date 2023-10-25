@@ -141,16 +141,24 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
     only have regular files or one zipped archive.
     """
     try:
-        # Check if the `input_dir` contains a mix of
-        # .zip and .sfm files. If so, bail.
-        if has_filetype(input_dir, f"**/{ZIP_FILE_PATTERN}") or any(
-            [
-                has_filetype(Path(extract_dir), f"**/{pattern}")
-                for pattern in USFM_FILE_PATTERNS
-            ]
+        # Check if the `input_dir` has neither .zip
+        # nor .sfm files. If so, bail.
+        if not has_filetype(input_dir, f"**/{ZIP_FILE_PATTERN}") and not any(
+            [has_filetype(input_dir, f"**/{pattern}") for pattern in USFM_FILE_PATTERNS]
         ):
             raise InputError(
-                f"The input directory contains both ZIP and USFM files. "
+                f"The input contains neither ZIP nor USFM files. "
+                f"Upload either a zipped archive of USFM files (or a Paratext Project) "
+                f"or a collection of USFM files only."
+            )
+
+        # Check if the `input_dir` contains a mix of
+        # .zip and .sfm files. If so, bail.
+        if has_filetype(input_dir, f"**/{ZIP_FILE_PATTERN}") and any(
+            [has_filetype(input_dir, f"**/{pattern}") for pattern in USFM_FILE_PATTERNS]
+        ):
+            raise InputError(
+                f"The input contains both ZIP and USFM files. "
                 f"Use only either of those types at a time."
             )
 
@@ -184,17 +192,17 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
             # Check if this is a Paratext project and handle accordingly
             # See: https://github.com/sillsdev/machine.py/blob/19188e173ffdd3c22f2c4eaa68c581d72f2c86c5
             # /machine/corpora/paratext_text_corpus.py#L55C12-L55C12
-            if settings := next(extract_dir.glob("**/[sS]ettings.xml"), False):
-                corpus = ParatextTextCorpus(settings.resolve(strict=True).parent())
+            if settings := next(Path(extract_dir).glob("**/[sS]ettings.xml"), False):
+                corpus = ParatextTextCorpus(settings.resolve(strict=True).parent)
             # else assume it is a plain directory with USFM files
             elif usfm_file := [
-                usfm_file
-                for usfm_file in extract_dir.glob(pattern)
+                usfm_file_item
                 for pattern in USFM_FILE_PATTERNS
+                for usfm_file_item in Path(extract_dir).glob(pattern)
             ][0]:
                 corpus = UsfmFileTextCorpus(
-                    usfm_file.resolve(strict=True).parent(),
-                    file_pattern=f"*.{usfm_file.suffix}",
+                    usfm_file.resolve(strict=True).parent,
+                    file_pattern=f"*{usfm_file.suffix}",
                 )
 
             if not corpus:
@@ -203,7 +211,7 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                 )
 
             # Create the output_dir, if it does not exist
-            output_dir.mkdir(exists_ok=True)
+            output_dir.mkdir(exist_ok=True)
 
             # Extract into BibleNLP format
             # This returns verse_text, org_versification, corpus_versification.
@@ -212,7 +220,13 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
             vrefs: [str] = []
             for verse, _, vref in extract_scripture_corpus(corpus):
                 verses.append(verse)
-                vrefs.append(str(vref))
+                vrefs.append(vref)
+
+            # Check if there was nothing extracted. If so, bail.
+            if not any(vrefs):
+                raise InputError(
+                    "Unable to parse and extract any text from the files provided."
+                )
 
             # Write out cleaned file in output_dir
             with (output_dir / f"{resource_id}.txt").open("w") as cleaned_file:
@@ -222,10 +236,15 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
 
             # Write corresponding vref.txt file
             with (output_dir / "vref.txt").open("w") as vref_file:
-                vref_file.write("\n".join(vrefs))
+                vref_file.write(
+                    "\n".join([str(vref) if vref else "" for vref in vrefs])
+                )
                 # Add a newline to the end since `.join()` omits it
                 vref_file.write("\n")
 
+    except InputError as ine:
+        _LOGGER.error("Error while parsing and saving the data: %s", ine)
+        raise ine
     except Exception as exc:
         _LOGGER.error("Error while parsing and saving the data: %s", exc)
-        raise InputError(f"Error while processsing the data. {exc}") from exc
+        raise InputError(f"Error while processsing the data.") from exc
