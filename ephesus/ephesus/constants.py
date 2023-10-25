@@ -49,7 +49,25 @@ class ProjectAcessRights(Enum):
 
 
 # The String to call the 'latest' version of the project
-LATEST_PROJECT_VERSION_NAME = "latest"
+LATEST_PROJECT_VERSION_NAME: str = "latest"
+
+# The name of the directory where the
+# file(s) uploaded by the user are stored as-is
+PROJECT_UPLOAD_DIR_NAME: str = "upload"
+
+# The name of the directory where the
+# uploaded compressed files are extracted to.
+PROJECT_CLEAN_DIR_NAME: str = "clean"
+
+
+## Patterns
+# Patterns for USFM files.
+# Not regex but usable in Path.glob()
+USFM_FILE_PATTERNS: list[str] = ["*.[sS][fF][mM]", "*.[uU][sS][fF][mM]"]
+
+# Pattern for .zip files.
+# Not regex but usable in Path.glob()
+ZIP_FILE_PATTERN: str = "*.[zZ][iI][pP]"
 
 
 @unique

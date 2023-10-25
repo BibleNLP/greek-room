@@ -1,4 +1,7 @@
 import logging
+import secrets
+import shutil
+import traceback
 from pathlib import Path
 from typing import Annotated
 from datetime import datetime, timezone
@@ -10,6 +13,7 @@ from fastapi import (
     Form,
     UploadFile,
     status,
+    HTTPException,
 )
 
 from fastapi.responses import HTMLResponse
@@ -20,10 +24,20 @@ from sqlalchemy.orm import Session
 from babel.dates import format_timedelta
 
 from ..config import get_ephesus_settings
+from ..constants import (
+    LATEST_PROJECT_VERSION_NAME,
+    PROJECT_UPLOAD_DIR_NAME,
+    PROJECT_CLEAN_DIR_NAME,
+)
 from ..dependencies import (
     get_db,
 )
 from ..database import crud, schemas
+from ..exceptions import InputError
+from ..common.utils import (
+    secure_filename,
+    parse_files,
+)
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -67,8 +81,10 @@ async def get_user_project(
     return crud.get_user_project(db, resource_id, username)
 
 
+# TODO: check and handle inputs with only whitespace
+# TODO: Limit file size at reverse-proxy layer (Traefik/Nginx)
 @api_router.post("/users/{username}/projects", status_code=status.HTTP_201_CREATED)
-async def create_user_project(
+def create_user_project(
     username: str,
     files: list[UploadFile],
     project_name: Annotated[str, Form(min_length=3, max_length=50)],
@@ -76,11 +92,80 @@ async def create_user_project(
     db: Session = Depends(get_db),
 ):
     """Create a user project using uploaded data"""
+    # _LOGGER.debug(f"{files}, {project_name}, {lang_code}")
+
+    # Save file in a new randomly named dir
+    resource_id: str = secrets.token_urlsafe(6)
+    project_path: Path = (
+        ephesus_setting.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME
+    )
+
+    # Create the project directories.
+    # including any missing parents
+    (project_path / PROJECT_UPLOAD_DIR_NAME).mkdir(parents=True)
+    # (project_path / PROJECT_UPLOADED_DIR_NAME).mkdir(parents=True)
+
+    # Store to the upload dir within the project dir
+    for file in files:
+        try:
+            with (
+                project_path
+                / PROJECT_UPLOAD_DIR_NAME
+                / Path(secure_filename(file.filename))
+            ).open("wb") as f:
+                shutil.copyfileobj(file.file, f)
+        except Exception as e:
+            _LOGGER.exception(e)
+            # clean-up
+            shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="There was an error uploading the file(s). Try again.",
+            )
+        finally:
+            # clean-up
+            file.file.close()
+
+    # Parse the uploaded files and
+    # save them to the clean dir
+    try:
+        parse_files(
+            (project_path / PROJECT_UPLOAD_DIR_NAME),
+            (project_path / PROJECT_CLEAN_DIR_NAME),
+        )
+    except InputError as ine:
+        # clean-up
+        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(ine),
+        )
+
+    return {
+        "message": f"Successfuly uploaded {len([file.filename for file in files])} file(s)."
+    }
+
+    # # Parse uploaded file
+    #             parse_uploaded_files(parsed_filepath, resource_id)
+
+    #             # Add project to DB and connect with user
+    #             project_db_instance = Project(
+    #                 resource_id=resource_id,
+    #                 name=project_name,
+    #                 lang_code=lang_code,
+    #             )
+    #             project_access = ProjectAccess(
+    #                 project=project_db_instance,
+    #                 user=current_user,
+    #                 access_type=ProjectAccessType.OWNER.name,
+    #             )
+    #             project_db_instance.users.append(project_access)
+    #             db.session.add(project_db_instance)
 
     return {"hello": "world"}
 
-
-# My favorite project name
 
 #############
 # UI Routes #
@@ -94,8 +179,6 @@ ui_router = APIRouter(
 
 @ui_router.get("/", response_class=HTMLResponse)
 async def get_homepage(request: Request, db: Session = Depends(get_db)):
-
-    _LOGGER.debug(f"{ephesus_setting.ephesus_projects_dir}")
 
     projects = crud.get_user_projects(db, "bob")
 

@@ -5,3 +5,4 @@ SQLAlchemy==2.0.21
 Jinja2==3.1.2
 python-multipart==0.0.6
 Babel==2.13.0
+sil-machine==0.9.3

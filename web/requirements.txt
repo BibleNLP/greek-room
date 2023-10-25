@@ -6,4 +6,4 @@ Flask-Redmail==0.3.0
 Flask-Babel==3.1.0
 usfm-grammar==3.0.0a5
 wildebeest-nlp==0.9.2
-sil-machine==0.9.3
+sil-machine==0.9.5
