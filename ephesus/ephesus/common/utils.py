@@ -7,6 +7,7 @@ import re
 import shutil
 import logging
 import secrets
+import zipfile
 import tempfile
 import unicodedata
 from pathlib import Path
@@ -117,13 +118,13 @@ def secure_filename(filename: str) -> str:
     return filename
 
 
-def has_filetype(dir: Path, pattern: str) -> bool:
-    """Return if `dir` has at least one file
+def has_filetype(dir: Path, pattern: str, min_count: int = 1) -> bool:
+    """Return if `dir` has at least `min_count` file(s)
     within it that matches `pattern`"""
     if not dir or not dir.exists() or not pattern or len(pattern.strip()) == 0:
         return False
 
-    return True if any(dir.glob(pattern)) else False
+    return True if len(list(dir.glob(pattern))) >= min_count else False
 
 
 # TODO: Add support for Scripture Burrito
@@ -162,8 +163,16 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                 f"Use only either of those types at a time."
             )
 
+        # Check if the `input_dir` contains multiple .zip archives.
+        # If so, bail.
+        if has_filetype(input_dir, f"**/{ZIP_FILE_PATTERN}", min_count=2):
+            raise InputError(
+                f"The input contains multiple ZIP files. "
+                f"Please upload only one ZIP archive at a time."
+            )
+
         with tempfile.TemporaryDirectory() as extract_dir:
-            # Handle Zipped project uploads
+            # Handle Zipped project uploads.
             # These can either by Paratext Projects or
             # a simple collection of USFM files
             # (with .sfm or .usfm extensions).
@@ -184,9 +193,18 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                 ]
             ):
                 raise InputError(
-                    "The .zip archive does not contain any identifiable USFM files. \
+                    "The ZIP archive does not contain any identifiable USFM files. \
                 Please ensure these are present directly within a directory (not sub-directories)."
                 )
+
+            # TODO: Check if there are multiple USFM files for the same book. If so bail.
+
+            # Normalize USFM file extensions
+            [
+                usfm_file.rename(usfm_file.with_suffix(".SFM"))
+                for pattern in USFM_FILE_PATTERNS
+                for usfm_file in Path(extract_dir).glob(pattern)
+            ]
 
             corpus = None
             # Check if this is a Paratext project and handle accordingly

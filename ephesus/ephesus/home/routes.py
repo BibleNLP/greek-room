@@ -1,7 +1,6 @@
 import logging
 import secrets
 import shutil
-import traceback
 from pathlib import Path
 from typing import Annotated
 from datetime import datetime, timezone
@@ -145,7 +144,7 @@ def create_user_project(
         )
 
     return {
-        "message": f"Successfuly uploaded {len([file.filename for file in files])} file(s)."
+        "message": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
 
     # # Parse uploaded file
@@ -164,8 +163,6 @@ def create_user_project(
     #             )
     #             project_db_instance.users.append(project_access)
     #             db.session.add(project_db_instance)
-
-    return {"hello": "world"}
 
 
 #############
