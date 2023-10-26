@@ -11,6 +11,7 @@ import zipfile
 import tempfile
 import unicodedata
 from pathlib import Path
+from collections import Counter
 
 from machine.corpora import (
     UsfmFileTextCorpus,
@@ -21,10 +22,12 @@ from machine.corpora import (
 from ..constants import (
     USFM_FILE_PATTERNS,
     ZIP_FILE_PATTERN,
+    BookCodes,
 )
 
 from ..exceptions import (
     InputError,
+    FormatError,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -127,6 +130,28 @@ def has_filetype(dir: Path, pattern: str, min_count: int = 1) -> bool:
     return True if len(list(dir.glob(pattern))) >= min_count else False
 
 
+def get_book_from_usfm(file_fragment: str) -> BookCodes:
+    """Cheap hack to sanity check if a file is indeed USFM
+    and return the book code from the `\id` tag (required in USFM)"""
+    if not file_fragment or len(file_fragment.strip()) < 4:
+        return None
+
+    tokens: list[str] = [token.upper() for token in file_fragment.split()]
+    if tokens.count("\ID") > 1:
+        raise FormatError("Invalid USFM File. Contains multiple `\id` markers.")
+    if tokens.count("\ID") == 0:
+        raise FormatError("Invalid USFM File. No `\id` marker found.")
+    if tokens.index("\ID") == (len(tokens) - 1):
+        raise FormatError("Invalid USFM File. No book code found after`\id` marker.")
+    book_code = tokens[tokens.index("\ID") + 1]
+    if book_code not in BookCodes:
+        raise FormatError(
+            f"Invalid USFM File. Invalid/unsupported BookCode {book_code} found."
+        )
+
+    return BookCodes(book_code)
+
+
 # TODO: Add support for Scripture Burrito
 def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
     """
@@ -160,7 +185,7 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
         ):
             raise InputError(
                 f"The input contains both ZIP and USFM files. "
-                f"Use only either of those types at a time."
+                f"Use only one of those types at a time."
             )
 
         # Check if the `input_dir` contains multiple .zip archives.
@@ -193,11 +218,48 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                 ]
             ):
                 raise InputError(
-                    "The ZIP archive does not contain any identifiable USFM files. \
-                Please ensure these are present directly within a directory (not sub-directories)."
+                    f"The ZIP archive does not contain any identifiable USFM files. "
+                    f"Please ensure these are present directly within a directory (not sub-directories)."
                 )
 
-            # TODO: Check if there are multiple USFM files for the same book. If so bail.
+            # import pdb
+
+            # pdb.set_trace()
+
+            # Sanity check USFM file format.
+            books: Counter = Counter()
+            for usfm_file in [
+                usfm_file_item
+                for pattern in USFM_FILE_PATTERNS
+                for usfm_file_item in Path(extract_dir).glob(pattern)
+            ]:
+                lines: list[str] = []
+                with usfm_file.open() as usfm_file_handle:
+                    for line in usfm_file_handle:
+                        if len(lines) > 2:
+                            break
+                        if len(line.strip()) > 0:
+                            lines.append(line)
+                try:
+                    books[get_book_from_usfm("\n".join(lines))] += 1
+                except FormatError as fme:
+                    # Don't act on these errors for now
+                    _LOGGER.error("Error in file format: %s", fme)
+
+            # Check if no books were found. If so, bail
+            if not books:
+                raise InputError(
+                    f"No valid format or supported book codes found from the uploaded USFM files"
+                )
+
+            # Check if there are multiple USFM files for the same book code.
+            # If so, bail.
+            if len(books) != sum(books.values()):
+                raise InputError(
+                    f"The input files contains more than one USFM file "
+                    f"for the book code(s): "
+                    f"{', '.join([book_code.value for book_code, count in books.items() if count > 1])}",
+                )
 
             # Normalize USFM file extensions
             [

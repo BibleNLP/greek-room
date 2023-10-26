@@ -9,3 +9,7 @@ class AppException(Exception):
 
 class InputError(AppException):
     """Error while processing input"""
+
+
+class FormatError(AppException):
+    """Error related to file format"""
