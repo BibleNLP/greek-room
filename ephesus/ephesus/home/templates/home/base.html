@@ -17,13 +17,13 @@
       </div>
     </div>
 
-    <div id="popup1" class="overlay">
+    <div id="createPopup" class="overlay">
       <div class="popup">
         <h3>Create Project</h3>
         <a class="close" href="#">&times;</a>
         <div class="content">
           <form
-            action="api/v1/users/bob/projects"
+            action="{{ url_for('create_user_project', username='bob') }}"
             method="POST"
             enctype="multipart/form-data"
           >
@@ -49,7 +49,9 @@
             /></label>
             <br />
             <br />
-            <label for="file-upload">USFM/TSV:</label>
+            <label for="file-upload"
+              >Upload USFM files or Paratext Project (.zip):</label
+            >
             <input
               type="file"
               id="file-upload"

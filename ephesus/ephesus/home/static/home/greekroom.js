@@ -16,6 +16,26 @@ export async function getDataFromElementURL(element, params) {
   }
 }
 
+export async function postForm(formElement) {
+  const response = await fetch(formElement.action, {
+    method: "POST",
+    body: new FormData(formElement),
+  });
+  if (response.status === 201) {
+    let data = undefined;
+    data = await response.json();
+    return Promise.resolve(data);
+  } else if (response.status === 500) {
+    let data = undefined;
+    data = await response.json();
+    return Promise.reject(data);
+  } else {
+    return Promise.reject(
+      "There was an error while processing this request. Please try again."
+    );
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const projectsListing = document.querySelector(".listing");
   const detailsPane = document.getElementById("details-pane");
@@ -57,5 +77,16 @@ document.addEventListener("DOMContentLoaded", () => {
         detailsPane.innerHTML = content;
       });
     }
+  });
+
+  // Event listener for create project form submission
+  document.forms["createPopup"].addEventListener("submit", (event) => {
+    event.preventDefault();
+    // TODO do something here to show user that form is being submitted
+
+    // Post form
+    postForm(event.target).then(responseData) => {
+      // TODO do something with the response message.
+    };
   });
 });

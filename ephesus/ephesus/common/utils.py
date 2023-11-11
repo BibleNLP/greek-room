@@ -222,10 +222,6 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                     f"Please ensure these are present directly within a directory (not sub-directories)."
                 )
 
-            # import pdb
-
-            # pdb.set_trace()
-
             # Sanity check USFM file format.
             books: Counter = Counter()
             for usfm_file in [
