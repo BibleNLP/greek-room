@@ -16,6 +16,7 @@ export async function getDataFromElementURL(element, params) {
   }
 }
 
+// Method to post data to backend
 export async function postForm(formElement) {
   const response = await fetch(formElement.action, {
     method: "POST",
@@ -80,13 +81,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Event listener for create project form submission
-  document.forms["createPopup"].addEventListener("submit", (event) => {
-    event.preventDefault();
-    // TODO do something here to show user that form is being submitted
-
-    // Post form
-    postForm(event.target).then(responseData) => {
-      // TODO do something with the response message.
-    };
-  });
+  document
+    .querySelector("#createPopup form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+      // TODO do something here to show user that form is being submitted
+      document.querySelector("input.create").style.display = "none";
+      document.querySelector("img.create").style.display = "";
+      // Post form
+      postForm(event.target).then((responseData) => {
+        console.log(responseData);
+        document.querySelector("img.create").style.display = "none";
+        // Show response
+        document.querySelector("#form-notification > b").innerHTML =
+          responseData.message;
+        document.querySelector("#form-notification").style.display = "";
+        // Refresh page
+        setTimeout(() => {
+          location.replace(location.pathname);
+        }, 3000);
+      });
+    });
 });
