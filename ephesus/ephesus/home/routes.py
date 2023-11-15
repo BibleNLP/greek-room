@@ -19,6 +19,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import DBAPIError
 
 from babel.dates import format_timedelta
 
@@ -115,6 +116,7 @@ def create_user_project(
                 shutil.copyfileobj(file.file, f)
         except Exception as e:
             _LOGGER.exception(e)
+
             # clean-up
             shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
 
@@ -126,15 +128,21 @@ def create_user_project(
             # clean-up
             file.file.close()
 
-    # Parse the uploaded files and
-    # save them to the clean dir
     try:
+        # Parse the uploaded files and
+        # save them to the clean dir
         parse_files(
             (project_path / PROJECT_UPLOAD_DIR_NAME),
             (project_path / PROJECT_CLEAN_DIR_NAME),
             resource_id,
         )
+
+        # Save project to DB
+        crud.create_user_project(db, project_name, resource_id, lang_code, username)
+
     except InputError as ine:
+        _LOGGER.exception(ine)
+
         # clean-up
         shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
 
@@ -142,27 +150,20 @@ def create_user_project(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(ine),
         )
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        # clean-up
+        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while saving this project to database. Please try again.",
+        )
 
     return {
         "message": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
-
-    # # Parse uploaded file
-    #             parse_uploaded_files(parsed_filepath, resource_id)
-
-    #             # Add project to DB and connect with user
-    #             project_db_instance = Project(
-    #                 resource_id=resource_id,
-    #                 name=project_name,
-    #                 lang_code=lang_code,
-    #             )
-    #             project_access = ProjectAccess(
-    #                 project=project_db_instance,
-    #                 user=current_user,
-    #                 access_type=ProjectAccessType.OWNER.name,
-    #             )
-    #             project_db_instance.users.append(project_access)
-    #             db.session.add(project_db_instance)
 
 
 #############

@@ -11,6 +11,8 @@ from .models.user_projects import (
     Project,
     ProjectAccess,
 )
+from ..constants import ProjectAccessType
+
 from . import schemas
 
 
@@ -51,3 +53,29 @@ def get_user_project(
         )
     ).first()
     return None if not project else project._mapping
+
+
+def create_user_project(
+    db: Session,
+    project_name: str,
+    resource_id: str,
+    lang_code: str,
+    username: str,
+) -> None:
+    """Create a project entry in the DB for a user"""
+    _LOGGER.debug(username)
+    user = db.scalars((select(User).where(User.username == username))).first()
+    project = Project(
+        resource_id=resource_id,
+        name=project_name,
+        lang_code=lang_code,
+    )
+    _LOGGER.debug(user)
+    project_access = ProjectAccess(
+        project=project,
+        user=user,
+        access_type=ProjectAccessType.OWNER.name,
+    )
+    project.users.append(project_access)
+    db.add(project)
+    db.commit()
