@@ -80,26 +80,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Function to handle the results after
+  function handleCreateProjectFormResult(responseData) {
+    console.log(responseData);
+    document.querySelector("img.create").style.display = "none";
+    // Show response
+    document.querySelector("#form-notification > b").innerHTML =
+      responseData.detail;
+    document.querySelector("#form-notification").style.display = "";
+    // Refresh page
+    setTimeout(() => {
+      location.replace(location.pathname);
+    }, 4000);
+  }
+
   // Event listener for create project form submission
   document
     .querySelector("#createPopup form")
     .addEventListener("submit", (event) => {
       event.preventDefault();
-      // TODO do something here to show user that form is being submitted
+      // Show loader
       document.querySelector("input.create").style.display = "none";
       document.querySelector("img.create").style.display = "";
       // Post form
-      postForm(event.target).then((responseData) => {
-        console.log(responseData);
-        document.querySelector("img.create").style.display = "none";
-        // Show response
-        document.querySelector("#form-notification > b").innerHTML =
-          responseData.message;
-        document.querySelector("#form-notification").style.display = "";
-        // Refresh page
-        setTimeout(() => {
-          location.replace(location.pathname);
-        }, 3000);
-      });
+      postForm(event.target).then(
+        (responseData) => {
+          handleCreateProjectFormResult(responseData);
+        },
+        (reason) => {
+          handleCreateProjectFormResult(reason);
+        }
+      );
     });
 });

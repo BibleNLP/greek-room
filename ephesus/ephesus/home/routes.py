@@ -148,7 +148,7 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(ine),
+            detail=f"There was an error creating the project. {str(ine)} Try again.",
         )
     except DBAPIError as dbe:
         _LOGGER.exception(dbe)
@@ -158,11 +158,11 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="There was an error while saving this project to database. Please try again.",
+            detail="There was an error while creating the project. Try again.",
         )
 
     return {
-        "message": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
+        "detail": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
 
 
