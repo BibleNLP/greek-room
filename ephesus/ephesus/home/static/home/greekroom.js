@@ -37,6 +37,26 @@ export async function postForm(formElement) {
   }
 }
 
+// Method to send delete request
+export async function deleteRequest(url) {
+  const response = await fetch(url, {
+    method: "DELETE",
+  });
+  if (response.status === 200) {
+    let data = undefined;
+    data = await response.json();
+    return Promise.resolve(data);
+  } else if (response.status === 500 || response.status === 403) {
+    let data = undefined;
+    data = await response.json();
+    return Promise.reject(data);
+  } else {
+    return Promise.reject(
+      "There was an error while processing this request. Please try again."
+    );
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const projectsListing = document.querySelector(".listing");
   const detailsPane = document.getElementById("details-pane");

@@ -28,6 +28,7 @@ from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_UPLOAD_DIR_NAME,
     PROJECT_CLEAN_DIR_NAME,
+    ProjectAccessType,
 )
 from ..dependencies import (
     get_db,
@@ -164,6 +165,32 @@ def create_user_project(
     return {
         "detail": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
+
+
+@api_router.delete(
+    "/users/{username}/projects/{resource_id}", status_code=status.HTTP_200_OK
+)
+def delete_user_project(
+    username: str,
+    resource_id: str,
+    db: Session = Depends(get_db),
+):
+    """Delete a user's project identified by `resource_id`"""
+    project_mapping = crud.get_user_project(db, resource_id, username)
+
+    # Project not found
+    if not project_mapping:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There was an error while processing this request. Please try again.",
+        )
+
+    # User not project owner
+    if project_mapping["access_type"] != ProjectAccessType.OWNER.name:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have the rights to delete this project. Contact the project owner.",
+        )
 
 
 #############

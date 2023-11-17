@@ -63,14 +63,12 @@ def create_user_project(
     username: str,
 ) -> None:
     """Create a project entry in the DB for a user"""
-    _LOGGER.debug(username)
     user = db.scalars((select(User).where(User.username == username))).first()
     project = Project(
         resource_id=resource_id,
         name=project_name,
         lang_code=lang_code,
     )
-    _LOGGER.debug(user)
     project_access = ProjectAccess(
         project=project,
         user=user,
@@ -79,3 +77,21 @@ def create_user_project(
     project.users.append(project_access)
     db.add(project)
     db.commit()
+
+
+def delete_user_project(
+    db: Session,
+    username: str,
+    resource_id: str,
+) -> None:
+    """Delete a project entry from the DB for a user"""
+    user = db.scalars(select(User).where(User.username == username)).first()
+
+    project = db.execute(
+        (
+            select(Project, ProjectAccess)
+            .join(ProjectAccess)
+            .where(ProjectAccess.user_id == current_user.id)
+            .where(Project.resource_id == resource_id)
+        )
+    ).first()

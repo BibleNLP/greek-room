@@ -1,13 +1,25 @@
 {% if project is not none %}
-<h2>{{ project["Project"].name }}</h2>
+<div class="flex">
+  <div>
+    <h2>{{ project["Project"].name }}</h2>
+  </div>
+  <div class="delete-icon">
+    <img
+      src="static/home/assets/recycle-bin-icon.webp"
+      data-url="{{ url_for('delete_user_project', username='bob', resource_id=project['Project'].resource_id) }}"
+    />
+  </div>
+</div>
 <hr />
 <p>
-  Language Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
+  Language Code: <strong>{{ project["Project"].lang_code }}</strong>
+  <br />Created:
   <strong
-    >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
-    ago</strong
+    >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat
+    }} ago</strong
   >
-  <br />Access Type: <strong>{{ project["ProjectAccess"].access_type.name }}</strong>
+  <br />Access Type:
+  <strong>{{ project["ProjectAccess"].access_type.name }}</strong>
   <br />Contents:
   <strong>MAT, MRK, LUK</strong>
 </p>
@@ -17,12 +29,7 @@
     <strong>Wildebeest</strong>
     <ul>
       <li>
-        <button
-          class="link"
-          name="wildebeest-analysis"
-        >
-          See results
-        </button>
+        <button class="link" name="wildebeest-analysis">See results</button>
       </li>
     </ul>
   </li>

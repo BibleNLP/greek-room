@@ -205,3 +205,16 @@ div.listing > ul li {
 .selected {
   background-color: #f4f96a;
 }
+.flex {
+  display: flex;
+}
+.flex:hover .delete-icon {
+  display: block;
+}
+.delete-icon {
+  margin: auto 0.5em auto 0.5em;
+  display: none;
+}
+.delete-icon > img {
+  height: 1em;
+}
