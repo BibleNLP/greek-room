@@ -208,6 +208,9 @@ div.listing > ul li {
 .flex {
   display: flex;
 }
+.justify-end {
+  justify-content: flex-end;
+}
 .flex:hover .delete-icon {
   display: block;
 }
@@ -215,6 +218,6 @@ div.listing > ul li {
   margin: auto 0.5em auto 0.5em;
   display: none;
 }
-.delete-icon > img {
+.delete-icon img {
   height: 1em;
 }

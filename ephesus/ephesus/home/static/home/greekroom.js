@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Parent event listener for the right pane
   detailsPane.addEventListener("click", (event) => {
-    // Apply onclick listener for the analysis results links in the right pane
+    // Apply onClick listener for the analysis results links in the right pane
     const linkTarget = event.target.closest(".link");
     if (linkTarget) {
       console.log(linkTarget.dataset);
@@ -97,6 +97,14 @@ document.addEventListener("DOMContentLoaded", () => {
       getDataFromElementURL(linkTarget).then((content) => {
         detailsPane.innerHTML = content;
       });
+      return;
+    }
+
+    // Apply onClick listener for delete button
+    const deleteIcon = event.target.closest('img[data-url*="projects"]');
+    if (deleteIcon) {
+      console.log("delete icon clicked!");
+      return;
     }
   });
 
