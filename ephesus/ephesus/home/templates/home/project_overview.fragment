@@ -4,12 +4,12 @@
     <h2>{{ project["Project"].name }}</h2>
   </div>
   <div class="delete-icon">
-    <a href="#deletePopup">
-      <img
-        src="static/home/assets/recycle-bin-icon.webp"
-        data-url="{{ url_for('delete_user_project', username='bob', resource_id=project['Project'].resource_id) }}"
-      />
-    </a>
+    <!-- <a href="#deletePopup"> -->
+    <img
+      src="static/home/assets/recycle-bin-icon.webp"
+      data-url="{{ url_for('delete_user_project', username='bob', resource_id=project['Project'].resource_id) }}"
+    />
+    <!-- </a> -->
   </div>
 </div>
 <hr />

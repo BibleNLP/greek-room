@@ -103,7 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply onClick listener for delete button
     const deleteIcon = event.target.closest('img[data-url*="projects"]');
     if (deleteIcon) {
-      console.log("delete icon clicked!");
+      if (
+        confirm(
+          "Are you sure you want to delete this project? This action cannot be undone."
+        )
+      ) {
+        console.log("delete icon clicked!");
+        deleteRequest(deleteIcon.dataset.url).then(
+          (responseData) => {
+            console.log(responseData);
+          },
+          (reason) => {
+            console.log(reason);
+          }
+        );
+      }
       return;
     }
   });

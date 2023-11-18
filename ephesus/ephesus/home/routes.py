@@ -185,12 +185,15 @@ def delete_user_project(
             detail="There was an error while processing this request. Please try again.",
         )
 
+    _LOGGER.debug(project_mapping["ProjectAccess"].access_type)
     # User not project owner
-    if project_mapping["access_type"] != ProjectAccessType.OWNER.name:
+    if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have the rights to delete this project. Contact the project owner.",
         )
+
+    return {"detail": "Done."}
 
 
 #############
