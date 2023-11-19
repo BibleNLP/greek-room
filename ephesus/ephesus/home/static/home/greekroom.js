@@ -84,6 +84,59 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Handle delete popup actions
+  const deletePopup = document.getElementById("deletePopup");
+  const deleteCancelButton = document.querySelector(
+    '#deletePopup button[role="close"]'
+  );
+  const deleteConfirmButton = document.querySelector(
+    '#deletePopup button[role="confirm"]'
+  );
+  var deleteEndpoint = {};
+
+  // Function to handle the results after DeleteProject
+  function handleDeleteProjectResult(responseData) {
+    console.log(responseData);
+    document.querySelector("#deletePopup .flex").style.display = "none";
+    // Show response
+    document.querySelector(
+      '#deletePopup p[role="notification"] > b'
+    ).innerHTML = responseData.detail;
+    document.querySelector(
+      '#deletePopup p[role="notification"]'
+    ).style.display = "";
+    // Refresh page
+    setTimeout(() => {
+      location.replace(location.pathname);
+    }, 3000);
+  }
+
+  deleteCancelButton.addEventListener("click", (event) => {
+    deletePopup.close();
+  });
+
+  deleteConfirmButton.addEventListener("click", (event) => {
+    console.log(deleteEndpoint);
+    if ("deleteEndpoint" in deleteEndpoint) {
+      document.querySelector(
+        '#deletePopup button[role="close"]'
+      ).style.display = "none";
+      document.querySelector(
+        '#deletePopup button[role="confirm"]'
+      ).style.display = "none";
+      document.querySelector('#deletePopup img[role="loader"]').style.display =
+        "";
+      deleteRequest(deleteEndpoint.deleteEndpoint).then(
+        (responseData) => {
+          handleDeleteProjectResult(responseData);
+        },
+        (reason) => {
+          handleDeleteProjectResult(reason);
+        }
+      );
+    }
+  });
+
   // Parent event listener for the right pane
   detailsPane.addEventListener("click", (event) => {
     // Apply onClick listener for the analysis results links in the right pane
@@ -103,26 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply onClick listener for delete button
     const deleteIcon = event.target.closest('img[data-url*="projects"]');
     if (deleteIcon) {
-      if (
-        confirm(
-          "Are you sure you want to delete this project? This action cannot be undone."
-        )
-      ) {
-        console.log("delete icon clicked!");
-        deleteRequest(deleteIcon.dataset.url).then(
-          (responseData) => {
-            console.log(responseData);
-          },
-          (reason) => {
-            console.log(reason);
-          }
-        );
-      }
+      console.log("delete icon clicked!");
+      deleteEndpoint = { deleteEndpoint: deleteIcon.dataset.url };
+      deletePopup.showModal();
+
       return;
     }
   });
 
-  // Function to handle the results after
+  // Function to handle the results after CreateProject
   function handleCreateProjectFormResult(responseData) {
     console.log(responseData);
     document.querySelector("img.create").style.display = "none";
