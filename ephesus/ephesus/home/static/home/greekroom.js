@@ -51,9 +51,10 @@ export async function deleteRequest(url) {
     data = await response.json();
     return Promise.reject(data);
   } else {
-    return Promise.reject(
-      "There was an error while processing this request. Please try again."
-    );
+    return Promise.reject({
+      detail:
+        "There was an error while processing this request. Please try again.",
+    });
   }
 }
 
