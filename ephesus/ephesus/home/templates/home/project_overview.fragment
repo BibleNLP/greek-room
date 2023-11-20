@@ -29,8 +29,8 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
     >
   </summary>
   {% set comma = joiner(", ") %} {% for book, chapters in project_scope.items()
-  %} {{ comma() }}{{ book }}({{ chapters|length }} chapter{% if
-  chapters|length>1 %}s{% endif %}) {% endfor %}
+  %}{{ comma() }}<strong>{{ book }}</strong>({{ chapters|length }} chapter{% if
+  chapters|length>1 %}s{% endif %}){% endfor %}
 </details>
 <h3>Tools</h3>
 <ul>
