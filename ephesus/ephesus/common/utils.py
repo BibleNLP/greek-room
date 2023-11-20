@@ -11,7 +11,7 @@ import zipfile
 import tempfile
 import unicodedata
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 
 from machine.corpora import (
     UsfmFileTextCorpus,
@@ -20,6 +20,7 @@ from machine.corpora import (
 )
 
 from ..constants import (
+    PROJECT_VREF_FILE_NAME,
     USFM_FILE_PATTERNS,
     ZIP_FILE_PATTERN,
     BookCodes,
@@ -311,7 +312,7 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
                 cleaned_file.write("\n")
 
             # Write corresponding vref.txt file
-            with (output_dir / "vref.txt").open("w") as vref_file:
+            with (output_dir / PROJECT_VREF_FILE_NAME).open("w") as vref_file:
                 vref_file.write(
                     "\n".join([str(vref) if vref else "" for vref in vrefs])
                 )
@@ -324,3 +325,30 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
     except Exception as exc:
         _LOGGER.error("Error while parsing and saving the data: %s", exc)
         raise InputError(f"Error while processsing the data.") from exc
+
+
+def get_scope_from_vref(vref_file: Path) -> dict[str, set] | None:
+    """
+    Read the project's `vref.txt` return
+    a dict with the names of book and the
+    numbers of chapters in each of them
+    """
+    if not vref_file or not vref_file.exists():
+        return None
+
+    books_chapters: dict[str, set(str)] = defaultdict(set)
+    try:
+        with vref_file.open() as vref:
+            for idx, line in enumerate(vref):
+                line: str = line.strip()
+                if not line:
+                    continue
+                book: str = line.split()[0]
+                chapter: str = line.split()[1].split(":")[0]
+                books_chapters[book].add(chapter)
+
+        return books_chapters
+
+    except Exception as exc:
+        _LOGGER.exception("Error while calculating scope of project. %s", exc)
+        raise FormatError("Error while calculating scope of project.")

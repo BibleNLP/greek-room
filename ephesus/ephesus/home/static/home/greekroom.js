@@ -92,10 +92,16 @@ document.addEventListener("DOMContentLoaded", () => {
       // Underline selected resource link
       linkTarget.classList.add("underline");
 
-      // Get HTML Wildebeest analysis content to display on right pane
-      getDataFromElementURL(linkTarget).then((content) => {
-        detailsPane.innerHTML = content;
-      });
+      // Get project overview content to display on right pane
+      getDataFromElementURL(linkTarget).then(
+        (content) => {
+          detailsPane.innerHTML = content;
+        },
+        (reason) => {
+          detailsPane.innerHTML =
+            "There was an error while fetching the project data. Try again.";
+        }
+      );
     }
   });
 
@@ -160,9 +166,15 @@ document.addEventListener("DOMContentLoaded", () => {
       const resourceId = linkTarget.dataset.resourceId;
 
       // Get HTML Wildebeest analysis content to display on right pane
-      getDataFromElementURL(linkTarget).then((content) => {
-        detailsPane.innerHTML = content;
-      });
+      getDataFromElementURL(linkTarget).then(
+        (content) => {
+          detailsPane.innerHTML = content;
+        },
+        (reason) => {
+          detailsPane.innerHTML =
+            "There was an error while processing the request. Try again.";
+        }
+      );
       return;
     }
 

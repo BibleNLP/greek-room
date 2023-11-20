@@ -28,6 +28,7 @@ from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_UPLOAD_DIR_NAME,
     PROJECT_CLEAN_DIR_NAME,
+    PROJECT_VREF_FILE_NAME,
     ProjectAccessType,
 )
 from ..dependencies import (
@@ -38,6 +39,7 @@ from ..exceptions import InputError
 from ..common.utils import (
     secure_filename,
     parse_files,
+    get_scope_from_vref,
 )
 
 # Get app logger
@@ -247,6 +249,15 @@ async def get_project_overview(
         {
             "request": request,
             "project": project,
+            "project_scope": get_scope_from_vref(
+                Path(
+                    ephesus_setting.ephesus_projects_dir
+                    / resource_id
+                    / LATEST_PROJECT_VERSION_NAME
+                    / PROJECT_CLEAN_DIR_NAME
+                    / PROJECT_VREF_FILE_NAME
+                )
+            ),
             "current_datetime": datetime.now(timezone.utc),
         },
     )

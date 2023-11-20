@@ -59,6 +59,11 @@ PROJECT_UPLOAD_DIR_NAME: str = "upload"
 # uploaded compressed files are extracted to.
 PROJECT_CLEAN_DIR_NAME: str = "clean"
 
+# The name of the versification file
+# used for the project. It's the same
+# name across all projects.
+PROJECT_VREF_FILE_NAME: str = "vref.txt"
+
 
 ## Patterns
 # Patterns for USFM files.
