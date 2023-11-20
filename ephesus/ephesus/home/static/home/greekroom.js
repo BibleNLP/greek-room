@@ -48,7 +48,14 @@ export async function deleteRequest(url) {
     return Promise.resolve(data);
   } else if (response.status === 500 || response.status === 403) {
     let data = undefined;
-    data = await response.json();
+    if (response.headers.get("content-type") === "application/json") {
+      data = await response.json();
+    } else {
+      data = {
+        detail:
+          "There was an error while processing this request. Please try again.",
+      };
+    }
     return Promise.reject(data);
   } else {
     return Promise.reject({
@@ -97,7 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle the results after DeleteProject
   function handleDeleteProjectResult(responseData) {
-    console.log(responseData);
     document.querySelector("#deletePopup .flex").style.display = "none";
     // Show response
     document.querySelector(
@@ -106,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector(
       '#deletePopup p[role="notification"]'
     ).style.display = "";
+
     // Refresh page
     setTimeout(() => {
       location.replace(location.pathname);
@@ -117,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   deleteConfirmButton.addEventListener("click", (event) => {
-    console.log(deleteEndpoint);
     if ("deleteEndpoint" in deleteEndpoint) {
       document.querySelector(
         '#deletePopup button[role="close"]'
@@ -143,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply onClick listener for the analysis results links in the right pane
     const linkTarget = event.target.closest(".link");
     if (linkTarget) {
-      console.log(linkTarget.dataset);
       // Set resourceId state
       const resourceId = linkTarget.dataset.resourceId;
 
@@ -157,7 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply onClick listener for delete button
     const deleteIcon = event.target.closest('img[data-url*="projects"]');
     if (deleteIcon) {
-      console.log("delete icon clicked!");
       deleteEndpoint = { deleteEndpoint: deleteIcon.dataset.url };
       deletePopup.showModal();
 
@@ -167,7 +171,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle the results after CreateProject
   function handleCreateProjectFormResult(responseData) {
-    console.log(responseData);
     document.querySelector("img.create").style.display = "none";
     // Show response
     document.querySelector("#form-notification > b").innerHTML =

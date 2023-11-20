@@ -176,24 +176,36 @@ def delete_user_project(
     db: Session = Depends(get_db),
 ):
     """Delete a user's project identified by `resource_id`"""
-    project_mapping = crud.get_user_project(db, resource_id, username)
+    try:
+        project_mapping = crud.get_user_project(db, resource_id, username)
 
-    # Project not found
-    if not project_mapping:
+        # Project not found
+        if not project_mapping:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="There was an error while processing this request. Please try again.",
+            )
+
+        # User not project owner
+        if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have the rights to delete this project. Contact the project owner.",
+            )
+
+        crud.delete_project(db, resource_id)
+
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error while processing this request. Please try again.",
         )
 
-    _LOGGER.debug(project_mapping["ProjectAccess"].access_type)
-    # User not project owner
-    if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have the rights to delete this project. Contact the project owner.",
-        )
-
-    return {"detail": "Done."}
+    # Delete files, if DB deletion was successful.
+    shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+    return {"detail": "Successfully deleted project."}
 
 
 #############

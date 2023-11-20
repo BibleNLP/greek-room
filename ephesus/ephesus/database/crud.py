@@ -79,19 +79,26 @@ def create_user_project(
     db.commit()
 
 
-def delete_user_project(
+def delete_project(
     db: Session,
-    username: str,
     resource_id: str,
 ) -> None:
-    """Delete a project entry from the DB for a user"""
-    user = db.scalars(select(User).where(User.username == username)).first()
+    """Cascade delete a project entry from the DB.
+    WARNING: This function does not check for business
+    logic (e.g. access_type requirements, etc.). Those
+    are delegated to the caller. This is indescriminate!"""
 
-    project = db.execute(
-        (
-            select(Project, ProjectAccess)
-            .join(ProjectAccess)
-            .where(ProjectAccess.user_id == current_user.id)
-            .where(Project.resource_id == resource_id)
-        )
+    project = db.scalars(
+        (select(Project).where(Project.resource_id == resource_id))
     ).first()
+    project_access = db.scalars(
+        (select(ProjectAccess).where(ProjectAccess.project_id == project.id))
+    )
+
+    # Delete project_access and project instances
+    for projec_access_entry in project_access:
+        db.delete(projec_access_entry)
+
+    db.delete(project)
+
+    db.commit()
