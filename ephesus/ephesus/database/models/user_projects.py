@@ -1,15 +1,16 @@
 from typing import (
     List,
 )
+import secrets
+from functools import partial
+from datetime import datetime, timezone
+
 from sqlalchemy import String, Enum, JSON, ForeignKey
 from sqlalchemy.orm import (
     mapped_column,
     Mapped,
     relationship,
 )
-
-import secrets
-from datetime import datetime, timezone
 
 from ..setup import Base
 from ...constants import (
@@ -26,6 +27,16 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(50))
+    create_datetime: Mapped[TZDateTime] = mapped_column(
+        TZDateTime(timezone=True), default=partial(datetime.now, tz=timezone.utc)
+    )
+
+    update_datetime: Mapped[TZDateTime] = mapped_column(
+        TZDateTime(timezone=True),
+        default=partial(datetime.now, tz=timezone.utc),
+        onupdate=partial(datetime.now, tz=timezone.utc),
+    )
+
     projects: Mapped[List["Project"]] = relationship(
         "ProjectAccess", back_populates="user"
     )
@@ -49,13 +60,13 @@ class Project(Base):
         Enum(StatusType), default=StatusType.ACTIVE.name
     )
     create_datetime: Mapped[TZDateTime] = mapped_column(
-        TZDateTime(timezone=True), default=datetime.now(timezone.utc)
+        TZDateTime(timezone=True), default=partial(datetime.now, tz=timezone.utc)
     )
 
     update_datetime: Mapped[TZDateTime] = mapped_column(
         TZDateTime(timezone=True),
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=partial(datetime.now, tz=timezone.utc),
+        onupdate=partial(datetime.now, tz=timezone.utc),
     )
 
     # Store arbitary project metadata
@@ -78,13 +89,13 @@ class ProjectAccess(Base):
     project_id: Mapped[int] = mapped_column(ForeignKey(Project.id))
 
     create_datetime: Mapped[TZDateTime] = mapped_column(
-        TZDateTime(timezone=True), default=datetime.now(timezone.utc)
+        TZDateTime(timezone=True), default=partial(datetime.now, tz=timezone.utc)
     )
 
     update_datetime: Mapped[TZDateTime] = mapped_column(
         TZDateTime(timezone=True),
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=partial(datetime.now, tz=timezone.utc),
+        onupdate=partial(datetime.now, tz=timezone.utc),
     )
 
     user: Mapped[List["User"]] = relationship("User", back_populates="projects")

@@ -28,7 +28,14 @@ export async function postForm(formElement) {
     return Promise.resolve(data);
   } else if (response.status === 500) {
     let data = undefined;
-    data = await response.json();
+    if (response.headers.get("content-type") === "application/json") {
+      data = await response.json();
+    } else {
+      data = {
+        detail:
+          "There was an error while processing this request. Please try again.",
+      };
+    }
     return Promise.reject(data);
   } else {
     return Promise.reject(
