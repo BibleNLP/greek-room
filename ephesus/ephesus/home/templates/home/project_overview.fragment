@@ -38,7 +38,13 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
     <strong>Wildebeest</strong>
     <ul>
       <li>
-        <button class="link" name="wildebeest-analysis">See results</button>
+        <button
+          class="link"
+          data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
+          name="wildebeest-analysis"
+        >
+          See results
+        </button>
       </li>
     </ul>
   </li>

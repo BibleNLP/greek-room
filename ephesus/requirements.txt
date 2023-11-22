@@ -6,3 +6,4 @@ Jinja2==3.1.2
 python-multipart==0.0.6
 Babel==2.13.0
 sil-machine==0.9.3
+wildebeest-nlp==0.9.2

@@ -1,3 +1,7 @@
+"""
+API and UI routes for the home page of the application
+"""
+
 import logging
 import secrets
 import shutil
@@ -181,7 +185,8 @@ def delete_user_project(
     try:
         project_mapping = crud.get_user_project(db, resource_id, username)
 
-        # Project not found
+        # Project not found.
+        # Not returning a 404 for security sake.
         if not project_mapping:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
