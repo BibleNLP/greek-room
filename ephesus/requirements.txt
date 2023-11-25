@@ -1,9 +1,9 @@
-fastapi==0.103.2
-uvicorn[standard]==0.23.2
-pydantic-settings==2.0.3
-SQLAlchemy==2.0.21
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic-settings==2.1.0
+SQLAlchemy==2.0.23
 Jinja2==3.1.2
 python-multipart==0.0.6
-Babel==2.13.0
-sil-machine==0.9.3
+Babel==2.13.1
+sil-machine==1.0.1
 wildebeest-nlp==0.9.2
