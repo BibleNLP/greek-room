@@ -8,7 +8,6 @@ from pydantic import BaseModel
 class EphesusSettings(BaseSettings):
     ephesus_projects_dir: Path
     ephesus_default_vref_file: Path
-    ephesus_cache_dir: Path
 
     sqlalchemy_database_uri: str
     sqlite_json1_ext_file: Path

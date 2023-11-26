@@ -7,12 +7,18 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.event import listen as sqlalchemy_listen
 
+from ..config import get_ephesus_settings
 
-EPHESUS_DATABASE_URL = "sqlite:///./ephesus.db"
+# Get app settings
+ephesus_setting = get_ephesus_settings()
+
+# EPHESUS_DATABASE_URL = "sqlite:///./ephesus.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 ## DB engine setup
-engine = create_engine(EPHESUS_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    ephesus_setting.sqlalchemy_database_uri, connect_args={"check_same_thread": False}
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 ## Load Sqlite extensions
@@ -24,7 +30,7 @@ def load_sqlite_extension(db_conn, unused, ext_path=""):
 
 load_sqlite_json1_extension = partial(
     load_sqlite_extension,
-    ext_path="/Users/fox/dev/workspace/bt/greek-room/instance/sqlite_ext/json1.dylib",
+    ext_path=str(ephesus_setting.sqlite_json1_ext_file),
 )
 sqlalchemy_listen(engine, "connect", load_sqlite_json1_extension)
 
