@@ -8,10 +8,8 @@ from logging.config import dictConfig
 from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from .dependencies import get_query_token, get_token_header
-from .wildebeest import routes as wildebeest_routes
 from .home import routes as home_routes
-from .routers import items
+from .wildebeest import routes as wildebeest_routes
 from .database.setup import SessionLocal, engine, Base
 
 from .config import LogConfig

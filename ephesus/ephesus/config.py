@@ -10,7 +10,9 @@ class EphesusSettings(BaseSettings):
     ephesus_default_vref_file: Path
 
     sqlalchemy_database_uri: str
-    sqlite_json1_ext_file: Path
+
+    ephesus_client_id: str
+    ephesus_client_secret: str
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

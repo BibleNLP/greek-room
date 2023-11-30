@@ -27,6 +27,8 @@ from sqlalchemy.exc import DBAPIError
 
 from babel.dates import format_timedelta
 
+from fief_client import FiefAccessTokenInfo
+
 from ..config import get_ephesus_settings
 from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
@@ -37,6 +39,7 @@ from ..constants import (
 )
 from ..dependencies import (
     get_db,
+    get_api_auth_client,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError
@@ -50,7 +53,7 @@ from ..common.utils import (
 _LOGGER = logging.getLogger(__name__)
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 # Configure templates
 BASE_PATH = Path(__file__).resolve().parent
@@ -72,7 +75,13 @@ api_router = APIRouter(
 @api_router.get(
     "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
 )
-async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)):
+async def get_user_projects(
+    username: str = "bob",
+    db: Session = Depends(get_db),
+    access_token_info: FiefAccessTokenInfo = Depends(
+        get_api_auth_client().authenticated()
+    ),
+):
     """Get the list of projects associated with a user"""
     return crud.get_user_projects(db, username)
 
@@ -104,7 +113,9 @@ def create_user_project(
     # Save file in a new randomly named dir
     resource_id: str = secrets.token_urlsafe(6)
     project_path: Path = (
-        ephesus_setting.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME
+        ephesus_settings.ephesus_projects_dir
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
     )
 
     # Create the project directories.
@@ -125,7 +136,7 @@ def create_user_project(
             _LOGGER.exception(e)
 
             # clean-up
-            shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+            shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -151,7 +162,7 @@ def create_user_project(
         _LOGGER.exception(ine)
 
         # clean-up
-        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -161,7 +172,7 @@ def create_user_project(
         _LOGGER.exception(dbe)
 
         # clean-up
-        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -211,7 +222,7 @@ def delete_user_project(
         )
 
     # Delete files, if DB deletion was successful.
-    shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+    shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
     return {"detail": "Successfully deleted project."}
 
 
@@ -232,8 +243,8 @@ async def get_homepage(request: Request, db: Session = Depends(get_db)):
 
     # On first time login
     # create projects dirs
-    # if not ephesus_setting.ephesus_projects_dir.exists():
-    #     ephesus_setting.ephesus_projects_dir.mkdir(parents=True)
+    # if not ephesus_settings.ephesus_projects_dir.exists():
+    #     ephesus_settings.ephesus_projects_dir.mkdir(parents=True)
 
     return templates.TemplateResponse(
         "home/index.html",
@@ -256,7 +267,7 @@ async def get_project_overview(
             "project": project,
             "project_scope": get_scope_from_vref(
                 Path(
-                    ephesus_setting.ephesus_projects_dir
+                    ephesus_settings.ephesus_projects_dir
                     / resource_id
                     / LATEST_PROJECT_VERSION_NAME
                     / PROJECT_CLEAN_DIR_NAME

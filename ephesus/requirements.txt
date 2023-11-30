@@ -7,3 +7,4 @@ python-multipart==0.0.6
 Babel==2.13.1
 sil-machine==1.0.1
 wildebeest-nlp==0.9.2
+fief-client[fastapi]==0.18.3
