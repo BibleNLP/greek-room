@@ -1,0 +1,68 @@
+{% if project is not none %}
+<div class="flex">
+  <div>
+    <h2>{{ project["Project"].name }}</h2>
+  </div>
+  <div class="delete-icon">
+    <img
+      src="static/home/assets/recycle-bin-icon.webp"
+      data-url="{{ url_for('delete_user_project', username='bob', resource_id=project['Project'].resource_id) }}"
+    />
+  </div>
+</div>
+<hr />
+Language Code: <strong>{{ project["Project"].lang_code }}</strong>
+<br />Created:
+<strong
+  >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
+  ago</strong
+>
+<br />Access Type:
+<strong>{{ project["ProjectAccess"].access_type.name }}</strong>
+<br />
+<details>
+  <summary>
+    Contents:
+    <strong
+      >{{ project_scope|length }} Book{% if project_scope|length>1 %}s{% endif
+      %}</strong
+    >
+  </summary>
+  {% set comma = joiner(", ") %} {% for book, chapters in project_scope.items()
+  %}{{ comma() }}<strong>{{ book }}</strong>({{ chapters|length }} chapter{% if
+  chapters|length>1 %}s{% endif %}){% endfor %}
+</details>
+<h3>Tools</h3>
+<ul>
+  <li>
+    <strong>Wildebeest</strong>
+    <ul>
+      <li>
+        <button
+          class="link"
+          data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
+          name="wildebeest-analysis"
+        >
+          See results
+        </button>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <strong>Spellings</strong>
+    <ul>
+      <li>Status: <strong>Pending</strong></li>
+      <li>See results</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Alignment Visualization</strong>
+    <ul>
+      <li>Status: <strong>Pending</strong></li>
+      <li>See results</li>
+    </ul>
+  </li>
+</ul>
+{% else %}
+<p>Could not find project.</p>
+{% endif %}

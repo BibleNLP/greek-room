@@ -151,3 +151,9 @@ utilities/scripts
 .hugo_build.lock
 public
 themes
+
+# Tempfiles
+eng-hin/
+
+# App data
+ephesus.db
