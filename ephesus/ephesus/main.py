@@ -15,8 +15,8 @@ from .database.setup import SessionLocal, engine, Base
 from .config import LogConfig
 
 # Get and set logger
-_LOGGER = logging.getLogger(__name__)
 dictConfig(LogConfig().dict())
+_LOGGER = logging.getLogger(__name__)
 
 # Create DB instance
 Base.metadata.create_all(bind=engine)

@@ -39,7 +39,7 @@ from ..constants import (
 )
 from ..dependencies import (
     get_db,
-    get_api_auth_client,
+    api_auth,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError
@@ -78,9 +78,7 @@ api_router = APIRouter(
 async def get_user_projects(
     username: str = "bob",
     db: Session = Depends(get_db),
-    access_token_info: FiefAccessTokenInfo = Depends(
-        get_api_auth_client().authenticated()
-    ),
+    access_token_info: FiefAccessTokenInfo = Depends(api_auth.authenticated()),
 ):
     """Get the list of projects associated with a user"""
     return crud.get_user_projects(db, username)

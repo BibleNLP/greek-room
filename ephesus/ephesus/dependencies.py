@@ -27,30 +27,48 @@ def get_db():
 
 API_AUTH = None
 
-# Auth
-def create_api_auth_client():
-    """Create an auth client for the app"""
+# # Auth
+# async def create_api_auth_client():
+#     """Create an auth client for the app"""
 
-    fief = FiefAsync(
-        "http://greek-room.localhost:9000/ephesus",
-        ephesus_settings.ephesus_client_id,
-        ephesus_settings.ephesus_client_secret,
-    )
+#     fief = FiefAsync(
+#         "http://greek-room.localhost:9000/ephesus",
+#         ephesus_settings.ephesus_client_id,
+#         ephesus_settings.ephesus_client_secret,
+#     )
 
-    # Auth instance for API
-    api_scheme = OAuth2AuthorizationCodeBearer(
-        "http://greek-room.localhost:9000/ephesus/authorize",
-        "http://greek-room.localhost:9000/ephesus/api/token",
-        scopes={"openid": "openid", "offline_access": "offline_access"},
-        auto_error=False,
-    )
-    return FiefAuth(fief, api_scheme)
+#     # Auth instance for API
+#     api_scheme = OAuth2AuthorizationCodeBearer(
+#         "http://greek-room.localhost:9000/ephesus/authorize",
+#         "http://greek-room.localhost:9000/ephesus/api/token",
+#         scopes={"openid": "openid", "offline_access": "offline_access"},
+#         auto_error=False,
+#     )
+#     return FiefAuth(fief, api_scheme)
 
 
-def get_api_auth_client():
-    """Create a singleton instance of the client"""
-    global API_AUTH
-    if not API_AUTH:
-        API_AUTH = create_api_auth_client()
+# def get_api_auth_client():
+#     """Create a singleton instance of the client"""
+#     global API_AUTH
+#     if not API_AUTH:
+#         API_AUTH = await create_api_auth_client()
 
-    return API_AUTH
+#     return API_AUTH
+
+
+fief = FiefAsync(
+    "https://test-jt756c.fief.dev",
+    ephesus_settings.ephesus_client_id,
+    ephesus_settings.ephesus_client_secret,
+    verify=False,
+)
+
+# Auth instance for API
+api_scheme = OAuth2AuthorizationCodeBearer(
+    "https://test-jt756c.fief.dev/authorize",
+    "https://test-jt756c.fief.dev/api/token",
+    scopes={"openid": "openid", "offline_access": "offline_access"},
+    auto_error=False,
+)
+
+api_auth = FiefAuth(fief, api_scheme)
