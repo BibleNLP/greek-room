@@ -37,6 +37,10 @@ def get_current_user(
     x_forwarded_email: str | None = Header(None),
     x_forwarded_preferred_username: str | None = Header(None),
 ) -> AuthenticatedUserModel:
+    """
+    Get authenticated user details from headers.
+    Auth is assumed to be handled upstream by proxy servers
+    """
     try:
         authenticated_user = AuthenticatedUserModel(
             username=x_forwarded_user, email=x_forwarded_email
