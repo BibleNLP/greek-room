@@ -37,7 +37,7 @@ router = APIRouter()
 _LOGGER = logging.getLogger(__name__)
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 # Configure templates
 BASE_PATH = Path(__file__).resolve().parent

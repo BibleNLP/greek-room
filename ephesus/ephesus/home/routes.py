@@ -74,7 +74,7 @@ api_router = APIRouter(
     "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
 )
 async def get_user_projects(
-    username: str = "bob",
+    username: str,
     db: Session = Depends(get_db),
 ):
     """Get the list of projects associated with a user"""
@@ -87,12 +87,10 @@ async def get_user_projects(
 )
 async def get_user_project(
     resource_id: str,
-    username: str = "bob",
+    username: str,
     db: Session = Depends(get_db),
-    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
 ):
     """Get the details of a specific project that belongs to a user"""
-    _LOGGER.debug(current_user)
     return crud.get_user_project(db, resource_id, username)
 
 
@@ -236,9 +234,13 @@ ui_router = APIRouter(
 
 
 @ui_router.get("/", response_class=HTMLResponse)
-async def get_homepage(request: Request, db: Session = Depends(get_db)):
+async def get_homepage(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
+):
 
-    projects = crud.get_user_projects(db, "bob")
+    projects = crud.get_user_projects(db, current_user.username)
 
     # On first time login
     # create projects dirs
@@ -260,8 +262,7 @@ async def get_project_overview(
 ):
     """Get the basic overview of `resource_id` project"""
 
-    _LOGGER.debug("in here")
-    project = crud.get_user_project(db, resource_id, "bob")
+    project = crud.get_user_project(db, resource_id, current_user.username)
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",

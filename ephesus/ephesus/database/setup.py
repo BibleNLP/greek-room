@@ -7,14 +7,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from sqlalchemy.event import listen as sqlalchemy_listen
 
+from ..constants import EphesusEnvType
 from ..config import get_ephesus_settings
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 ## DB engine setup
 engine = create_engine(
-    ephesus_setting.sqlalchemy_database_uri, connect_args={"check_same_thread": False}
+    ephesus_settings.sqlalchemy_database_uri, connect_args={"check_same_thread": False}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -40,6 +41,8 @@ def seed_table(target, connection, **kw):
         connection.execute(target.insert(), seed_data[tablename])
 
 
-sqlalchemy_listen(User.__table__, "after_create", seed_table)
-sqlalchemy_listen(Project.__table__, "after_create", seed_table)
-sqlalchemy_listen(ProjectAccess.__table__, "after_create", seed_table)
+# Load in seed data when running app in development mode
+if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower():
+    sqlalchemy_listen(User.__table__, "after_create", seed_table)
+    sqlalchemy_listen(Project.__table__, "after_create", seed_table)
+    sqlalchemy_listen(ProjectAccess.__table__, "after_create", seed_table)
