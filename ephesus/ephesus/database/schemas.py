@@ -58,3 +58,9 @@ class ProjectModel(ProjectListModel):
 class ProjectWithAccessModel(TypedDict):
     Project: ProjectModel
     ProjectAccess: ProjectAccessModel
+
+
+# Model for the current authenticated user details
+class AuthenticatedUserModel(BaseModel):
+    username: str
+    email: str | None = None

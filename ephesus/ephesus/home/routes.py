@@ -27,8 +27,6 @@ from sqlalchemy.exc import DBAPIError
 
 from babel.dates import format_timedelta
 
-from fief_client import FiefAccessTokenInfo
-
 from ..config import get_ephesus_settings
 from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
@@ -39,7 +37,7 @@ from ..constants import (
 )
 from ..dependencies import (
     get_db,
-    api_auth,
+    get_current_user,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError
@@ -78,7 +76,6 @@ api_router = APIRouter(
 async def get_user_projects(
     username: str = "bob",
     db: Session = Depends(get_db),
-    access_token_info: FiefAccessTokenInfo = Depends(api_auth.authenticated()),
 ):
     """Get the list of projects associated with a user"""
     return crud.get_user_projects(db, username)
@@ -89,9 +86,13 @@ async def get_user_projects(
     response_model=schemas.ProjectWithAccessModel | None,
 )
 async def get_user_project(
-    resource_id: str, username: str = "bob", db: Session = Depends(get_db)
+    resource_id: str,
+    username: str = "bob",
+    db: Session = Depends(get_db),
+    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
 ):
     """Get the details of a specific project that belongs to a user"""
+    _LOGGER.debug(current_user)
     return crud.get_user_project(db, resource_id, username)
 
 
@@ -252,10 +253,14 @@ async def get_homepage(request: Request, db: Session = Depends(get_db)):
 
 @ui_router.get("/projects/{resource_id}/overview", response_class=HTMLResponse)
 async def get_project_overview(
-    resource_id: str, request: Request, db: Session = Depends(get_db)
+    resource_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
 ):
     """Get the basic overview of `resource_id` project"""
 
+    _LOGGER.debug("in here")
     project = crud.get_user_project(db, resource_id, "bob")
 
     return templates.TemplateResponse(

@@ -24,6 +24,14 @@ class ProjectTypes(Enum, metaclass=MyEnumMeta):
     PROJ_WILDEBEEST = "wildebeest"
 
 
+class EphesusEnvType(Enum):
+    """Ephesus app environment types"""
+
+    DEVELOPMENT = 1
+    STAGING = 2
+    PRODUCTION = 3
+
+
 class StatusType(Enum):
     """Generic app status types"""
 
