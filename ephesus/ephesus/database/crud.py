@@ -20,6 +20,17 @@ from . import schemas
 _LOGGER = logging.getLogger(__name__)
 
 
+def create_user(db: Session, username: str) -> None:
+    """Create a user in the app database"""
+    db.add(User(username=username))
+    db.commit()
+
+
+def is_user_exists(db: Session, username: str) -> bool:
+    """Check if a user exists in the app database"""
+    return db.scalars(select(User).where(User.username == username)).first() is not None
+
+
 def get_user_projects(
     db: Session, username: str
 ) -> list[schemas.ProjectListModel] | None:
