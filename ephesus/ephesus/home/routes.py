@@ -237,10 +237,10 @@ ui_router = APIRouter(
 async def get_homepage(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
+    current_user: str = Depends(get_current_user),
 ):
 
-    projects = crud.get_user_projects(db, current_user.username)
+    projects = crud.get_user_projects(db, current_user)
 
     # On first time login
     # create projects dirs
@@ -258,11 +258,11 @@ async def get_project_overview(
     resource_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    current_user: schemas.AuthenticatedUserModel = Depends(get_current_user),
+    current_user: str = Depends(get_current_user),
 ):
     """Get the basic overview of `resource_id` project"""
 
-    project = crud.get_user_project(db, resource_id, current_user.username)
+    project = crud.get_user_project(db, resource_id, current_user)
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",

@@ -2,15 +2,12 @@
 Common dependencies useful for the Ephesus application
 """
 import logging
+from typing import Annotated
 
 from fastapi import (
     Depends,
     Header,
-    HTTPException,
-    status,
 )
-
-from pydantic import ValidationError
 
 from sqlalchemy.orm import Session
 
@@ -20,9 +17,6 @@ from .database.crud import (
     create_user,
 )
 from .database.setup import SessionLocal
-from .database.schemas import (
-    AuthenticatedUserModel,
-)
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -40,8 +34,8 @@ def get_db():
 
 
 async def create_app_user(
+    x_forwarded_preferred_username: Annotated[str, Header()],
     db: Session = Depends(get_db),
-    x_forwarded_user: str = Header(),
 ) -> bool:
     """
     Since auth is handled upstream, any time a new user is
@@ -51,33 +45,23 @@ async def create_app_user(
     callback from the upstream user registration flow.
     """
     # If user already exists in the DB, skip creation
-    if is_user_exists(db, x_forwarded_user):
+    if is_user_exists(db, x_forwarded_preferred_username):
         return True
 
     # If user does not exist, create it
-    create_user(db, x_forwarded_user)
+    create_user(db, x_forwarded_preferred_username)
 
     return True
 
 
 async def get_current_user(
+    x_forwarded_preferred_username: Annotated[str, Header()],
     is_app_user_created: bool = Depends(create_app_user),
-    x_forwarded_user: str = Header(),
-    x_forwarded_email: str | None = Header(None),
-    x_forwarded_preferred_username: str | None = Header(None),
-) -> AuthenticatedUserModel:
+    # x_forwarded_user: str = Header(),
+    # x_forwarded_email: str | None = Header(None),
+) -> str:
     """
     Get authenticated user details from headers.
     Auth is assumed to be handled upstream by proxy servers
     """
-    try:
-        authenticated_user = AuthenticatedUserModel(
-            username=x_forwarded_user, email=x_forwarded_email
-        )
-    except ValidationError as exc:
-        _LOGGER.exception(exc)
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unable to find username. Please login and try again.",
-        )
-    return authenticated_user
+    return x_forwarded_preferred_username

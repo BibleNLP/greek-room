@@ -48,10 +48,12 @@ if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower
     @app.middleware("http")
     async def add_user_headers(request: Request, call_next):
         # Add user headers to request for running in dev mode
+        # These headers need to be lowercased to match their
+        # internal representation, while injecting.
         headers = dict(request.scope["headers"])
         headers[b"x-forwarded-user"] = b"bob"
-        headers[b"x_forwarded_email"] = b"bob@greekroom.org"
-        headers[b"x_forwarded_preferred_username"] = b"bob"
+        headers[b"x-forwarded-email"] = b"bob@greekroom.org"
+        headers[b"x-forwarded-preferred-username"] = b"bob"
 
         request.scope["headers"] = [(k, v) for k, v in headers.items()]
 
