@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir -r /ephesus/requirements.txt
 COPY ./ephesus /ephesus/ephesus
 COPY ./data /ephesus/data
 
-CMD ["uvicorn", "ephesus.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "ephesus.main:app", "--proxy-headers","--forwarded-allow-ips", "*", "--host", "0.0.0.0", "--port", "8000"]
