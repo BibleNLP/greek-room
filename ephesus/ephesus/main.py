@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from sqlalchemy.event import listen as sqlalchemy_listen
 
+from .auth import routes as auth_routes
 from .home import routes as home_routes
 from .wildebeest import routes as wildebeest_routes
 from .database.setup import SessionLocal, engine, Base
@@ -30,6 +31,9 @@ Base.metadata.create_all(bind=engine)
 # Create and configure app instance
 app = FastAPI()
 app.mount("/static", StaticFiles(packages=[("ephesus.home", "static")]), name="static")
+
+# Auth routes
+app.include_router(auth_routes.api_router)
 
 # Home routes
 app.include_router(home_routes.ui_router)
@@ -54,6 +58,7 @@ if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower
         headers[b"x-forwarded-user"] = b"bob"
         headers[b"x-forwarded-email"] = b"bob@greekroom.org"
         headers[b"x-forwarded-preferred-username"] = b"bob"
+        headers[b"x-access-token"] = b"my_development_token"
 
         request.scope["headers"] = [(k, v) for k, v in headers.items()]
 

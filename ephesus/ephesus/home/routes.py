@@ -37,7 +37,7 @@ from ..constants import (
 )
 from ..dependencies import (
     get_db,
-    get_current_user,
+    get_current_username,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError
@@ -70,38 +70,36 @@ api_router = APIRouter(
 )
 
 
-@api_router.get(
-    "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
-)
+@api_router.get("/projects", response_model=list[schemas.ProjectListModel] | None)
 async def get_user_projects(
-    username: str,
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Get the list of projects associated with a user"""
-    return crud.get_user_projects(db, username)
+    return crud.get_user_projects(db, current_username)
 
 
 @api_router.get(
-    "/users/{username}/projects/{resource_id}",
+    "/projects/{resource_id}",
     response_model=schemas.ProjectWithAccessModel | None,
 )
 async def get_user_project(
     resource_id: str,
-    username: str,
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Get the details of a specific project that belongs to a user"""
-    return crud.get_user_project(db, resource_id, username)
+    return crud.get_user_project(db, resource_id, current_username)
 
 
 # TODO: check and handle inputs with only whitespace
 # TODO: Limit file size at reverse-proxy layer (Traefik/Nginx)
-@api_router.post("/users/{username}/projects", status_code=status.HTTP_201_CREATED)
+@api_router.post("/projects", status_code=status.HTTP_201_CREATED)
 def create_user_project(
-    username: str,
     files: list[UploadFile],
     project_name: Annotated[str, Form(min_length=3, max_length=50)],
     lang_code: Annotated[str, Form(min_length=2, max_length=8)],
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Create a user project using uploaded data"""
@@ -153,7 +151,9 @@ def create_user_project(
         )
 
         # Save project to DB
-        crud.create_user_project(db, project_name, resource_id, lang_code, username)
+        crud.create_user_project(
+            db, project_name, resource_id, lang_code, current_username
+        )
 
     except InputError as ine:
         _LOGGER.exception(ine)
@@ -181,17 +181,15 @@ def create_user_project(
     }
 
 
-@api_router.delete(
-    "/users/{username}/projects/{resource_id}", status_code=status.HTTP_200_OK
-)
+@api_router.delete("/projects/{resource_id}", status_code=status.HTTP_200_OK)
 def delete_user_project(
-    username: str,
     resource_id: str,
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Delete a user's project identified by `resource_id`"""
     try:
-        project_mapping = crud.get_user_project(db, resource_id, username)
+        project_mapping = crud.get_user_project(db, resource_id, current_username)
 
         # Project not found.
         # Not returning a 404 for security sake.
@@ -229,7 +227,7 @@ def delete_user_project(
 
 # Create UI router instance
 ui_router = APIRouter(
-    tags=["UI"],
+    tags=["ui"],
 )
 
 
@@ -237,10 +235,10 @@ ui_router = APIRouter(
 async def get_homepage(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: str = Depends(get_current_user),
+    current_username: str = Depends(get_current_username),
 ):
 
-    projects = crud.get_user_projects(db, current_user)
+    projects = crud.get_user_projects(db, current_username)
 
     # On first time login
     # create projects dirs
@@ -258,11 +256,11 @@ async def get_project_overview(
     resource_id: str,
     request: Request,
     db: Session = Depends(get_db),
-    current_user: str = Depends(get_current_user),
+    current_username: str = Depends(get_current_username),
 ):
     """Get the basic overview of `resource_id` project"""
 
-    project = crud.get_user_project(db, resource_id, current_user)
+    project = crud.get_user_project(db, resource_id, current_username)
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",

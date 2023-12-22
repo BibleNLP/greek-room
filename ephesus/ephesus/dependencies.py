@@ -34,7 +34,7 @@ def get_db():
 
 
 async def create_app_user(
-    x_forwarded_preferred_username: Annotated[str, Header()],
+    x_forwarded_preferred_username: Annotated[str, Header(include_in_schema=False)],
     db: Session = Depends(get_db),
 ) -> bool:
     """
@@ -54,8 +54,8 @@ async def create_app_user(
     return True
 
 
-async def get_current_user(
-    x_forwarded_preferred_username: Annotated[str, Header()],
+async def get_current_username(
+    x_forwarded_preferred_username: Annotated[str, Header(include_in_schema=False)],
     is_app_user_created: bool = Depends(create_app_user),
     # x_forwarded_user: str = Header(),
     # x_forwarded_email: str | None = Header(None),
