@@ -1,0 +1,71 @@
+version: "3"
+
+volumes:
+  postgres-data:
+    driver: local
+  ephesus-data:
+    driver: local
+
+services:
+  postgres:
+    image: postgres:15
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    env_file:
+      - ./postgres.env
+    ports:
+      - 5432:5432
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    env_file:
+      - ./keycloak.env
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    entrypoint: ["/opt/keycloak/bin/kc.sh", "start"]
+  oauth2proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
+    env_file:
+      - ./oauth2proxy.env
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs
+    ports:
+      - 4180:4180
+    depends_on:
+      - keycloak
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+  ephesus:
+    # image: ephesus:2023.12.19.1
+    build: /usr/local/src/greek-room/ephesus
+    volumes:
+      - ephesus-data:/data
+    env_file:
+      - ./ephesus.env
+    ports:
+      - 8000:8000
+    depends_on:
+      - oauth2proxy
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+    develop:
+      watch:
+        - action: sync+restart
+          path: /usr/local/src/greek-room/ephesus/ephesus
+          target: /ephesus
+        - action: rebuild
+          path: /usr/local/src/greek-room/ephesus/requirements.txt
+  backup:
+    image: offen/docker-volume-backup:v2.34.0
+    restart: always
+    env_file: ./backup.env
+    volumes:
+      - ephesus-data:/backup/ephesus_database
+      - postgres-data:/backup/postgres_database
+      - /usr/local/backups/docker-volumes:/archive
+      

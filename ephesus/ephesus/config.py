@@ -6,11 +6,11 @@ from pydantic import BaseModel
 
 # App settings
 class EphesusSettings(BaseSettings):
+    ephesus_env: str
     ephesus_projects_dir: Path
     ephesus_default_vref_file: Path
 
     sqlalchemy_database_uri: str
-    sqlite_json1_ext_file: Path
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -42,7 +42,7 @@ class LogConfig(BaseSettings):
         "default": {
             "formatter": "default",
             "class": "logging.StreamHandler",
-            "stream": "ext://sys.stderr",
+            "stream": "ext://sys.stdout",
         },
     }
     loggers: dict = {

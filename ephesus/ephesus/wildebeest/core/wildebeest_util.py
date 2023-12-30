@@ -20,7 +20,7 @@ from ...constants import (
 _LOGGER = logging.getLogger(__name__)
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 
 def run_wildebeest_analysis(
@@ -30,7 +30,7 @@ def run_wildebeest_analysis(
     Run the Wildebeest Analysis for the project `resource_id`.
     """
     project_path: Path = (
-        ephesus_setting.ephesus_projects_dir
+        ephesus_settings.ephesus_projects_dir
         / resource_id
         / LATEST_PROJECT_VERSION_NAME
         / PROJECT_CLEAN_DIR_NAME

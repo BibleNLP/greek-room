@@ -11,9 +11,9 @@
         <h1>Greek Room</h1>
       </div>
       <div class="logout">
-        <p class="username">Bob</p>
+        <p class="username">{{ current_username }}</p>
         |
-        <a href="/logout">Logout</a>
+        <a href="/oauth2/sign_out">Logout</a>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
         <a class="close" href="#">&times;</a>
         <div class="content">
           <form
-            action="{{ url_for('create_user_project', username='bob') }}"
+            action="{{ url_for('create_user_project') }}"
             method="POST"
             enctype="multipart/form-data"
           >

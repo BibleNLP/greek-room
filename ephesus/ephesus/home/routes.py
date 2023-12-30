@@ -37,6 +37,7 @@ from ..constants import (
 )
 from ..dependencies import (
     get_db,
+    get_current_username,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError
@@ -50,7 +51,7 @@ from ..common.utils import (
 _LOGGER = logging.getLogger(__name__)
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 # Configure templates
 BASE_PATH = Path(__file__).resolve().parent
@@ -69,33 +70,36 @@ api_router = APIRouter(
 )
 
 
-@api_router.get(
-    "/users/{username}/projects", response_model=list[schemas.ProjectListModel] | None
-)
-async def get_user_projects(username: str = "bob", db: Session = Depends(get_db)):
+@api_router.get("/projects", response_model=list[schemas.ProjectListModel] | None)
+async def get_user_projects(
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
     """Get the list of projects associated with a user"""
-    return crud.get_user_projects(db, username)
+    return crud.get_user_projects(db, current_username)
 
 
 @api_router.get(
-    "/users/{username}/projects/{resource_id}",
+    "/projects/{resource_id}",
     response_model=schemas.ProjectWithAccessModel | None,
 )
 async def get_user_project(
-    resource_id: str, username: str = "bob", db: Session = Depends(get_db)
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
 ):
     """Get the details of a specific project that belongs to a user"""
-    return crud.get_user_project(db, resource_id, username)
+    return crud.get_user_project(db, resource_id, current_username)
 
 
 # TODO: check and handle inputs with only whitespace
 # TODO: Limit file size at reverse-proxy layer (Traefik/Nginx)
-@api_router.post("/users/{username}/projects", status_code=status.HTTP_201_CREATED)
+@api_router.post("/projects", status_code=status.HTTP_201_CREATED)
 def create_user_project(
-    username: str,
     files: list[UploadFile],
     project_name: Annotated[str, Form(min_length=3, max_length=50)],
     lang_code: Annotated[str, Form(min_length=2, max_length=8)],
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Create a user project using uploaded data"""
@@ -104,7 +108,9 @@ def create_user_project(
     # Save file in a new randomly named dir
     resource_id: str = secrets.token_urlsafe(6)
     project_path: Path = (
-        ephesus_setting.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME
+        ephesus_settings.ephesus_projects_dir
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
     )
 
     # Create the project directories.
@@ -125,7 +131,7 @@ def create_user_project(
             _LOGGER.exception(e)
 
             # clean-up
-            shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+            shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -145,13 +151,15 @@ def create_user_project(
         )
 
         # Save project to DB
-        crud.create_user_project(db, project_name, resource_id, lang_code, username)
+        crud.create_user_project(
+            db, project_name, resource_id, lang_code, current_username
+        )
 
     except InputError as ine:
         _LOGGER.exception(ine)
 
         # clean-up
-        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -161,7 +169,7 @@ def create_user_project(
         _LOGGER.exception(dbe)
 
         # clean-up
-        shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -173,17 +181,15 @@ def create_user_project(
     }
 
 
-@api_router.delete(
-    "/users/{username}/projects/{resource_id}", status_code=status.HTTP_200_OK
-)
+@api_router.delete("/projects/{resource_id}", status_code=status.HTTP_200_OK)
 def delete_user_project(
-    username: str,
     resource_id: str,
+    current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Delete a user's project identified by `resource_id`"""
     try:
-        project_mapping = crud.get_user_project(db, resource_id, username)
+        project_mapping = crud.get_user_project(db, resource_id, current_username)
 
         # Project not found.
         # Not returning a 404 for security sake.
@@ -211,7 +217,7 @@ def delete_user_project(
         )
 
     # Delete files, if DB deletion was successful.
-    shutil.rmtree((ephesus_setting.ephesus_projects_dir / resource_id))
+    shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
     return {"detail": "Successfully deleted project."}
 
 
@@ -221,33 +227,44 @@ def delete_user_project(
 
 # Create UI router instance
 ui_router = APIRouter(
-    tags=["UI"],
+    tags=["ui"],
 )
 
 
 @ui_router.get("/", response_class=HTMLResponse)
-async def get_homepage(request: Request, db: Session = Depends(get_db)):
+async def get_homepage(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_username: str = Depends(get_current_username),
+):
 
-    projects = crud.get_user_projects(db, "bob")
+    projects = crud.get_user_projects(db, current_username)
 
     # On first time login
     # create projects dirs
-    # if not ephesus_setting.ephesus_projects_dir.exists():
-    #     ephesus_setting.ephesus_projects_dir.mkdir(parents=True)
+    # if not ephesus_settings.ephesus_projects_dir.exists():
+    #     ephesus_settings.ephesus_projects_dir.mkdir(parents=True)
 
     return templates.TemplateResponse(
         "home/index.html",
-        {"request": request, "projects": projects},
+        {
+            "request": request,
+            "projects": projects,
+            "current_username": current_username,
+        },
     )
 
 
 @ui_router.get("/projects/{resource_id}/overview", response_class=HTMLResponse)
 async def get_project_overview(
-    resource_id: str, request: Request, db: Session = Depends(get_db)
+    resource_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_username: str = Depends(get_current_username),
 ):
     """Get the basic overview of `resource_id` project"""
 
-    project = crud.get_user_project(db, resource_id, "bob")
+    project = crud.get_user_project(db, resource_id, current_username)
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",
@@ -256,7 +273,7 @@ async def get_project_overview(
             "project": project,
             "project_scope": get_scope_from_vref(
                 Path(
-                    ephesus_setting.ephesus_projects_dir
+                    ephesus_settings.ephesus_projects_dir
                     / resource_id
                     / LATEST_PROJECT_VERSION_NAME
                     / PROJECT_CLEAN_DIR_NAME

@@ -1,0 +1,1 @@
+5 3 * * * bash /usr/local/cron/greek-room-keycloak-db-backup.sh -c /usr/local/cron/greek-room-keycloak-db-backup.config

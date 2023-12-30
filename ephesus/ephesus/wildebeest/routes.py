@@ -26,6 +26,7 @@ from .core.wildebeest_util import (
 )
 from ..dependencies import (
     get_db,
+    get_current_username,
 )
 from ..exceptions import InputError
 from ..database import crud
@@ -37,7 +38,7 @@ router = APIRouter()
 _LOGGER = logging.getLogger(__name__)
 
 # Get app settings
-ephesus_setting = get_ephesus_settings()
+ephesus_settings = get_ephesus_settings()
 
 # Configure templates
 BASE_PATH = Path(__file__).resolve().parent
@@ -56,14 +57,16 @@ api_router = APIRouter(
 ##############
 
 
-@api_router.get("/users/{username}/projects/{resource_id}/wildebeest")
+@api_router.get("/projects/{resource_id}/wildebeest")
 async def get_wildebeest_analysis(
-    resource_id: str, username: str = "bob", db: Session = Depends(get_db)
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
 ) -> dict:
     """Get Wildebeest analysis results"""
 
     # Check if user has read access on project
-    project_mapping = crud.get_user_project(db, resource_id, username)
+    project_mapping = crud.get_user_project(db, resource_id, current_username)
 
     # `resource_id` not associated with `username`
     if not project_mapping:
@@ -96,21 +99,21 @@ async def get_wildebeest_analysis(
 
 # Create UI router instance
 ui_router = APIRouter(
-    tags=["UI"],
+    tags=["ui"],
 )
 
 
 @ui_router.get("/projects/{resource_id}/wildebeest", response_class=HTMLResponse)
 async def get_formatted_wildebeest_analysis(
-    request: Request, resource_id: str, db: Session = Depends(get_db)
+    request: Request,
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
 ):
     """Get the formatted wildebeest analysis results to show in the UI"""
-    # TODO: Get user from session
-    username: str = "bob"
-
     # Check if user has read access on project
     project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(
-        db, resource_id, username
+        db, resource_id, current_username
     )
 
     # `resource_id` not associated with `username`
