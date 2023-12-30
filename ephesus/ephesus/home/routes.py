@@ -247,7 +247,11 @@ async def get_homepage(
 
     return templates.TemplateResponse(
         "home/index.html",
-        {"request": request, "projects": projects},
+        {
+            "request": request,
+            "projects": projects,
+            "current_username": current_username,
+        },
     )
 
 
