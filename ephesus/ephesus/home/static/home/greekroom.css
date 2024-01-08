@@ -221,3 +221,12 @@ div.listing > ul li {
 .delete-icon img {
   height: 1em;
 }
+.disabled {
+  color: gray;
+}
+.hide {
+  display: none;
+}
+.back-icon {
+  height: 0.9em;
+}
