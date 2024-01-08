@@ -11,12 +11,17 @@ from fastapi import (
 
 from sqlalchemy.orm import Session
 
+import redis.asyncio as redis
+
 from .config import get_ephesus_settings
 from .database.crud import (
     is_user_exists,
     create_user,
 )
-from .database.setup import SessionLocal
+from .database.setup import (
+    SessionLocal,
+    redis_conn_pool,
+)
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -33,6 +38,14 @@ def get_db():
         db.close()
 
 
+async def get_cache():
+    cache = redis.Redis(connection_pool=redis_conn_pool)
+    try:
+        yield cache
+    finally:
+        await cache.aclose()
+
+
 async def create_app_user(
     x_forwarded_preferred_username: Annotated[str, Header(include_in_schema=False)],
     db: Session = Depends(get_db),
@@ -41,8 +54,8 @@ async def create_app_user(
     Since auth is handled upstream, any time a new user is
     encountered from the headers, add them into the DB.
 
-    This maybe improved once we figure out a way to get a
-    callback from the upstream user registration flow.
+    Note: This maybe improved once we figure out a way to
+    get a callback from the upstream user registration flow.
     """
     # If user already exists in the DB, skip creation
     if is_user_exists(db, x_forwarded_preferred_username):
