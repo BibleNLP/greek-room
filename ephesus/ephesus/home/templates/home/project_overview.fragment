@@ -45,21 +45,24 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
         >
           See results
         </button>
+        <img
+          src="static/home/assets/eclipse-loader.svg"
+          role="loader"
+          class="hide"
+        />
       </li>
     </ul>
   </li>
-  <li>
+  <li class="disabled">
     <strong>Spellings</strong>
     <ul>
-      <li>Status: <strong>Pending</strong></li>
-      <li>See results</li>
+      <li><strong>Pending</strong></li>
     </ul>
   </li>
-  <li>
+  <li class="disabled">
     <strong>Alignment Visualization</strong>
     <ul>
-      <li>Status: <strong>Pending</strong></li>
-      <li>See results</li>
+      <li><strong>Pending</strong></li>
     </ul>
   </li>
 </ul>

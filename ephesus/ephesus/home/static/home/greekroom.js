@@ -165,6 +165,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // Set resourceId state
       const resourceId = linkTarget.dataset.resourceId;
 
+      // Show loader
+      linkTarget.classList.add("hide");
+      linkTarget.nextElementSibling.classList.remove("hide");
+
       // Get HTML Wildebeest analysis content to display on right pane
       getDataFromElementURL(linkTarget).then(
         (content) => {

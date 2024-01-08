@@ -5,7 +5,13 @@
             <tr bgcolor="#BBCCFF">
                 <td><table border="0" cellpadding="3" cellspacing="0">
                         <tr>
-                            <td><b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b></td>
+                          <td>
+                            <img
+                              src="static/home/assets/left-arrow.svg"
+                              role="back"
+                              class="back-icon hide"
+                              />
+                            <b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b></td>
                         </tr>
                     </table>
                 </td>
