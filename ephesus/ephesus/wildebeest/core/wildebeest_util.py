@@ -47,9 +47,7 @@ def run_wildebeest_analysis(
         return None
 
     try:
-        ref_id_dict: dict[int, str] = wb_analysis.load_ref_ids(
-            str(project_path / PROJECT_VREF_FILE_NAME)
-        )
+        ref_id_dict: dict[int, str] = load_ref_ids(resource_id)
         return (
             wb_analysis.process(
                 in_file=str(project_path / f"{resource_id}.txt"),
@@ -60,3 +58,14 @@ def run_wildebeest_analysis(
     except Exception as exc:
         _LOGGER.exception(exc)
         raise InputError("Error while running Wildebeest analysis")
+
+
+def load_ref_ids(resource_id: str) -> dict[int, int]:
+    """Load reference IDs from a path; uses Wildebeest"""
+    project_path: Path = (
+        ephesus_settings.ephesus_projects_dir
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
+        / PROJECT_CLEAN_DIR_NAME
+    )
+    return wb_analysis.load_ref_ids(str(project_path / PROJECT_VREF_FILE_NAME))

@@ -39,7 +39,7 @@ def get_db():
 
 
 async def get_cache():
-    cache = redis.Redis(connection_pool=redis_conn_pool)
+    cache: redis = redis.Redis(connection_pool=redis_conn_pool)
     try:
         yield cache
     finally:
