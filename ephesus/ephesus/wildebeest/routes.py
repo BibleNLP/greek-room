@@ -118,7 +118,7 @@ async def get_formatted_wildebeest_analysis(
     resource_id: str,
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
-    cache: redis = Depends(get_cache),
+    cache: redis.client.Redis = Depends(get_cache),
 ):
     """Get the formatted wildebeest analysis results to show in the UI"""
     # Check if user has read access on project
@@ -137,7 +137,7 @@ async def get_formatted_wildebeest_analysis(
     ref_id_dict: dict[int, int]
 
     # Return from cache, if it exists
-    if await cache.exists(f"wb:{resource_id}:analysis"):
+    if cache and await cache.exists(f"wb:{resource_id}:analysis"):
         wb_analysis = await cache.get(f"wb:{resource_id}:analysis")
         wb_analysis = json.loads(wb_analysis)
         ref_id_dict = load_ref_ids(resource_id)
@@ -147,17 +147,19 @@ async def get_formatted_wildebeest_analysis(
         try:
             wb_analysis, ref_id_dict = run_wildebeest_analysis(resource_id)
 
-            async with cache.pipeline(transaction=True) as cache_pipeline:
-                await (
-                    cache_pipeline.set(
-                        f"wb:{resource_id}:analysis", json.dumps(wb_analysis.analysis)
+            if cache:
+                async with cache.pipeline(transaction=True) as cache_pipeline:
+                    await (
+                        cache_pipeline.set(
+                            f"wb:{resource_id}:analysis",
+                            json.dumps(wb_analysis.analysis),
+                        )
+                        .set(
+                            f"wb:{resource_id}:create_time",
+                            datetime.now(timezone.utc).timestamp(),
+                        )
+                        .execute()
                     )
-                    .set(
-                        f"wb:{resource_id}:create_time",
-                        datetime.now(timezone.utc).timestamp(),
-                    )
-                    .execute()
-                )
 
             if not wb_analysis:
                 raise HTTPException(

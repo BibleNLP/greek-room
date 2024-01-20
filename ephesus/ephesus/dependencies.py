@@ -14,6 +14,8 @@ from sqlalchemy.orm import Session
 import redis.asyncio as redis
 
 from .config import get_ephesus_settings
+from .constants import EphesusEnvType
+
 from .database.crud import (
     is_user_exists,
     create_user,
@@ -38,7 +40,13 @@ def get_db():
         db.close()
 
 
-async def get_cache():
+# Get a Cache instance
+async def get_cache() -> redis.client.Redis | None:
+    # Short-circuit for Development mode
+    if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower():
+        yield None
+        return
+
     cache: redis = redis.Redis(connection_pool=redis_conn_pool)
     try:
         yield cache
