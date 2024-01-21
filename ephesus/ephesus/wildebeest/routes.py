@@ -79,35 +79,15 @@ async def get_wildebeest_analysis(
     resource_id: str,
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
+    cache: redis.client.Redis = Depends(get_cache),
 ) -> dict:
     """Get Wildebeest analysis results"""
 
-    # Check if user has read access on project
-    project_mapping = crud.get_user_project(db, resource_id, current_username)
+    wb_analysis, ref_id_dict = await process_wildebeest_analysis_request(
+        resource_id, current_username, db, cache
+    )
 
-    # `resource_id` not associated with `username`
-    if not project_mapping:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="There was an error while processing this request. Please try again.",
-        )
-
-    try:
-        wb_analysis: dict
-        ref_id_dict: dict
-        wb_analysis, ref_id_dict = run_wildebeest_analysis(resource_id)
-        if not wb_analysis:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Unable to find project contents.",
-            )
-        return wb_analysis.analysis
-
-    except InputError as ine:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="There was an error while processing this request. Please try again.",
-        )
+    return wb_analysis
 
 
 #############
@@ -129,6 +109,37 @@ async def get_formatted_wildebeest_analysis(
     cache: redis.client.Redis = Depends(get_cache),
 ):
     """Get the formatted wildebeest analysis results to show in the UI"""
+
+    wb_analysis, ref_id_dict = await process_wildebeest_analysis_request(
+        resource_id, current_username, db, cache
+    )
+
+    return templates.TemplateResponse(
+        "wildebeest/analysis.fragment",
+        {
+            "request": request,
+            "wb_analysis_data": wb_analysis,
+            "ref_id_dict": ref_id_dict,
+        },
+    )
+
+
+##########
+# Common #
+##########
+
+
+async def process_wildebeest_analysis_request(
+    resource_id: str,
+    current_username: str,
+    db: Session,
+    cache: redis.client.Redis,
+) -> (dict, dict[int, int]):
+    """
+    Refactored common functionality for both
+    Wildebeest Analysis UI and API endpoints
+    """
+
     # Check if user has read access on project
     project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(
         db, resource_id, current_username
@@ -195,11 +206,4 @@ async def get_formatted_wildebeest_analysis(
                 detail="There was an error while processing this request. Please try again.",
             )
 
-    return templates.TemplateResponse(
-        "wildebeest/analysis.fragment",
-        {
-            "request": request,
-            "wb_analysis_data": wb_analysis,
-            "ref_id_dict": ref_id_dict,
-        },
-    )
+    return wb_analysis, ref_id_dict
