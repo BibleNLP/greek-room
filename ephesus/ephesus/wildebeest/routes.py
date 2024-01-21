@@ -4,11 +4,11 @@ API and UI routes for the wildebeest checks
 
 import logging
 from pathlib import Path
+import json
 from datetime import (
     datetime,
     timezone,
 )
-import json
 
 from fastapi import (
     APIRouter,
@@ -28,9 +28,17 @@ from sqlalchemy.exc import DBAPIError
 import redis.asyncio as redis
 
 from ..config import get_ephesus_settings
+from ..constants import (
+    DATETIME_TZ_FORMAT_STRING,
+    ProjectMetadata,
+)
 from .core.wildebeest_util import (
     run_wildebeest_analysis,
     load_ref_ids,
+    is_cache_valid,
+)
+from ..common.utils import (
+    get_datetime,
 )
 from ..dependencies import (
     get_db,
@@ -125,6 +133,10 @@ async def get_formatted_wildebeest_analysis(
     project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(
         db, resource_id, current_username
     )
+    # Get upload_time for cache validation check
+    upload_time = ProjectMetadata(
+        **project_mapping.Project.project_metadata
+    ).get_upload_time()
 
     # `resource_id` not associated with `username`
     if not project_mapping:
@@ -136,8 +148,14 @@ async def get_formatted_wildebeest_analysis(
     wb_analysis: dict
     ref_id_dict: dict[int, int]
 
-    # Return from cache, if it exists
-    if cache and await cache.exists(f"wb:{resource_id}:analysis"):
+    # Return from cache, if it exists and is valid
+    if (
+        cache
+        and await cache.exists(f"wb:{resource_id}:analysis")
+        and is_cache_valid(
+            get_datetime(await cache.get(f"wb:{resource_id}:create_time")), upload_time
+        )
+    ):
         wb_analysis = await cache.get(f"wb:{resource_id}:analysis")
         wb_analysis = json.loads(wb_analysis)
         ref_id_dict = load_ref_ids(resource_id)
@@ -156,7 +174,9 @@ async def get_formatted_wildebeest_analysis(
                         )
                         .set(
                             f"wb:{resource_id}:create_time",
-                            datetime.now(timezone.utc).timestamp(),
+                            datetime.now(timezone.utc).strftime(
+                                DATETIME_TZ_FORMAT_STRING
+                            ),
                         )
                         .execute()
                     )

@@ -12,6 +12,10 @@ import tempfile
 import unicodedata
 from pathlib import Path
 from collections import Counter, defaultdict
+from datetime import (
+    datetime,
+    timezone,
+)
 
 from machine.corpora import (
     UsfmFileTextCorpus,
@@ -23,6 +27,7 @@ from ..constants import (
     PROJECT_VREF_FILE_NAME,
     USFM_FILE_PATTERNS,
     ZIP_FILE_PATTERN,
+    DATETIME_TZ_FORMAT_STRING,
     BookCodes,
 )
 
@@ -353,3 +358,16 @@ def get_scope_from_vref(vref_file: Path) -> dict[str, set] | None:
     except Exception as exc:
         _LOGGER.exception("Error while calculating scope of project. %s", exc)
         raise FormatError("Error while calculating scope of project.")
+
+
+def get_datetime(formatted_time: str) -> datetime:
+    """
+    Helper for getting Timezone aware datetime
+    from a formatted string based on the app
+    convention as defined by
+    constants.DATETIME_TZ_FORMAT_STRING
+    """
+    if not formatted_time:
+        return None
+
+    return datetime.strptime(formatted_time, DATETIME_TZ_FORMAT_STRING)

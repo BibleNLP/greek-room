@@ -5,6 +5,10 @@ import logging
 import json
 from pathlib import Path
 from tempfile import TemporaryFile
+from datetime import (
+    datetime,
+)
+
 
 from wildebeest import wb_analysis
 
@@ -69,3 +73,17 @@ def load_ref_ids(resource_id: str) -> dict[int, int]:
         / PROJECT_CLEAN_DIR_NAME
     )
     return wb_analysis.load_ref_ids(str(project_path / PROJECT_VREF_FILE_NAME))
+
+
+def is_cache_valid(cached_time: datetime, upload_time: datetime) -> bool:
+    """
+    If the cached_time is prior to upload_time,
+    the cache is invalid and should be refreshed
+    """
+    if not cached_time or not upload_time:
+        return False
+
+    if upload_time > cached_time:
+        return False
+
+    return True
