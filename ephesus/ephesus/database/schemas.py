@@ -53,6 +53,7 @@ class ProjectModel(ProjectListModel):
     tags: list[str] = None
     status: StatusType
     update_datetime: datetime
+    project_metadata: dict
 
 
 class ProjectWithAccessModel(TypedDict):

@@ -12,6 +12,8 @@ class EphesusSettings(BaseSettings):
 
     sqlalchemy_database_uri: str
 
+    redis_connection_uri: str
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

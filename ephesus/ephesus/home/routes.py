@@ -8,6 +8,7 @@ import shutil
 from pathlib import Path
 from typing import Annotated
 from datetime import datetime, timezone
+from dataclasses import asdict
 
 from fastapi import (
     APIRouter,
@@ -34,6 +35,7 @@ from ..constants import (
     PROJECT_CLEAN_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
     ProjectAccessType,
+    ProjectMetadata,
 )
 from ..dependencies import (
     get_db,
@@ -152,7 +154,12 @@ def create_user_project(
 
         # Save project to DB
         crud.create_user_project(
-            db, project_name, resource_id, lang_code, current_username
+            db,
+            project_name,
+            resource_id,
+            lang_code,
+            current_username,
+            project_metadata=asdict(ProjectMetadata()),
         )
 
     except InputError as ine:

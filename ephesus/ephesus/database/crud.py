@@ -72,6 +72,7 @@ def create_user_project(
     resource_id: str,
     lang_code: str,
     username: str,
+    project_metadata: dict = {},
 ) -> None:
     """Create a project entry in the DB for a user"""
     user = db.scalars((select(User).where(User.username == username))).first()
@@ -79,6 +80,7 @@ def create_user_project(
         resource_id=resource_id,
         name=project_name,
         lang_code=lang_code,
+        project_metadata=project_metadata,
     )
     project_access = ProjectAccess(
         project=project,

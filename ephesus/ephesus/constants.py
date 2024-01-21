@@ -3,6 +3,11 @@ Constants used in this application
 """
 from enum import Enum, unique, EnumMeta
 from collections import namedtuple
+from dataclasses import dataclass, field
+
+from functools import partial
+
+from datetime import datetime, timezone
 
 # Enums
 class MyEnumMeta(EnumMeta):
@@ -22,6 +27,21 @@ class ProjectTypes(Enum, metaclass=MyEnumMeta):
     """
 
     PROJ_WILDEBEEST = "wildebeest"
+
+
+@dataclass
+class ProjectMetadata:
+    """Class for storing project metadata in DB as JSON"""
+
+    # Using JSON naming convention
+    uploadTime: str = field(
+        default_factory=lambda: datetime.now(tz=timezone.utc).strftime(
+            DATETIME_TZ_FORMAT_STRING
+        )
+    )
+
+    def get_upload_time(self):
+        return datetime.strptime(self.uploadTime, DATETIME_TZ_FORMAT_STRING)
 
 
 class EphesusEnvType(Enum):
@@ -72,6 +92,9 @@ PROJECT_CLEAN_DIR_NAME: str = "clean"
 # name across all projects.
 PROJECT_VREF_FILE_NAME: str = "vref.txt"
 
+# The timezone-aware datetime format string
+# used internally in this application
+DATETIME_TZ_FORMAT_STRING = "%Y-%m-%d %H:%M:%S %z"
 
 ## Patterns
 # Patterns for USFM files.
