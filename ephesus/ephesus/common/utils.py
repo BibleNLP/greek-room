@@ -16,6 +16,7 @@ from datetime import (
     datetime,
     timezone,
 )
+from io import IOBase
 
 from machine.corpora import (
     UsfmFileTextCorpus,
@@ -33,6 +34,7 @@ from ..constants import (
 
 from ..exceptions import (
     InputError,
+    OutputError,
     FormatError,
 )
 
@@ -371,3 +373,20 @@ def get_datetime(formatted_time: str) -> datetime:
         return None
 
     return datetime.strptime(formatted_time, DATETIME_TZ_FORMAT_STRING)
+
+
+def iter_file(filepath: str, mode: str, delete: bool = False):
+    """
+    Given a filepath, iterate over its chunks.
+    mode e.g.: `r`, `rb`, etc.
+    This is useful for streaming responses.
+    """
+    try:
+        with open(filepath, mode=mode) as f:
+            yield from f
+
+        if delete:
+            Path(filepath).unlink(missing_ok=True)
+    except Exception as exc:
+        _LOGGER.exception("Error while downloading file. %s", exc)
+        raise OutputError("Error while downloading file")

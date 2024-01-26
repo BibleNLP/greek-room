@@ -96,6 +96,9 @@ PROJECT_VREF_FILE_NAME: str = "vref.txt"
 # used internally in this application
 DATETIME_TZ_FORMAT_STRING = "%Y-%m-%d %H:%M:%S %z"
 
+# The template for downloaded file names
+WILDEBEEST_DOWNLOAD_FILENAME = "wildebeest-report-{name}.txt"
+
 ## Patterns
 # Patterns for USFM files.
 # Not regex but usable in Path.glob()
