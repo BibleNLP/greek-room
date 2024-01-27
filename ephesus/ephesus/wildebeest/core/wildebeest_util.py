@@ -4,7 +4,7 @@ The utility module that contains logic to work with the Greek Room Wildebeest mo
 import logging
 import json
 from pathlib import Path
-from tempfile import TemporaryFile
+from tempfile import NamedTemporaryFile
 from datetime import (
     datetime,
 )
@@ -48,7 +48,7 @@ def run_wildebeest_analysis(
         ]
     ):
         _LOGGER.error("Unable to find content files for project %s", resource_id)
-        return None
+        return None, None
 
     try:
         ref_id_dict: dict[int, str] = load_ref_ids(resource_id)
@@ -59,6 +59,46 @@ def run_wildebeest_analysis(
             ),
             ref_id_dict,
         )
+    except Exception as exc:
+        _LOGGER.exception(exc)
+        raise InputError("Error while running Wildebeest analysis")
+
+
+def prettyprint_wildebeest_analysis(
+    resource_id: str,
+) -> str | None:
+    """
+    Run the Wildebeest Analysis for the project `resource_id`
+    and write results in a text file and return the filename.
+    """
+    project_path: Path = (
+        ephesus_settings.ephesus_projects_dir
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
+        / PROJECT_CLEAN_DIR_NAME
+    )
+
+    if not all(
+        [
+            project_path.exists(),
+            (project_path / f"{resource_id}.txt").exists(),
+            (project_path / PROJECT_VREF_FILE_NAME).exists(),
+        ]
+    ):
+        _LOGGER.error("Unable to find content files for project %s", resource_id)
+        return None
+
+    try:
+        ref_id_dict: dict[int, str] = load_ref_ids(resource_id)
+
+        with NamedTemporaryFile(mode="w", delete=False) as fp:
+            wb_analysis.process(
+                in_file=str(project_path / f"{resource_id}.txt"),
+                ref_id_dict=ref_id_dict,
+                pp_output=fp,
+            )
+            return fp.name
+
     except Exception as exc:
         _LOGGER.exception(exc)
         raise InputError("Error while running Wildebeest analysis")

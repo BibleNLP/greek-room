@@ -19,7 +19,10 @@ from fastapi import (
     status,
     HTTPException,
 )
-from fastapi.responses import HTMLResponse
+from fastapi.responses import (
+    HTMLResponse,
+    StreamingResponse,
+)
 from fastapi.templating import Jinja2Templates
 
 from sqlalchemy.orm import Session
@@ -30,22 +33,25 @@ import redis.asyncio as redis
 from ..config import get_ephesus_settings
 from ..constants import (
     DATETIME_TZ_FORMAT_STRING,
+    WILDEBEEST_DOWNLOAD_FILENAME,
     ProjectMetadata,
 )
 from .core.wildebeest_util import (
     run_wildebeest_analysis,
     load_ref_ids,
     is_cache_valid,
+    prettyprint_wildebeest_analysis,
 )
 from ..common.utils import (
     get_datetime,
+    iter_file,
 )
 from ..dependencies import (
     get_db,
     get_cache,
     get_current_username,
 )
-from ..exceptions import InputError
+from ..exceptions import InputError, OutputError
 from ..database import crud
 from ..database.schemas import ProjectAccessModel
 
@@ -120,8 +126,48 @@ async def get_formatted_wildebeest_analysis(
             "request": request,
             "wb_analysis_data": wb_analysis,
             "ref_id_dict": ref_id_dict,
+            "resource_id": resource_id,
         },
     )
+
+
+@ui_router.get("/projects/{resource_id}/wildebeest/download")
+def download_formatted_wildebeest_analysis(
+    request: Request,
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Pretty print the wildebeest analysis results for direct download"""
+
+    # Check if user has read access on project
+    project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(
+        db, resource_id, current_username
+    )
+
+    # `resource_id` not associated with `username`
+    if not project_mapping:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There was an error while processing this request. Please try again.",
+        )
+
+    try:
+        wb_prettyprint_filepath = prettyprint_wildebeest_analysis(resource_id)
+        headers = {
+            "Content-Disposition": f"attachment; filename={WILDEBEEST_DOWNLOAD_FILENAME.format(name=Path(wb_prettyprint_filepath).name)}"
+        }
+        return StreamingResponse(
+            iter_file(wb_prettyprint_filepath, mode="r", delete=True),
+            media_type="text/plain; charset=UTF-8",
+            headers=headers,
+        )
+
+    except OutputError as oute:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There was an error while processing this request. Please try again.",
+        )
 
 
 ##########

@@ -13,3 +13,7 @@ class InputError(AppException):
 
 class FormatError(AppException):
     """Error related to file format"""
+
+
+class OutputError(AppException):
+    """Error while processing output"""

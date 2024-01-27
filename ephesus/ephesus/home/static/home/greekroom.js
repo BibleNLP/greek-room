@@ -12,7 +12,7 @@ export async function getDataFromElementURL(element, params) {
     data = await response.text();
     return Promise.resolve(data);
   } else {
-    return Promise.reject("Unable to retrieve project overview data.");
+    return Promise.reject("Unable to retrieve data.");
   }
 }
 
@@ -42,6 +42,25 @@ export async function postForm(formElement) {
       "There was an error while processing this request. Please try again."
     );
   }
+}
+
+export async function showInfoPopup(title, message) {
+  const infoPopup = document.getElementById("info-popup");
+  document.querySelector('#info-popup h3[role="title"]').innerHTML = title;
+  document.querySelector('#info-popup p[role="message"]').innerHTML = message;
+  infoPopup.showModal();
+
+  // "OK" button closes the dialog
+  document
+    .querySelector('#info-popup button[role="confirm"]')
+    .addEventListener("click", () => {
+      infoPopup.close();
+    });
+}
+
+export async function closeInfoPopup() {
+  const infoPopup = document.getElementById("info-popup");
+  infoPopup.close();
 }
 
 // Method to send delete request
@@ -166,15 +185,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const resourceId = linkTarget.dataset.resourceId;
 
       // Show loader
+      detailsPane.classList.add("cursor-wait");
       linkTarget.classList.add("hide");
       linkTarget.nextElementSibling.classList.remove("hide");
 
       // Get HTML Wildebeest analysis content to display on right pane
       getDataFromElementURL(linkTarget).then(
         (content) => {
+          detailsPane.classList.remove("cursor-wait");
           detailsPane.innerHTML = content;
         },
         (reason) => {
+          detailsPane.classList.remove("cursor-wait");
           detailsPane.innerHTML =
             "There was an error while processing the request. Try again.";
         }
@@ -183,11 +205,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Apply onClick listener for delete button
-    const deleteIcon = event.target.closest('img[data-url*="projects"]');
+    const deleteIcon = event.target.closest('img[role="delete-project"]');
     if (deleteIcon) {
       deleteEndpoint = { deleteEndpoint: deleteIcon.dataset.url };
       deletePopup.showModal();
 
+      return;
+    }
+
+    // Apply onClick listener for Wildebeest download button
+    const wildebeestDownloadIcon = event.target.closest(
+      'img[role="wildebeest-download"]'
+    );
+    if (wildebeestDownloadIcon) {
+      const downloadHandle = window.open(
+        wildebeestDownloadIcon.dataset.url,
+        "GreekRoomContext"
+      );
+      if (!downloadHandle) {
+        // Handle download error
+        showInfoPopup(
+          "Wildebeest Download Error",
+          "There was an error while attempting to download the Wildebeest analysis report. Please try again."
+        );
+      } else {
+        // noop if download was successful
+      }
       return;
     }
   });

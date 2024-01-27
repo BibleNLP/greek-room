@@ -227,6 +227,17 @@ div.listing > ul li {
 .hide {
   display: none;
 }
-.back-icon {
+.cursor-wait {
+  cursor: wait;
+}
+.wildebeest-icon-tray {
+  float: right;
+}
+.wildebeest-icon-item {
   height: 0.9em;
+  padding: 0 0.2em 0 0;
+  cursor: pointer;
+}
+.loader-small {
+  height: 0.95em;
 }
