@@ -126,6 +126,7 @@ async def get_formatted_wildebeest_analysis(
             "request": request,
             "wb_analysis_data": wb_analysis,
             "ref_id_dict": ref_id_dict,
+            "resource_id": resource_id,
         },
     )
 
@@ -137,7 +138,7 @@ def download_formatted_wildebeest_analysis(
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
-    """Get the formatted wildebeest analysis results to show in the UI"""
+    """Pretty print the wildebeest analysis results for direct download"""
 
     # Check if user has read access on project
     project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(

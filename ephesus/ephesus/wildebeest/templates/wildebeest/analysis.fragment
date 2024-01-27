@@ -3,17 +3,23 @@
 {% else %}
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr bgcolor="#BBCCFF">
-                <td><table border="0" cellpadding="3" cellspacing="0">
+              <td>
+                <table width="100%" border="0" cellpadding="3" cellspacing="0">
                         <tr>
                           <td>
-                            <img
-                              src="static/home/assets/left-arrow.svg"
-                              role="back"
-                              class="back-icon hide"
-                              />
-                            <b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b></td>
+                            <b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b>
+                            <div class="wildebeest-icon-tray">
+                              <img
+                                src="static/home/assets/download-icon.svg"
+                                role="wildebeest-download"
+                                class="wildebeest-icon-item"
+                                data-url="{{ url_for('download_formatted_wildebeest_analysis', resource_id=resource_id) }}"
+                                data-resource-id="{{ resource_id }}"
+                                />
+                            </div>
+                          </td>
                         </tr>
-                    </table>
+                  </table>
                 </td>
             </tr>
         </table><p>

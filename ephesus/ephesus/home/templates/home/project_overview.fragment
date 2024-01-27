@@ -6,6 +6,7 @@
   <div class="delete-icon">
     <img
       src="static/home/assets/recycle-bin-icon.webp"
+      role="delete-project"
       data-url="{{ url_for('delete_user_project', resource_id=project['Project'].resource_id) }}"
     />
   </div>
@@ -48,7 +49,7 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
         <img
           src="static/home/assets/eclipse-loader.svg"
           role="loader"
-          class="hide"
+          class="loader-small hide"
         />
       </li>
     </ul>
