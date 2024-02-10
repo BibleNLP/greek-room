@@ -40,7 +40,7 @@ class ProjectMetadata:
         )
     )
 
-    def get_upload_time(self):
+    def get_upload_time(self) -> datetime:
         return datetime.strptime(self.uploadTime, DATETIME_TZ_FORMAT_STRING)
 
 
@@ -95,6 +95,11 @@ PROJECT_VREF_FILE_NAME: str = "vref.txt"
 # The timezone-aware datetime format string
 # used internally in this application
 DATETIME_TZ_FORMAT_STRING = "%Y-%m-%d %H:%M:%S %z"
+
+# The timezone-aware datetime format
+# string used for UI purposes. Assumes
+# the the time output is in UTC.
+DATETIME_UTC_UI_FORMAT_STRING = "%B %d, %Y at %H:%M UTC"
 
 # The template for downloaded file names
 WILDEBEEST_DOWNLOAD_FILENAME = "wildebeest-report-{name}.txt"

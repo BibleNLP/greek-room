@@ -7,15 +7,20 @@
                 <table width="100%" border="0" cellpadding="3" cellspacing="0">
                         <tr>
                           <td>
-                            <b><font class="large" size="+1">&nbsp Wildebeest Analysis Report</font></b>
+                            <b><font class="large" size="+1">&nbsp Wildebeest Analysis Report for {{ project_name }} ({{ lang_code }})</font></b></td>
+                          <td>
                             <div class="wildebeest-icon-tray">
-                              <img
-                                src="static/home/assets/download-icon.svg"
-                                role="wildebeest-download"
-                                class="wildebeest-icon-item"
-                                data-url="{{ url_for('download_formatted_wildebeest_analysis', resource_id=resource_id) }}"
-                                data-resource-id="{{ resource_id }}"
-                                />
+                            {{ report_create_time }}
+                            &nbsp;
+                            |
+                            &nbsp;
+                            <img
+                              src="static/home/assets/download-icon.svg"
+                              role="wildebeest-download"
+                              class="wildebeest-icon-item"
+                              data-url="{{ url_for('download_formatted_wildebeest_analysis', resource_id=resource_id) }}"
+                              data-resource-id="{{ resource_id }}"
+                              />
                             </div>
                           </td>
                         </tr>
