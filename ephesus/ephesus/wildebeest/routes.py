@@ -176,7 +176,7 @@ def download_formatted_wildebeest_analysis(
         # Write out Project metadata
         with open(wb_prettyprint_filepath, mode="a") as f:
             f.write(
-                f"\nPROJECT METADATA\n    Name: {project_mapping.Project.name}\n    Language Code: {project_mapping.Project.lang_code}\n    Report Creation Time: {datetime.now(timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}"
+                f"\nGREEK ROOM METADATA\n    Project Name: {project_mapping.Project.name}\n    Language Code: {project_mapping.Project.lang_code}\n    Report Create Time: {datetime.now(timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}"
             )
 
         return StreamingResponse(
