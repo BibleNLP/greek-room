@@ -33,6 +33,7 @@ import redis.asyncio as redis
 from ..config import get_ephesus_settings
 from ..constants import (
     DATETIME_TZ_FORMAT_STRING,
+    DATETIME_UTC_UI_FORMAT_STRING,
     WILDEBEEST_DOWNLOAD_FILENAME,
     ProjectMetadata,
 )
@@ -53,7 +54,7 @@ from ..dependencies import (
 )
 from ..exceptions import InputError, OutputError
 from ..database import crud
-from ..database.schemas import ProjectAccessModel
+from ..database.schemas import ProjectAccessModel, WildebeestResultsModel
 
 router = APIRouter()
 
@@ -89,11 +90,20 @@ async def get_wildebeest_analysis(
 ) -> dict:
     """Get Wildebeest analysis results"""
 
-    wb_analysis, ref_id_dict = await process_wildebeest_analysis_request(
+    wb_results: WildebeestResultsModel = await process_wildebeest_analysis_request(
         resource_id, current_username, db, cache
     )
 
-    return wb_analysis
+    return {
+        "greek_room_metadata": {
+            "project_name": wb_results["project_name"],
+            "language_code": wb_results["lang_code"],
+            "report_create_time": wb_results["report_create_time"].strftime(
+                DATETIME_TZ_FORMAT_STRING
+            ),
+        },
+        **wb_results["wb_analysis"],
+    }
 
 
 #############
@@ -116,7 +126,7 @@ async def get_formatted_wildebeest_analysis(
 ):
     """Get the formatted wildebeest analysis results to show in the UI"""
 
-    wb_analysis, ref_id_dict = await process_wildebeest_analysis_request(
+    wb_results: WildebeestResultsModel = await process_wildebeest_analysis_request(
         resource_id, current_username, db, cache
     )
 
@@ -124,8 +134,13 @@ async def get_formatted_wildebeest_analysis(
         "wildebeest/analysis.fragment",
         {
             "request": request,
-            "wb_analysis_data": wb_analysis,
-            "ref_id_dict": ref_id_dict,
+            "wb_analysis_data": wb_results["wb_analysis"],
+            "ref_id_dict": wb_results["ref_id_dict"],
+            "project_name": wb_results["project_name"],
+            "lang_code": wb_results["lang_code"],
+            "report_create_time": wb_results["report_create_time"].strftime(
+                DATETIME_UTC_UI_FORMAT_STRING
+            ),
             "resource_id": resource_id,
         },
     )
@@ -157,6 +172,13 @@ def download_formatted_wildebeest_analysis(
         headers = {
             "Content-Disposition": f"attachment; filename={WILDEBEEST_DOWNLOAD_FILENAME.format(name=Path(wb_prettyprint_filepath).name)}"
         }
+
+        # Write out Project metadata
+        with open(wb_prettyprint_filepath, mode="a") as f:
+            f.write(
+                f"\nGREEK ROOM METADATA\n    Project Name: {project_mapping.Project.name}\n    Language Code: {project_mapping.Project.lang_code}\n    Report Create Time: {datetime.now(timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}"
+            )
+
         return StreamingResponse(
             iter_file(wb_prettyprint_filepath, mode="r", delete=True),
             media_type="text/plain; charset=UTF-8",
@@ -180,7 +202,7 @@ async def process_wildebeest_analysis_request(
     current_username: str,
     db: Session,
     cache: redis.client.Redis,
-) -> (dict, dict[int, int]):
+) -> WildebeestResultsModel:
     """
     Refactored common functionality for both
     Wildebeest Analysis UI and API endpoints
@@ -204,6 +226,7 @@ async def process_wildebeest_analysis_request(
 
     wb_analysis: dict
     ref_id_dict: dict[int, int]
+    report_create_time: datetime = datetime.now(tz=timezone.utc)
 
     # Return from cache, if it exists and is valid
     if (
@@ -215,6 +238,9 @@ async def process_wildebeest_analysis_request(
     ):
         wb_analysis = await cache.get(f"wb:{resource_id}:analysis")
         wb_analysis = json.loads(wb_analysis)
+        report_create_time = get_datetime(
+            await cache.get(f"wb:{resource_id}:create_time")
+        )
         ref_id_dict = load_ref_ids(resource_id)
 
     # If not, process using Wildebeest
@@ -252,4 +278,10 @@ async def process_wildebeest_analysis_request(
                 detail="There was an error while processing this request. Please try again.",
             )
 
-    return wb_analysis, ref_id_dict
+    return WildebeestResultsModel(
+        wb_analysis=wb_analysis,
+        ref_id_dict=ref_id_dict,
+        report_create_time=report_create_time,
+        project_name=project_mapping.Project.name,
+        lang_code=project_mapping.Project.lang_code,
+    )

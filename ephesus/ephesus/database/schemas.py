@@ -59,3 +59,14 @@ class ProjectModel(ProjectListModel):
 class ProjectWithAccessModel(TypedDict):
     Project: ProjectModel
     ProjectAccess: ProjectAccessModel
+
+
+# Wildebeest specific
+class WildebeestResultsModel(TypedDict):
+    """Model for Wildebeest process functions return values"""
+
+    wb_analysis: dict
+    ref_id_dict: dict[int, int]
+    report_create_time: datetime
+    project_name: str
+    lang_code: str
