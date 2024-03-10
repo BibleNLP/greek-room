@@ -11,6 +11,14 @@ class InputError(AppException):
     """Error while processing input"""
 
 
+class BoundsError(AppException):
+    """
+    Some reference was out of bounds.
+    This for is more application
+    specific ranges like BCV
+    """
+
+
 class FormatError(AppException):
     """Error related to file format"""
 

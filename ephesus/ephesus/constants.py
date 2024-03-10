@@ -9,6 +9,10 @@ from functools import partial
 
 from datetime import datetime, timezone
 
+from .exceptions import (
+    InputError,
+)
+
 # Enums
 class MyEnumMeta(EnumMeta):
     def __contains__(cls, item):
@@ -223,3 +227,44 @@ class BookCodes(Enum, metaclass=MyEnumMeta):
     BOOK_REP = "REP"
     BOOK_4BA = "4BA"
     BOOK_LAO = "LAO"
+
+
+@dataclass
+class BibleReference:
+    """Class for holding a Biblical reference (BCV)"""
+
+    book: BookCodes
+    chapter: str = None
+    verse: str = None
+
+    @classmethod
+    def from_string(cls, ref: str):
+        """Initialize an object a Bible reference string"""
+        if not len or len(ref) < 3:
+            raise InputError(
+                "Invalid Bible reference string. It must be of the form BOOK Chapter:Verse"
+            )
+
+        book: str
+        cv: str | None
+        book, cv = ref.split()
+        if book.upper() not in BookCodes:
+            raise InputError(
+                "Invalid Bible reference string. No matching Book Code found."
+            )
+        if not cv:
+            return cls(book=book)
+
+        if ":" in cv:
+            return cls(book=book, chapter=cv.split(":")[0], verse=cv.split(":")[1])
+
+        return cls(book=book, chapter=cv)
+
+    def get_formatted_reference(self) -> str:
+        if chapter and verse:
+            return f"{book} {chapter}:{verse}"
+
+        if chapter:
+            return f"{book} {chapter}"
+
+        return book

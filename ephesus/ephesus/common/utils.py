@@ -339,7 +339,7 @@ def get_scope_from_vref(vref_file: Path) -> dict[str, set] | None:
     """
     Read the project's `vref.txt` return
     a dict with the names of book and the
-    numbers of chapters in each of them
+    numbers of chapters (as str) in each of them
     """
     if not vref_file or not vref_file.exists():
         return None

@@ -4,6 +4,8 @@ Main entry point for the Ephesus application
 # Imports
 import logging
 from logging.config import dictConfig
+from collections import defaultdict
+import json
 
 from fastapi import Depends, FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -42,6 +44,43 @@ app.include_router(home_routes.api_router)
 # Wildebeest routes
 app.include_router(wildebeest_routes.api_router)
 app.include_router(wildebeest_routes.ui_router)
+
+
+# App initialization steps
+@app.on_event("startup")
+async def index_vref():
+    """Create an index for the vref.txt file"""
+    if not ephesus_settings.ephesus_default_vref_file.exists():
+        raise AppException("Unable to find the default vref.txt file")
+
+    # Re-use existing index file, if it already exists
+    if ephesus_settings.ephesus_default_vref_file.with_suffix(".index").exists():
+        _LOGGER.info("Skipped creating and reusing existing vref.index")
+        return
+
+    _LOGGER.info("Creating vref.index")
+    vref_idx_map: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+    with ephesus_settings.ephesus_default_vref_file.open() as vref_file, ephesus_settings.ephesus_default_vref_file.with_suffix(
+        ".index"
+    ).open(
+        "w"
+    ) as index_file:
+        for idx, line in enumerate(vref_file):
+            line: str = line.strip()
+            if not line:
+                continue
+
+            book: str = line.split()[0]
+            chapter: str = line.split()[1].split(":")[0]
+
+            # Write out only strating line
+            # numbers of each book-chapter
+            if book in vref_idx_map and chapter in vref_idx_map[book]:
+                continue
+
+            vref_idx_map[book][chapter] = idx
+
+        json.dump(vref_idx_map, index_file)
 
 
 # Add user auth headers for running app only in development mode.
