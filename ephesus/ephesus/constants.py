@@ -118,6 +118,12 @@ USFM_FILE_PATTERNS: list[str] = ["*.[sS][fF][mM]", "*.[uU][sS][fF][mM]"]
 ZIP_FILE_PATTERN: str = "*.[zZ][iI][pP]"
 
 
+# Enum of all global state keys
+@unique
+class GlobalStates(Enum, metaclass=MyEnumMeta):
+    """All global state keys for the app"""
+    VREF_INDEX = "vref_index"
+
 @unique
 class BookCodes(Enum, metaclass=MyEnumMeta):
     """

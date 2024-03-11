@@ -9,7 +9,10 @@ from datetime import (
     datetime,
 )
 
-from ...config import get_ephesus_settings
+from ...config import (
+    get_ephesus_settings,
+    get_global_state,
+)
 from ...exceptions import BoundsError
 from ...constants import (
     LATEST_PROJECT_VERSION_NAME,
@@ -28,3 +31,4 @@ def get_chapter_content(resource_id: str, ref: BibleReference):
     """Get the `ref` (chapter) content to show in editor"""
     if not ref.chapter:
         raise BoundsError("Unable to find the chapter reference")
+    # get_global_state

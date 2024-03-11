@@ -1,8 +1,18 @@
+from contextlib import asynccontextmanager
+from collections import defaultdict
 from functools import lru_cache
 from pathlib import Path
+from typing import Any
+import logging
+import json
+
+from fastapi import FastAPI
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel
+
+# logging
+_LOGGER = logging.getLogger(__name__)
 
 # App settings
 class EphesusSettings(BaseSettings):
@@ -17,9 +27,100 @@ class EphesusSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
-@lru_cache()
+@lru_cache
 def get_ephesus_settings():
     return EphesusSettings()
+
+
+@lru_cache
+def get_global_state(key: str) -> Any | None:
+    """
+    Create a global state for the app
+    which holds random (small) stuff
+    that is useful across multiple parts
+    """
+    state: dict[str, Any] = {}
+
+    # Add the vref index
+    with get_ephesus_settings().ephesus_default_vref_file.with_suffix(".index").open() as index_file:
+        _LOGGER.info("Setting values!!")
+        state["vref_index"] = load(index_file)
+
+    return state.get(key, None)
+
+
+# App lifespan initialization
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Custom startup and shutdown logic.
+
+    On startup:
+    - Create an index for the vref.txt file
+
+    On shutdown:
+    - Noop
+    """
+    # Create vref.txt index
+    if not get_ephesus_settings().ephesus_default_vref_file.exists():
+        raise AppException("Unable to find the default vref.txt file")
+
+    # Re-use existing index file, if it already exists
+    if get_ephesus_settings().ephesus_default_vref_file.with_suffix(".index").exists():
+        _LOGGER.info("Skipped creating and reusing existing vref.index")
+    else:
+        _LOGGER.info("Creating vref.index")
+        vref_idx_map: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        with get_ephesus_settings().ephesus_default_vref_file.open() as vref_file, get_ephesus_settings().ephesus_default_vref_file.with_suffix(
+            ".index"
+        ).open(
+            "w"
+        ) as index_file:
+            for idx, line in enumerate(vref_file):
+                line: str = line.strip()
+                if not line:
+                    continue
+
+                book: str = line.split()[0]
+                chapter: str = line.split()[1].split(":")[0]
+
+                # Write out only starting line
+                # numbers of each book-chapter
+                if book in vref_idx_map and chapter in vref_idx_map[book]:
+                    continue
+
+                vref_idx_map[book][chapter] = idx
+
+            json.dump(vref_idx_map, index_file)
+
+    yield
+
+    ## On shutdown
+    # Noop
+
+# @app.on_event("startup")
+# async def populate_seed_data():
+#     """Setup seed data for development"""
+#     # This is here to avoid circular imports
+#     from .database.models.user_projects import (
+#         User,
+#         Project,
+#         ProjectAccess,
+#     )
+#     from .database.seed import seed_data
+
+#     # This method receives a table, a connection
+#     # and inserts data to that table.
+#     def seed_table(target, connection, **kw):
+#         tablename = str(target)
+#         if tablename in seed_data and len(seed_data[tablename]) > 0:
+#             connection.execute(target.insert(), seed_data[tablename])
+
+#     _LOGGER.debug("Populating seed data in app database")
+#     sqlalchemy_listen(User.__table__, "after_create", seed_table)
+#     sqlalchemy_listen(Project.__table__, "after_create", seed_table)
+#     sqlalchemy_listen(ProjectAccess.__table__, "after_create", seed_table)
+
 
 
 # Logging Config
