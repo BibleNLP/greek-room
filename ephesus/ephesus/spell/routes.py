@@ -28,8 +28,6 @@ from sqlalchemy.exc import DBAPIError
 from ..config import get_ephesus_settings
 from ..constants import BibleReference
 from ..common.utils import (
-    get_datetime,
-    iter_file,
     get_scope_from_vref,
 )
 from ..dependencies import (
@@ -37,8 +35,9 @@ from ..dependencies import (
     get_current_username,
 )
 from ..exceptions import InputError, OutputError
-from ..database import crud
-from ..database.schemas import ProjectAccessModel
+from .core.editor_utils import (
+    get_chapter_content,
+)
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -71,10 +70,11 @@ async def get_editor(
 ):
     """Get the spell checking UI"""
     bible_ref: BibleReference = BibleReference.from_string(ref)
-    return templates.TemplateResponse(
-        "spell/editor.fragment",
-        {
-            "request": request,
-            "ref_id_dict": wb_results["ref_id_dict"],
-        },
-    )
+    get_chapter_content(resource_id, bible_ref)
+    # return templates.TemplateResponse(
+    #     "spell/editor.fragment",
+    #     {
+    #         "request": request,
+    #         "ref_id_dict": wb_results["ref_id_dict"],
+    #     },
+    # )

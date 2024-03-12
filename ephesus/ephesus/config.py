@@ -11,6 +11,10 @@ from fastapi import FastAPI
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import BaseModel
 
+from .constants import (
+    GlobalStates,
+)
+
 # logging
 _LOGGER = logging.getLogger(__name__)
 
@@ -33,20 +37,66 @@ def get_ephesus_settings():
 
 
 @lru_cache
-def get_global_state(key: str) -> Any | None:
+def get_global_state(key: GlobalStates) -> Any | None:
     """
     Create a global state for the app
     which holds random (small) stuff
     that is useful across multiple parts
     """
-    state: dict[str, Any] = {}
+    # Keep the initialization inline
+    # since the get is optimized/memoized
+    # via the @lru_cache decorater
+    state: dict[GlobalStates, Any] = {}
 
     # Add the vref index
     with get_ephesus_settings().ephesus_default_vref_file.with_suffix(".index").open() as index_file:
-        _LOGGER.info("Setting values!!")
-        state["vref_index"] = load(index_file)
+        state[GlobalStates.VREF_INDEX.value] = json.load(index_file)
 
-    return state.get(key, None)
+    return state.get(key.value, None)
+
+
+def index_vref() -> None:
+    """Create index for the vref.txt file"""
+    if not get_ephesus_settings().ephesus_default_vref_file.exists():
+        raise AppException("Unable to find the default vref.txt file")
+
+    # Re-use existing index file, if it already exists
+    if get_ephesus_settings().ephesus_default_vref_file.with_suffix(".index").exists():
+        _LOGGER.info("Skipped creating and reusing existing vref.index")
+    else:
+        _LOGGER.info("Creating vref.index")
+        vref_idx_map: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(lambda: [-1, -1]))
+        with get_ephesus_settings().ephesus_default_vref_file.open() as vref_file, get_ephesus_settings().ephesus_default_vref_file.with_suffix(
+            ".index"
+        ).open(
+            "w"
+        ) as index_file:
+            for idx, line in enumerate(vref_file):
+                line: str = line.strip()
+                if not line:
+                    continue
+
+                book: str = line.split()[0]
+                chapter: str = line.split()[1].split(":")[0]
+
+                ## Write out start and end indices
+                # Start condition
+                if len(vref_idx_map) == 0:
+                    vref_idx_map[book][chapter][0] = idx
+                    prev_book: str = book
+                    prev_chapter: str = chapter
+                    continue
+
+                if book not in vref_idx_map or chapter not in vref_idx_map[book]:
+                    vref_idx_map[prev_book][prev_chapter][1] = idx-1
+                    vref_idx_map[book][chapter][0] = idx
+                    prev_book = book
+                    prev_chapter = chapter
+
+            # End condition
+            vref_idx_map[book][chapter][1] = idx
+
+            json.dump(vref_idx_map, index_file)
 
 
 # App lifespan initialization
@@ -61,37 +111,7 @@ async def lifespan(app: FastAPI):
     On shutdown:
     - Noop
     """
-    # Create vref.txt index
-    if not get_ephesus_settings().ephesus_default_vref_file.exists():
-        raise AppException("Unable to find the default vref.txt file")
-
-    # Re-use existing index file, if it already exists
-    if get_ephesus_settings().ephesus_default_vref_file.with_suffix(".index").exists():
-        _LOGGER.info("Skipped creating and reusing existing vref.index")
-    else:
-        _LOGGER.info("Creating vref.index")
-        vref_idx_map: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
-        with get_ephesus_settings().ephesus_default_vref_file.open() as vref_file, get_ephesus_settings().ephesus_default_vref_file.with_suffix(
-            ".index"
-        ).open(
-            "w"
-        ) as index_file:
-            for idx, line in enumerate(vref_file):
-                line: str = line.strip()
-                if not line:
-                    continue
-
-                book: str = line.split()[0]
-                chapter: str = line.split()[1].split(":")[0]
-
-                # Write out only starting line
-                # numbers of each book-chapter
-                if book in vref_idx_map and chapter in vref_idx_map[book]:
-                    continue
-
-                vref_idx_map[book][chapter] = idx
-
-            json.dump(vref_idx_map, index_file)
+    index_vref()
 
     yield
 

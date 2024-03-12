@@ -16,7 +16,6 @@ from datetime import (
     datetime,
     timezone,
 )
-from io import IOBase
 
 from machine.corpora import (
     UsfmFileTextCorpus,

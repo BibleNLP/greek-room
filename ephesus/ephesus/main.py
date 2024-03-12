@@ -13,6 +13,7 @@ from sqlalchemy.event import listen as sqlalchemy_listen
 from .auth import routes as auth_routes
 from .home import routes as home_routes
 from .wildebeest import routes as wildebeest_routes
+from .spell import routes as spell_routes
 from .database.setup import SessionLocal, engine, Base
 
 from .config import (
@@ -47,6 +48,8 @@ app.include_router(home_routes.api_router)
 app.include_router(wildebeest_routes.api_router)
 app.include_router(wildebeest_routes.ui_router)
 
+# Spell checker routes
+app.include_router(spell_routes.ui_router)
 
 # Usually, these headers are supplied by the auth proxy server.
 if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower():
