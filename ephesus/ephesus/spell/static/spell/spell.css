@@ -1,0 +1,9 @@
+#bcv-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 0.5em;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  /* display: inline-flex; */
+}

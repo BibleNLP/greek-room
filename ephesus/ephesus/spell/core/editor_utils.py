@@ -57,8 +57,8 @@ def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str]:
     verses: list[list[str]] = []
     with(project_path / f"{resource_id}.txt").open() as bible_file:
         for idx, line in enumerate(islice(bible_file,
-                           vref_bounds[0],
-                           vref_bounds[1]+1)):
+                                          vref_bounds[0],
+                                          vref_bounds[1]+1), 1):
 
             # Handle verse ranges
             if line.strip() == BIBLENLP_RANGE_SYMBOL:

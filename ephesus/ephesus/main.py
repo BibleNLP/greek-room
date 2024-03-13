@@ -36,6 +36,7 @@ Base.metadata.create_all(bind=engine)
 # Create and configure app instance
 app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(packages=[("ephesus.home", "static")]), name="static")
+app.mount("/static-spell", StaticFiles(packages=[("ephesus.spell", "static")]), name="static-spell")
 
 # Auth routes
 app.include_router(auth_routes.api_router)

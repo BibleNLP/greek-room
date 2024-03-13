@@ -1,3 +1,4 @@
+{% extends "spell/editor-pane.html" %}{% block editor %}
 {% if verses|length == 0 %}
 <p>No data found.</p>
 {% else %}
@@ -12,3 +13,4 @@
   {% endfor %}
 </div>
 {% endif %}
+{% endblock %}
