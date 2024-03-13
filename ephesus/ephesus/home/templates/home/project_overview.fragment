@@ -54,10 +54,22 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
       </li>
     </ul>
   </li>
-  <li class="disabled">
+  <li>
     <strong>Spellings</strong>
     <ul>
-      <li><strong>Pending</strong></li>
+      <li>
+        <button
+          class="link"
+          data-url="{{ url_for('get_editor', resource_id=project['Project'].resource_id) }}"
+          name="spell-checker"
+        >
+          See results
+        </button>
+        <img
+          src="static/home/assets/eclipse-loader.svg"
+          role="loader"
+          class="loader-small hide"
+        />
     </ul>
   </li>
   <li class="disabled">

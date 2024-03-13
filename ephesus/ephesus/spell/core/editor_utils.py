@@ -4,6 +4,7 @@ Module with logic to work with the Greek Room Spell Checker
 import logging
 import json
 from pathlib import Path
+from itertools import islice
 from tempfile import NamedTemporaryFile
 from datetime import (
     datetime,
@@ -18,6 +19,7 @@ from ...constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_CLEAN_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
+    BIBLENLP_RANGE_SYMBOL,
     GlobalStates,
     BibleReference,
 )
@@ -29,11 +31,11 @@ _LOGGER = logging.getLogger(__name__)
 ephesus_settings = get_ephesus_settings()
 
 
-def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str] | None:
+def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str]:
     """Get the `ref` (chapter) content to show in editor"""
     if not ref.chapter:
         raise BoundsError("Unable to find the chapter reference")
-    _LOGGER.debug(get_global_state(GlobalStates.VREF_INDEX))
+
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
         / resource_id
@@ -51,14 +53,18 @@ def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str] | No
         _LOGGER.error("Unable to find content files for project %s", resource_id)
         return None
 
-    verses: list[str] = []
+    vref_bounds: list[int] = get_global_state(GlobalStates.VREF_INDEX)[ref.book][ref.chapter]
+    verses: list[list[str]] = []
     with(project_path / f"{resource_id}.txt").open() as bible_file:
-        is_chapter: bool = False
-        for idx, line in enumerate(bible_file):
+        for idx, line in enumerate(islice(bible_file,
+                           vref_bounds[0],
+                           vref_bounds[1]+1)):
 
-            if is_chapter and :
-                verses.append(line.strip())
+            # Handle verse ranges
+            if line.strip() == BIBLENLP_RANGE_SYMBOL:
+                verses[-1][0] = f"{verses[-1][0].split('-')[0]}-{idx}"
+                continue
 
-            # Get the chapter start line no.
-            if idx == get_global_state(GlobalStates.VREF_INDEX)[ref.book][ref.chapter]:
-                is_chapter = True
+            verses.append([str(idx), line.strip()])
+
+    return verses

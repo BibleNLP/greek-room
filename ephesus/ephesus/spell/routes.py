@@ -63,18 +63,19 @@ ui_router = APIRouter(
 @ui_router.get("/projects/{resource_id}/spell", response_class=HTMLResponse)
 async def get_editor(
     request: Request,
-    ref: str,
     resource_id: str,
+    ref: str = "MAT 1",
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Get the spell checking UI"""
     bible_ref: BibleReference = BibleReference.from_string(ref)
-    get_chapter_content(resource_id, bible_ref)
-    # return templates.TemplateResponse(
-    #     "spell/editor.fragment",
-    #     {
-    #         "request": request,
-    #         "ref_id_dict": wb_results["ref_id_dict"],
-    #     },
-    # )
+    verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
+    return templates.TemplateResponse(
+        "spell/editor.fragment",
+        {
+            "request": request,
+            "verses": verses,
+            "ref": f"{bible_ref.book} {bible_ref.chapter}"
+        },
+    )

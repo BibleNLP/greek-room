@@ -108,6 +108,10 @@ DATETIME_UTC_UI_FORMAT_STRING = "%B %d, %Y at %H:%M UTC"
 # The template for downloaded file names
 WILDEBEEST_DOWNLOAD_FILENAME = "wildebeest-report-{name}.txt"
 
+# The symbol that marks verse ranges
+# in the BibleNLP format.
+BIBLENLP_RANGE_SYMBOL = "<range>"
+
 ## Patterns
 # Patterns for USFM files.
 # Not regex but usable in Path.glob()
