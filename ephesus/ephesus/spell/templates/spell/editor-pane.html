@@ -1,9 +1,7 @@
-<div id="bcv-nav">
-  <ul>
-    <li>MAT</li>
-    <li>MRK</li>
-    <li>LUK</li>
-  </ul>
+<div class="bcv-nav">
+  {% for book, chapters in project_scope.items() %}
+  <div class="bcv-book">{{ book }}</div>
+  {% endfor %}
 </div>
 <hr />
 <div>{% block editor %}{% endblock %}</div>

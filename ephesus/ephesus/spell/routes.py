@@ -26,8 +26,14 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import DBAPIError
 
 from ..config import get_ephesus_settings
-from ..constants import BibleReference
+from ..constants import (
+    BibleReference,
+    LATEST_PROJECT_VERSION_NAME,
+    PROJECT_CLEAN_DIR_NAME,
+    PROJECT_VREF_FILE_NAME,
+)
 from ..common.utils import (
+    get_scope_from_vref,
     get_scope_from_vref,
 )
 from ..dependencies import (
@@ -71,11 +77,20 @@ async def get_editor(
     """Get the spell checking UI"""
     bible_ref: BibleReference = BibleReference.from_string(ref)
     verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
+
+    # Get nav bar data
+    project_scope: dict[str, set] = get_scope_from_vref(ephesus_settings.ephesus_projects_dir
+                        / resource_id
+                        / LATEST_PROJECT_VERSION_NAME
+                        / PROJECT_CLEAN_DIR_NAME
+                        / PROJECT_VREF_FILE_NAME)
+
     return templates.TemplateResponse(
         "spell/editor.fragment",
         {
             "request": request,
             "verses": verses,
-            "ref": f"{bible_ref.book} {bible_ref.chapter}"
+            "ref": f"{bible_ref.book} {bible_ref.chapter}",
+            "project_scope": project_scope
         },
     )

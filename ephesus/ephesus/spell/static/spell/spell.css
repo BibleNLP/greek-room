@@ -1,9 +1,17 @@
-#bcv-nav ul {
-  list-style: none;
+.bcv-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+}
+.bcv-books {
+  heigth: 10em;
+  width: 30em;
   display: flex;
   gap: 0.5em;
-  align-items: flex-start;
-  margin: 0;
-  padding: 0;
-  /* display: inline-flex; */
+  flex-wrap: wrap;
+  flex-direction: column;
+}
+.bcv-chapters {
+  display: flex;
+  gap: 0.5em;
 }
