@@ -1,9 +1,17 @@
 <div class="bcv-nav">
   {% for book, chapters in project_scope.items() %}
-  <div class="bcv-book">{{ book }}</div>
+  <span data-chapters="{{ chapters|map('int')|sort|join('|') }}"
+    >{{ book }}</span
+  >
   {% endfor %}
+</div>
+<div class="bcv-nav">
+  <span>1</span>
+  <span>2</span>
+  <span>3</span>
 </div>
 <hr />
 <div>{% block editor %}{% endblock %}</div>
 
 <link rel="stylesheet" type="text/css" href="static-spell/spell/spell.css" />
+<script src="static-spell/spell/spell.js"></script>

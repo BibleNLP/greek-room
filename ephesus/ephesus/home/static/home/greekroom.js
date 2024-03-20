@@ -44,6 +44,20 @@ export async function postForm(formElement) {
   }
 }
 
+// Method to setInnerHTML but with <script> tags
+// that actually run on the page
+export function setInnerHtml(elm, html) {
+  elm.innerHTML = html;
+  Array.from(elm.querySelectorAll("script")).forEach((oldScript) => {
+    const newScript = document.createElement("script");
+    Array.from(oldScript.attributes).forEach((attr) =>
+      newScript.setAttribute(attr.name, attr.value)
+    );
+    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+    oldScript.parentNode.replaceChild(newScript, oldScript);
+  });
+}
+
 export async function showInfoPopup(title, message) {
   const infoPopup = document.getElementById("info-popup");
   document.querySelector('#info-popup h3[role="title"]').innerHTML = title;
@@ -114,7 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Get project overview content to display on right pane
       getDataFromElementURL(linkTarget).then(
         (content) => {
-          detailsPane.innerHTML = content;
+          setInnerHtml(detailsPane, content);
+          // detailsPane.innerHTML = content;
         },
         (reason) => {
           detailsPane.innerHTML =
@@ -189,11 +204,12 @@ document.addEventListener("DOMContentLoaded", () => {
       linkTarget.classList.add("hide");
       linkTarget.nextElementSibling.classList.remove("hide");
 
-      // Get HTML Wildebeest analysis content to display on right pane
+      // - Get HTML Wildebeest analysis content
+      // - Get HTML Spell checking analysis content
       getDataFromElementURL(linkTarget).then(
         (content) => {
           detailsPane.classList.remove("cursor-wait");
-          detailsPane.innerHTML = content;
+          setInnerHtml(detailsPane, content);
         },
         (reason) => {
           detailsPane.classList.remove("cursor-wait");
