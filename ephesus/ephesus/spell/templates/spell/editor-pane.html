@@ -1,17 +1,19 @@
 <div class="bcv-nav">
   {% for book, chapters in project_scope.items() %}
-  <span data-chapters="{{ chapters|map('int')|sort|join('|') }}"
+  <span
+    class="bcv-nav-item"
+    data-chapters="{{ chapters|map('int')|sort|join('|') }}"
+    data-url="{{ url_for('get_verses', resource_id=resource_id) }}"
+    data-book-code="{{ book }}"
     >{{ book }}</span
   >
   {% endfor %}
 </div>
 <div class="bcv-nav">
-  <span>1</span>
-  <span>2</span>
-  <span>3</span>
+  <span>Click on a Book name to select chapters.</span>
 </div>
 <hr />
-<div>{% block editor %}{% endblock %}</div>
+<div role="main">{% include "spell/editor.fragment" %}</div>
 
 <link rel="stylesheet" type="text/css" href="static-spell/spell/spell.css" />
-<script src="static-spell/spell/spell.js"></script>
+<script type="module" src="static-spell/spell/spell.js"></script>

@@ -1,9 +1,11 @@
 console.log("καλωσορίσατε στο ελληνικό δωμάτιο!");
 
-// Method to get formatted Wildebeest analysis output from the backend
+// Generic method to callout to the backend and return results
 export async function getDataFromElementURL(element, params) {
   var URL =
-    params === undefined ? element.dataset.url : element.dataset.url + params;
+    params === undefined
+      ? element.dataset.url
+      : `${element.dataset.url}?${params}`;
 
   const response = await fetch(URL);
   if (response.ok) {

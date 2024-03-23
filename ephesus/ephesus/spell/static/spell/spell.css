@@ -3,15 +3,8 @@
   flex-wrap: wrap;
   gap: 0.5em;
 }
-/* .bcv-books { */
-/*   heigth: 10em; */
-/*   width: 30em; */
-/*   display: flex; */
-/*   gap: 0.5em; */
-/*   flex-wrap: wrap; */
-/*   flex-direction: column; */
-/* } */
-/* .bcv-chapters { */
-/*   display: flex; */
-/*   gap: 0.5em; */
-/* } */
+
+.bcv-nav-item:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}

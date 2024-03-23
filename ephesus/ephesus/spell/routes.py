@@ -70,14 +70,9 @@ ui_router = APIRouter(
 async def get_editor(
     request: Request,
     resource_id: str,
-    ref: str = "MAT 1",
     current_username: str = Depends(get_current_username),
-    db: Session = Depends(get_db),
 ):
     """Get the spell checking UI"""
-    bible_ref: BibleReference = BibleReference.from_string(ref)
-    verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
-
     # Get nav bar data
     project_scope: dict[str, set] = get_scope_from_vref(ephesus_settings.ephesus_projects_dir
                         / resource_id
@@ -86,11 +81,30 @@ async def get_editor(
                         / PROJECT_VREF_FILE_NAME)
 
     return templates.TemplateResponse(
+        "spell/editor-pane.html",
+        {
+            "request": request,
+            "resource_id": resource_id,
+            "project_scope": project_scope
+        },
+    )
+
+
+@ui_router.get("/projects/{resource_id}/verses", response_class=HTMLResponse)
+async def get_verses(
+        request: Request,
+        resource_id: str,
+        ref: str,
+):
+    """Get the verses content"""
+    bible_ref: BibleReference = BibleReference.from_string(ref)
+    verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
+
+    return templates.TemplateResponse(
         "spell/editor.fragment",
         {
             "request": request,
-            "verses": verses,
             "ref": f"{bible_ref.book} {bible_ref.chapter}",
-            "project_scope": project_scope
+            "verses": verses
         },
     )
