@@ -58,10 +58,25 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
     <strong>Spellings</strong>
     <ul>
       <li>
-        Please send an email to support@greekroom.org stating your<br />
-        username (see top-right of this page) and project name to raise a
-        request for a spell check analysis.
+        <button
+          class="link"
+          data-url="{{ url_for('request_manual_analysis', resource_id=project['Project'].resource_id) }}"
+          name="spell-analysis"
+        >
+          Request Analysis
+        </button>
+        <img
+          src="static/home/assets/eclipse-loader.svg"
+          role="loader"
+          class="loader-small hide"
+        />
       </li>
+    </ul>
+  </li>
+  <li class="disabled">
+    <strong>Alignment Visualization</strong>
+    <ul>
+      <li><strong>Pending</strong></li>
     </ul>
   </li>
   <!-- <li class="disabled"> -->
