@@ -1,4 +1,4 @@
-<div name="verses-content">
+<div id="verses-content">
   {% if verses is none() or verses|length == 0 %}
   <p>Select a Book and Chapter to load its contents.</p>
   {% else %}
