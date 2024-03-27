@@ -9,6 +9,7 @@ import logging
 import secrets
 import zipfile
 import tempfile
+import subprocess
 import unicodedata
 from pathlib import Path
 from collections import Counter, defaultdict
@@ -390,3 +391,12 @@ def iter_file(filepath: str, mode: str, delete: bool = False):
     except Exception as exc:
         _LOGGER.exception("Error while downloading file. %s", exc)
         raise OutputError("Error while downloading file")
+
+
+def send_email(from_addr: str, to_addr: str, subject: str, body:str) -> bool:
+    """Uses the host machines CLI to send a simple email"""
+    try:
+        subprocess.run(["mail", "-a", f"From:{from_addr}", "-s", "Spell Check Request", f"{to_addr}", "<<<", body])
+    except Exception as exc:
+        _LOGGER.exception("Error while sending email. %s", exc)
+        raise OutputError("Error while sending email")

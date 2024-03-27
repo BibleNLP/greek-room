@@ -32,13 +32,18 @@ class ProjectTypes(Enum, metaclass=MyEnumMeta):
 @dataclass
 class ProjectMetadata:
     """Class for storing project metadata in DB as JSON"""
+    # Use JSON naming convention
 
-    # Using JSON naming convention
+    # Time this project was uploaded
     uploadTime: str = field(
         default_factory=lambda: datetime.now(tz=timezone.utc).strftime(
             DATETIME_TZ_FORMAT_STRING
         )
     )
+
+    # Time if and when the manual analysis
+    # for this project was requested
+    manualAnalysisRequestTime: str = None
 
     def get_upload_time(self) -> datetime:
         return datetime.strptime(self.uploadTime, DATETIME_TZ_FORMAT_STRING)

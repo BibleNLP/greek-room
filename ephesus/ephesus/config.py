@@ -9,6 +9,7 @@ class EphesusSettings(BaseSettings):
     ephesus_env: str
     ephesus_projects_dir: Path
     ephesus_default_vref_file: Path
+    ephesus_moderator_emails: str
 
     sqlalchemy_database_uri: str
 

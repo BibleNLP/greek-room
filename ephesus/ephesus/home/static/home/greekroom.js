@@ -179,21 +179,48 @@ document.addEventListener("DOMContentLoaded", () => {
   // Parent event listener for the right pane
   detailsPane.addEventListener("click", (event) => {
     // Apply onClick listener for the analysis results links in the right pane
-    const linkTarget = event.target.closest(".link");
-    if (linkTarget) {
-      // Set resourceId state
-      const resourceId = linkTarget.dataset.resourceId;
-
+    // Handle Wildebeest Analysis Click
+    const wbLinkTarget = event.target.closest(
+      'button[name="wildebeest-analysis"]'
+    );
+    if (wbLinkTarget) {
       // Show loader
       detailsPane.classList.add("cursor-wait");
-      linkTarget.classList.add("hide");
-      linkTarget.nextElementSibling.classList.remove("hide");
+      wbLinkTarget.classList.add("hide");
+      wbLinkTarget.nextElementSibling.classList.remove("hide");
 
       // Get HTML Wildebeest analysis content to display on right pane
-      getDataFromElementURL(linkTarget).then(
+      getDataFromElementURL(wbLinkTarget).then(
         (content) => {
           detailsPane.classList.remove("cursor-wait");
           detailsPane.innerHTML = content;
+        },
+        (reason) => {
+          detailsPane.classList.remove("cursor-wait");
+          detailsPane.innerHTML =
+            "There was an error while processing the request. Try again.";
+        }
+      );
+      return;
+    }
+
+    // Handle Spell Check Analysis Click
+    const spellLinkTarget = event.target.closest(
+      'button[name="spell-analysis"]'
+    );
+    if (spellLinkTarget) {
+      // Show loader
+      detailsPane.classList.add("cursor-wait");
+      spellLinkTarget.classList.add("hide");
+      spellLinkTarget.nextElementSibling.classList.remove("hide");
+
+      // Get HTML Wildebeest analysis content to display on right pane
+      getDataFromElementURL(spellLinkTarget).then(
+        (content) => {
+          detailsPane.classList.remove("cursor-wait");
+          spellLinkTarget.nextElementSibling.classList.remove("hide");
+          spellLinkTarget.innerHTML =
+            "Successfully sent request. We will send you an email when the results are ready.";
         },
         (reason) => {
           detailsPane.classList.remove("cursor-wait");

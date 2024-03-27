@@ -3,7 +3,7 @@ CRUD operations for the Home section of the app
 """
 import logging
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from .models.user_projects import (
@@ -64,6 +64,23 @@ def get_user_project(
         )
     ).first()
     return None if not project else project._mapping
+
+
+def update_user_project_metadata(
+    db: Session, resource_id: str, metadata: dict
+) -> None:
+    """Update the metadata for the project `resource_id`"""
+    project = db.scalars(
+        (select(Project).where(Project.resource_id == resource_id))
+    ).first()
+
+    db.execute(
+        (
+            update(Project)
+            .where(Project.resource_id == resource_id)
+            .values(project_metadata={**project.project_metadata, **metadata})
+        )
+    )
 
 
 def create_user_project(
