@@ -1,3 +1,9 @@
 [submodule "site/themes/zen"]
 	path = site/themes/zen
 	url = https://github.com/frjo/hugo-theme-zen.git
+[submodule "vendor/uroman"]
+	path = ephesus/ephesus/vendor/uroman
+	url = git@github.com:isi-nlp/uroman.git
+[submodule "vendor/spell_checker"]
+	path = ephesus/ephesus/vendor/spell_checker
+	url = https://github.com/uhermjakob/spell_checker.git

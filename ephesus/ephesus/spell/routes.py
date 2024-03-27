@@ -45,6 +45,14 @@ from .core.editor_utils import (
     get_chapter_content,
 )
 
+# Get vendored deps
+# from ..vendor.uroman.bin import uroman
+# from ..vendor.smart_edit_distance.src import smart_edit_distance
+
+from ..vendor.spell_checker.bin import spell_check
+spc = spell_check.SpellCheckModel("eng")
+spc.test_spell_checker("eng")
+
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
 
