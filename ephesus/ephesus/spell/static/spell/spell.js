@@ -38,13 +38,13 @@ detailsPane.addEventListener("click", (event) => {
       chapterSpan.classList.add("bcv-nav-item");
       chapterSpan.textContent = chapter;
       chapterSpan.dataset.url = `${event.target.dataset.url}?ref=${event.target.dataset.bookCode} ${chapter}`;
-      chapterSpan.dataset.ref = `${event.target.dataset.bookCode} ${chapter}`;
+      chapterSpan.dataset.chapterLabel = chapter;
       chapters.appendChild(chapterSpan);
     });
   }
 
   // Interactive Chapter navigation
-  const chapterSpan = event.target.closest("span[data-ref]");
+  const chapterSpan = event.target.closest("span[data-chapter-label]");
   if (chapterSpan) {
     const verses = document.querySelector('div[role="main"]');
     const chapters = document.querySelector(
@@ -80,14 +80,3 @@ detailsPane.addEventListener("click", (event) => {
     );
   }
 });
-
-// Interactive Chapter navigation
-// chapters.addEventListener("click", (event) => {
-//   // Handle cases where the click is not
-//   // exactly on a chapter number
-//   if (event.target.dataset.url === undefined) {
-//     // noop
-//     return;
-//   }
-
-// });

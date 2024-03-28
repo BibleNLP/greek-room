@@ -8,3 +8,16 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+.editor-container {
+  display: flex;
+}
+
+#verses-content {
+  padding-right: 0.5em;
+}
+
+#suggestions {
+  min-width: 20%;
+  border-left: 1px solid black;
+}
