@@ -51,7 +51,7 @@ from .core.editor_utils import (
 
 from ..vendor.spell_checker.bin import spell_check
 spc = spell_check.SpellCheckModel("eng")
-spc.test_spell_checker("eng")
+spc.test_spell_checker()
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)

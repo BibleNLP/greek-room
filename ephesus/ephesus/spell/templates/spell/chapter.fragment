@@ -14,14 +14,6 @@
     <h4 class="title">Details</h4>
     <div>
       <p><i>Select a word to see any suggestions and details.</i></p>
-      <div>
-        <h4 class="subtitle">Spelling Suggestions</h4>
-        <ul>
-          <li>New spellings</li>
-          <li>Another spelling</li>
-          <li>oword</li>
-        </ul>
-      </div>
     </div>
   </div>
 </div>

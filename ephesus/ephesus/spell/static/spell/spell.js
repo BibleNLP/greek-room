@@ -82,10 +82,21 @@ detailsPane.addEventListener("click", (event) => {
 });
 
 // Mouseover interaction for words/tokens
+const wordDetailsTemplate = document.querySelector("#word-details-template");
+const spellSuggestionsTemplate = document.querySelector(
+  "#spell-suggestions-template"
+);
 detailsPane.addEventListener("mouseover", (event) => {
   // Show word/token details
   const tokenSpan = event.target.closest('span[class~="token"]');
   if (tokenSpan) {
     console.log(tokenSpan.dataset.details);
+    // const wordDetails = wordDetailsTemplate.content.cloneNode(true);
+    document
+      .querySelector("#suggestions div")
+      .replaceWith(wordDetailsTemplate.content.cloneNode(true));
+    document
+      .querySelector("#suggestions div")
+      .append(spellSuggestionsTemplate.content.cloneNode(true));
   }
 });
