@@ -1,0 +1,10 @@
+<div class="verse-container">
+  <div class="bold verse-number">{{ verse[0] }}</div>
+  <div data-ref="{{ ref }}" class="verse" contenteditable="true">
+    {% for word in verse[1].split() %}
+    <span class="token" data-details="{{ mydata|tojson|forceescape }}"
+      >{{ word }}</span
+    >
+    {% endfor %}
+  </div>
+</div>

@@ -17,7 +17,30 @@
   padding-right: 0.5em;
 }
 
+.verse-container {
+  display: flex;
+}
+
 #suggestions {
   min-width: 20%;
   border-left: 1px solid black;
+  padding-left: 0.5em;
+}
+
+#suggestions .subtitle {
+  margin: 0 0 0.3em 0;
+}
+
+#suggestions ul {
+  /* position: relative; */
+  list-style: none;
+  padding: 0 0 0 0.3em;
+  margin: 0 0 0 0;
+}
+
+#suggestions li::before {
+  content: "→";
+  padding: 0 0.3em 0 0;
+  /* position: absolute; */
+  /* left: 0; */
 }

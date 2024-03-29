@@ -3,7 +3,7 @@
   <span
     class="bcv-nav-item"
     data-chapters="{{ chapters|map('int')|sort|join('|') }}"
-    data-url="{{ url_for('get_verses', resource_id=resource_id) }}"
+    data-url="{{ url_for('get_chapter', resource_id=resource_id) }}"
     data-book-code="{{ book }}"
     >{{ book }}</span
   >
@@ -13,7 +13,10 @@
   <span>Click on a Book name to select chapters.</span>
 </div>
 <hr />
-<div role="main">{% include "spell/editor.fragment" %}</div>
+<div role="main">{% include "spell/chapter.fragment" %}</div>
 
 <link rel="stylesheet" type="text/css" href="static-spell/spell/spell.css" />
 <script type="module" src="static-spell/spell/spell.js"></script>
+<template>
+  <div></div>
+</template>

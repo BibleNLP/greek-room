@@ -80,3 +80,12 @@ detailsPane.addEventListener("click", (event) => {
     );
   }
 });
+
+// Mouseover interaction for words/tokens
+detailsPane.addEventListener("mouseover", (event) => {
+  // Show word/token details
+  const tokenSpan = event.target.closest('span[class~="token"]');
+  if (tokenSpan) {
+    console.log(tokenSpan.dataset.details);
+  }
+});

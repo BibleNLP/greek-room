@@ -98,8 +98,8 @@ async def get_editor(
     )
 
 
-@ui_router.get("/projects/{resource_id}/verses", response_class=HTMLResponse)
-async def get_verses(
+@ui_router.get("/projects/{resource_id}/chapter", response_class=HTMLResponse)
+async def get_chapter(
         request: Request,
         resource_id: str,
         ref: str,
@@ -109,10 +109,11 @@ async def get_verses(
     verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
 
     return templates.TemplateResponse(
-        "spell/editor.fragment",
+        "spell/chapter.fragment",
         {
             "request": request,
             "ref": f"{bible_ref.book} {bible_ref.chapter}",
-            "verses": verses
+            "verses": verses,
+            "mydata": {"Frequency": 10, "Smart Edit Distance": 0.23}
         },
     )
