@@ -2,9 +2,10 @@
 API and UI routes for spell check
 """
 
-import logging
-from pathlib import Path
 import json
+import logging
+from typing import Any
+from pathlib import Path
 from datetime import (
     datetime,
     timezone,
@@ -34,24 +35,16 @@ from ..constants import (
 )
 from ..common.utils import (
     get_scope_from_vref,
-    get_scope_from_vref,
 )
 from ..dependencies import (
     get_db,
     get_current_username,
 )
+from ..database import crud, schemas
 from ..exceptions import InputError, OutputError
 from .core.editor_utils import (
     get_chapter_content,
 )
-
-# Get vendored deps
-# from ..vendor.uroman.bin import uroman
-# from ..vendor.smart_edit_distance.src import smart_edit_distance
-
-from ..vendor.spell_checker.bin import spell_check
-spc = spell_check.SpellCheckModel("eng")
-spc.test_spell_checker()
 
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
@@ -73,14 +66,28 @@ ui_router = APIRouter(
     tags=["ui"],
 )
 
-
 @ui_router.get("/projects/{resource_id}/spell", response_class=HTMLResponse)
 async def get_editor(
     request: Request,
     resource_id: str,
+    db: Session = Depends(get_db),
     current_username: str = Depends(get_current_username),
 ):
     """Get the spell checking UI"""
+
+    # Get project language code
+    project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
+
+    # Project not found.
+    # Not returning a 404 for security sake.
+    if not project_mapping:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="There was an error while processing this request. Please try again.",
+        )
+
+
+
     # Get nav bar data
     project_scope: dict[str, set] = get_scope_from_vref(ephesus_settings.ephesus_projects_dir
                         / resource_id

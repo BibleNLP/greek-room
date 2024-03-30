@@ -1,14 +1,9 @@
 """
-Module with logic to work with the Greek Room Spell Checker
+Module with logic to work with the Greek Room Spell Checker Editor
 """
 import logging
-import json
 from pathlib import Path
 from itertools import islice
-from tempfile import NamedTemporaryFile
-from datetime import (
-    datetime,
-)
 
 from ...config import (
     get_ephesus_settings,

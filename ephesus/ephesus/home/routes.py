@@ -196,7 +196,7 @@ def delete_user_project(
 ):
     """Delete a user's project identified by `resource_id`"""
     try:
-        project_mapping = crud.get_user_project(db, resource_id, current_username)
+        project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
 
         # Project not found.
         # Not returning a 404 for security sake.
