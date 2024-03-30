@@ -32,16 +32,17 @@ _LOGGER = logging.getLogger(__name__)
 # Get app settings
 ephesus_settings = get_ephesus_settings()
 
-# My cheap cache
+# My cheap cache:
+# dict[(current_username, resource_id)] = spell_check.SpellCheckModel
 # TODO: Improve this by using redis.
 # This would need for the spell_check
 # model to be JSON serializable.
 # Or better, the model is able to
 # perform atomic updates without
 # needing the whole class instance in-memory.
-_spell_model_cache: dict[str, Any] = {}
+_spell_check_model_cache: dict[(str, str), Any] = {}
 
-def get_spell_checker_data(project_path: Path, resource_id: str, lang_code: str) -> dict[str, str]:
+def get_spell_checker_data(project_path: Path, resource_id: str, lang_code: str) -> (dict[str, str], dict[(str, str), int]):
     """Utility to create a dict[ref] = verse from the project data. Also, return dict[(lcode, word)] = word_frequency"""
     try:
         corpus: dict[str, str] = {}
@@ -63,17 +64,27 @@ def get_spell_checker_data(project_path: Path, resource_id: str, lang_code: str)
         raise FormatError("Error while creating corpus object.")
 
 
-def get_spell_checker_model(resource_id: str, lang_code: str) -> spell_check.SpellCheckModel:
+def get_spell_check_model(current_username: str, resource_id: str, lang_code: str) -> spell_check.SpellCheckModel:
     """
     Initialize and get the Greek Room spell
     checker model for a given `resource_id`
     """
-    project_path: Path = ephesus_settings.ephesus_projects_dir    / resource_id    / LATEST_PROJECT_VERSION_NAME    / PROJECT_CLEAN_DIR_NAME
+    # Attempt to obtain model from cache
+    if (current_username, resource_id) in _spell_check_model_cache:
+        _LOGGER.debug("Cache hit for spell_checkmodel")
+        return _spell_check_model_cache[(current_username, resource_id)]
+
+    project_path: Path = ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME / PROJECT_CLEAN_DIR_NAME
 
     # Initialize Greek Room spell checker model
     greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(lang_code)
 
     greek_room_spell_checker.corpus, greek_room_spell_checker.word_count = get_spell_checker_data(project_path, resource_id, lang_code)
+
+    # Set cache
+    _spell_check_model_cache[(current_username, resource_id)] = greek_room_spell_checker
+
+    return greek_room_spell_checker
 
     test_snt1 = 'advisors heven blesing son Beersheba'
     test_snt2 = 'advisers heaven blessing son California'

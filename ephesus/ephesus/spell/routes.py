@@ -36,7 +36,7 @@ from ..common.utils import (
     get_scope_from_vref,
 )
 from .core.spell_check_utils import (
-    get_spell_checker_model,
+    get_spell_check_model,
 )
 from ..dependencies import (
     get_db,
@@ -46,6 +46,10 @@ from ..database import crud, schemas
 from ..exceptions import InputError, OutputError
 from .core.editor_utils import (
     get_chapter_content,
+)
+
+from ..vendor.spell_checker.bin.spell_check import (
+    SpellCheckModel,
 )
 
 # Get app logger
@@ -95,7 +99,7 @@ async def get_editor(
                         / PROJECT_CLEAN_DIR_NAME
                         / PROJECT_VREF_FILE_NAME)
 
-    get_spell_checker_model(resource_id, project_mapping["Project"].lang_code)
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, project_mapping["Project"].lang_code)
 
     return templates.TemplateResponse(
         "spell/editor-pane.html",
