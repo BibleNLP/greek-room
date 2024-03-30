@@ -4,7 +4,6 @@ API and UI routes for spell check
 
 import json
 import logging
-from typing import Any
 from pathlib import Path
 from datetime import (
     datetime,
@@ -35,6 +34,9 @@ from ..constants import (
 )
 from ..common.utils import (
     get_scope_from_vref,
+)
+from .core.spell_check_utils import (
+    get_spell_checker_model,
 )
 from ..dependencies import (
     get_db,
@@ -86,14 +88,14 @@ async def get_editor(
             detail="There was an error while processing this request. Please try again.",
         )
 
-
-
     # Get nav bar data
     project_scope: dict[str, set] = get_scope_from_vref(ephesus_settings.ephesus_projects_dir
                         / resource_id
                         / LATEST_PROJECT_VERSION_NAME
                         / PROJECT_CLEAN_DIR_NAME
                         / PROJECT_VREF_FILE_NAME)
+
+    get_spell_checker_model(resource_id, project_mapping["Project"].lang_code)
 
     return templates.TemplateResponse(
         "spell/editor-pane.html",

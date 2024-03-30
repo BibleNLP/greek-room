@@ -1,14 +1,19 @@
 """
 Utilities to in service of the spell checking interface
 """
+# debug
+import sys
+
 import logging
+from typing import Any
 from pathlib import Path
+from collections import defaultdict
 
 from ...config import (
     get_ephesus_settings,
     get_global_state,
 )
-# from ...exceptions import BoundsError
+from ...exceptions import FormatError
 from ...constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_CLEAN_DIR_NAME,
@@ -36,55 +41,49 @@ ephesus_settings = get_ephesus_settings()
 # needing the whole class instance in-memory.
 _spell_model_cache: dict[str, Any] = {}
 
-def get_spell_checker_corpus(project_path: Path) -> dict[str, str]:
-    """Utility to create a dict[ref] = verse from the project data"""
+def get_spell_checker_data(project_path: Path, resource_id: str, lang_code: str) -> dict[str, str]:
+    """Utility to create a dict[ref] = verse from the project data. Also, return dict[(lcode, word)] = word_frequency"""
     try:
-        with (project_path/PROJECT_VREF_FILE_NAME).open() as vref:
-            for idx, line in enumerate(vref):
-                line: str = line.strip()
-                if not line:
+        corpus: dict[str, str] = {}
+        word_count: dict[(str, str), int] = defaultdict(int)
+        with (project_path/PROJECT_VREF_FILE_NAME).open() as vref_file, (project_path/f"{resource_id}.txt").open() as bible_file:
+            for idx, (vref, verse) in enumerate(zip(vref_file, bible_file)):
+                vref = vref.strip()
+                if not vref:
                     continue
 
-                books_chapters[book].add(chapter)
+                corpus[vref] = verse.strip()
+                for word in spell_check.words_in_snt(verse.strip()):
+                    word_count[(lang_code, word)] += 1
 
-        return books_chapters
+        return corpus, word_count
 
     except Exception as exc:
-        _LOGGER.exception("Error while calculating scope of project. %s", exc)
-        raise FormatError("Error while calculating scope of project.")
+        _LOGGER.exception("Error while creating corpus object. %s", exc)
+        raise FormatError("Error while creating corpus object.")
 
 
-
-def get_spell_checker_model(data_filepath: Path, lang_code: str) -> spell_check.SpellCheckModel:
+def get_spell_checker_model(resource_id: str, lang_code: str) -> spell_check.SpellCheckModel:
     """
     Initialize and get the Greek Room spell
     checker model for a given `resource_id`
     """
+    project_path: Path = ephesus_settings.ephesus_projects_dir    / resource_id    / LATEST_PROJECT_VERSION_NAME    / PROJECT_CLEAN_DIR_NAME
 
     # Initialize Greek Room spell checker model
-    greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(project_mapping["Project"].lang_code)
-    ephesus_settings.ephesus_projects_dir
-                        / resource_id
-                        / LATEST_PROJECT_VERSION_NAME
-                        / PROJECT_CLEAN_DIR_NAME
-                        / PROJECT_VREF_FILE_NAME
+    greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(lang_code)
 
-    books_chapters: dict[str, set(str)] = defaultdict(set)
-    try:
-        with vref_file.open() as vref:
-            for idx, line in enumerate(vref):
-                line: str = line.strip()
-                if not line:
-                    continue
-                book: str = line.split()[0]
-                chapter: str = line.split()[1].split(":")[0]
-                books_chapters[book].add(chapter)
+    greek_room_spell_checker.corpus, greek_room_spell_checker.word_count = get_spell_checker_data(project_path, resource_id, lang_code)
 
-        return books_chapters
-
-    greek_room_spell_checker.load_text_corpus(str(data_filepath), None)
-    greek_room_spell_checker.test_spell_checker(ephesus_settings.ephesus_projects_dir
-                                                / resource_id
-                                                / LATEST_PROJECT_VERSION_NAME
-                                                / PROJECT_CLEAN_DIR_NAME
-                                                / f"{resource_id}.txt")
+    test_snt1 = 'advisors heven blesing son Beersheba'
+    test_snt2 = 'advisers heaven blessing son California'
+    print(test_snt1)
+    sc_suggestions = greek_room_spell_checker.spell_check_snt(test_snt1, 'test')
+    print(sc_suggestions)
+    wc_words = ['the', 'heven', 'advisers', 'advisors', 'California']
+    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
+    greek_room_spell_checker.update_snt(test_snt1, 'test', log=sys.stdout)
+    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
+    greek_room_spell_checker.update_snt(test_snt2, 'test', old_snt=test_snt1, log=sys.stdout)
+    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
+    print(greek_room_spell_checker.spell_check_snt('Californie', 'test'))
