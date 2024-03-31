@@ -90,13 +90,22 @@ detailsPane.addEventListener("mouseover", (event) => {
   // Show word/token details
   const tokenSpan = event.target.closest('span[class~="token"]');
   if (tokenSpan) {
-    console.log(tokenSpan.dataset.details);
-    // const wordDetails = wordDetailsTemplate.content.cloneNode(true);
-    document
-      .querySelector("#suggestions div")
-      .replaceWith(wordDetailsTemplate.content.cloneNode(true));
-    document
-      .querySelector("#suggestions div")
-      .append(spellSuggestionsTemplate.content.cloneNode(true));
+    // Update details pane
+    const wordDetails = JSON.parse(tokenSpan.dataset.details);
+    const wordDetailsDiv = wordDetailsTemplate.content.cloneNode(true);
+    wordDetailsDiv.querySelector("div b").textContent = wordDetails["count"];
+    document.querySelector("#suggestions div").replaceWith(wordDetailsDiv);
+
+    // Update spell suggestions pane, if any
+    const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
+    const spellSuggestionsList = spellSuggestions.querySelector("ul");
+    wordDetails["spellSuggestions"].forEach((suggestion) => {
+      const suggestionEntry = document.createElement("li");
+      suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
+      suggestionEntry.textContent = suggestion["alternativeSpelling"];
+      spellSuggestionsList.appendChild(suggestionEntry);
+    });
+
+    document.querySelector("#suggestions div").append(spellSuggestions);
   }
 });

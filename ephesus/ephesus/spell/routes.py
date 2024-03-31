@@ -5,6 +5,8 @@ API and UI routes for spell check
 import json
 import logging
 from pathlib import Path
+import random
+import secrets
 from datetime import (
     datetime,
     timezone,
@@ -121,12 +123,21 @@ async def get_chapter(
     bible_ref: BibleReference = BibleReference.from_string(ref)
     verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
 
+    # Create dummy data
+    dummy_data: list[list] = []
+    for verse in verses:
+        verse_dummy_data = []
+        for word in verse[1].split():
+            verse_dummy_data.append({"count": random.randint(0, 100), "spellSuggestions": [{"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}]})
+        dummy_data.append(verse_dummy_data)
+
+
     return templates.TemplateResponse(
         "spell/chapter.fragment",
         {
             "request": request,
             "ref": f"{bible_ref.book} {bible_ref.chapter}",
             "verses": verses,
-            "mydata": {"Frequency": 10, "Smart Edit Distance": 0.23}
+            "dummy_data": dummy_data,
         },
     )

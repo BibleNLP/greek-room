@@ -5,8 +5,8 @@
     {% else %}
     <h2>{{ ref }}</h2>
     <div>
-      {% for verse in verses %} {% include "spell/verse.fragment" %} {% endfor
-      %}
+      {% for verse in verses %} {% set verse_loop = loop %} {% include
+      "spell/verse.fragment" %} {% endfor %}
     </div>
     {% endif %}
   </div>
