@@ -79,6 +79,13 @@ detailsPane.addEventListener("click", (event) => {
       }
     );
   }
+
+  // Handle token click
+  const tokenSpan = event.target.closest('span[class~="token"]');
+  if (tokenSpan) {
+    detailsPane.removeEventListener("mouseover", detailsPaneMouseoverHandler);
+    tokenSpan.classList.add("highlight");
+  }
 });
 
 // Mouseover interaction for words/tokens
@@ -86,7 +93,7 @@ const wordDetailsTemplate = document.querySelector("#word-details-template");
 const spellSuggestionsTemplate = document.querySelector(
   "#spell-suggestions-template"
 );
-detailsPane.addEventListener("mouseover", (event) => {
+function detailsPaneMouseoverHandler(event) {
   // Show word/token details
   const tokenSpan = event.target.closest('span[class~="token"]');
   if (tokenSpan) {
@@ -108,4 +115,6 @@ detailsPane.addEventListener("mouseover", (event) => {
 
     document.querySelector("#suggestions div").append(spellSuggestions);
   }
-});
+}
+
+detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);

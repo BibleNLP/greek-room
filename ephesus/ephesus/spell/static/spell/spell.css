@@ -11,6 +11,7 @@
 
 .editor-container {
   display: flex;
+  font-size: 1.15em;
 }
 
 #verses-content {
@@ -43,4 +44,32 @@
   padding: 0 0.3em 0 0;
   /* position: absolute; */
   /* left: 0; */
+}
+
+.token:hover {
+  font-weight: bold;
+}
+
+.orange {
+  color: #ca4c00;
+}
+
+.green {
+  color: #008800;
+}
+
+.blue {
+  color: #0000ff;
+}
+
+.red {
+  color: #ff3028;
+}
+
+.spell-error {
+  text-decoration: underline wavy #ff3028;
+}
+
+.highlight {
+  background-color: #ffff00;
 }

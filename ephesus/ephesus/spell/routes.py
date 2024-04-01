@@ -128,7 +128,10 @@ async def get_chapter(
     for verse in verses:
         verse_dummy_data = []
         for word in verse[1].split():
-            verse_dummy_data.append({"count": random.randint(0, 100), "spellSuggestions": [{"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}]})
+            if random.randint(0, 10) < 5:
+                verse_dummy_data.append({"count": random.randint(0, 10), "spellSuggestions": [{"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}]})
+            else:
+                verse_dummy_data.append({"count": random.randint(0, 10)})
         dummy_data.append(verse_dummy_data)
 
 
