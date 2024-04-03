@@ -11,6 +11,7 @@ import zipfile
 import tempfile
 import subprocess
 import unicodedata
+import smtplib, ssl
 from pathlib import Path
 from collections import Counter, defaultdict
 from datetime import (
@@ -395,8 +396,20 @@ def iter_file(filepath: str, mode: str, delete: bool = False):
 
 def send_email(from_addr: str, to_addr: str, subject: str, body:str) -> bool:
     """Uses the host machines CLI to send a simple email"""
-    try:
-        subprocess.run(["mail", "-a", f"From:{from_addr}", "-s", "Spell Check Request", f"{to_addr}", "<<<", body])
-    except Exception as exc:
-        _LOGGER.exception("Error while sending email. %s", exc)
-        raise OutputError("Error while sending email")
+    pass
+    # port = 587  # For starttls
+    # smtp_server = "smtp.gmail.com"
+    # password = input("Type your password and press enter:")
+    # message = """\
+    # Subject: Hi there
+
+    # This message is sent from Python."""
+    # try:
+    #     context = ssl.create_default_context()
+    #     with smtplib.SMTP(smtp_server, port) as server:
+    #         server.starttls(context=context)
+    #         server.login(sender_email, password)
+    #         server.sendmail(sender_email, receiver_email, message)
+    # except Exception as exc:
+    #     _LOGGER.exception("Error while sending email. %s", exc)
+    #     raise OutputError("Error while sending email")
