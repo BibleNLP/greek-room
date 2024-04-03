@@ -54,18 +54,22 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
       </li>
     </ul>
   </li>
-  <li class="disabled">
+  <li>
     <strong>Spellings</strong>
     <ul>
-      <li><strong>Pending</strong></li>
+      <li>
+        Please send an email to support@greekroom.org stating your<br />
+        username (see top-right of this page) and project name to raise a
+        request for a spell check analysis.
+      </li>
     </ul>
   </li>
-  <li class="disabled">
-    <strong>Alignment Visualization</strong>
-    <ul>
-      <li><strong>Pending</strong></li>
-    </ul>
-  </li>
+  <!-- <li class="disabled"> -->
+  <!--   <strong>Alignment Visualization</strong> -->
+  <!--   <ul> -->
+  <!--     <li><strong>Pending</strong></li> -->
+  <!--   </ul> -->
+  <!-- </li> -->
 </ul>
 {% else %}
 <p>Could not find project.</p>
