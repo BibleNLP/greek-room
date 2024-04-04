@@ -9,6 +9,36 @@ const observer = new MutationObserver(() => {
   console.log("callback that runs when observer is triggered");
 });
 
+// Method to post data to backend
+async function saveChapter(verses, url) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: new Headers({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    }),
+    body: JSON.stringify(verses),
+  });
+  if (response.status === 200) {
+    return Promise.resolve(await response.json());
+  } else if (response.status === 500) {
+    let data = undefined;
+    if (response.headers.get("content-type") === "application/json") {
+      data = await response.json();
+    } else {
+      data = {
+        detail:
+          "There was an error while processing this request. Please try again.",
+      };
+    }
+    return Promise.reject(data);
+  } else {
+    return Promise.reject(
+      "There was an error while processing this request. Please try again."
+    );
+  }
+}
+
 const detailsPane = document.getElementById("details-pane");
 
 // Mouseover interaction for words/tokens
@@ -52,6 +82,36 @@ detailsPane.addEventListener("click", (event) => {
   const chapters = document.querySelector(
     "#details-pane .bcv-nav:nth-child(2)"
   );
+
+  // Testing
+  const detailsTitle = event.target.closest("#suggestions h4[class='title']");
+  if (detailsTitle) {
+    // console.log(detailsTitle);
+
+    // Array.from(
+    //   document.querySelectorAll("#verses-content div.verse-container div.verse")
+    // ).forEach((verseDiv) => {
+    //   Array.from(
+    //     document.querySelectorAll("span")
+    // )
+    //   console.log(verseDiv.innerHTML);
+    // });
+    // saveChapter(
+    //   [
+    //     ["GEN 1:1", "In the beginning..."],
+    //     ["GEN 1:2", "The earth was formless..."],
+    //   ],
+    //   `${document.querySelector("#verses-content").dataset.url}?ref=TIT 1`
+    // ).then(
+    //   (content) => {
+    //     console.log(content);
+    //   },
+    //   (reason) => {
+    //     console.log(reason);
+    //   }
+    // );
+    return;
+  }
 
   // Interactive Book navigation
   const bookSpan = event.target.closest("span[data-chapters]");

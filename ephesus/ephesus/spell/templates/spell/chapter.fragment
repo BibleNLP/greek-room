@@ -1,5 +1,8 @@
 <div class="editor-container">
-  <div id="verses-content">
+  <div
+    id="verses-content"
+    data-save-url="{{ url_for('save_chapter', resource_id=resource_id) }}"
+  >
     {% if verses is none() or verses|length == 0 %}
     <p>Select a Book and Chapter to load its contents.</p>
     {% else %}

@@ -2,6 +2,7 @@
 Module with logic to work with the Greek Room Spell Checker Editor
 """
 import logging
+import fileinput
 from pathlib import Path
 from itertools import islice
 
@@ -9,7 +10,10 @@ from ...config import (
     get_ephesus_settings,
     get_global_state,
 )
-from ...exceptions import BoundsError
+from ...exceptions import (
+    BoundsError,
+    InputError
+)
 from ...constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_CLEAN_DIR_NAME,
@@ -46,7 +50,7 @@ def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str]:
         ]
     ):
         _LOGGER.error("Unable to find content files for project %s", resource_id)
-        return None
+        raise InputError("Unable to find content files for project %s", resource_id)
 
     vref_bounds: list[int] = get_global_state(GlobalStates.VREF_INDEX)[ref.book][ref.chapter]
     verses: list[list[str]] = []
@@ -63,3 +67,42 @@ def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str]:
             verses.append([str(idx), line.strip()])
 
     return verses
+
+def set_chapter_content(resource_id: str, ref: BibleReference, verses: list[list[str]]) -> None:
+    """Write verses text to file. Used for updating text."""
+    if not ref.chapter:
+        raise BoundsError("Unable to find the chapter reference")
+
+    project_path: Path = (
+        ephesus_settings.ephesus_projects_dir
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
+        / PROJECT_CLEAN_DIR_NAME
+    )
+
+    if not all(
+        [
+            project_path.exists(),
+            (project_path / f"{resource_id}.txt").exists(),
+            (project_path / PROJECT_VREF_FILE_NAME).exists(),
+        ]
+    ):
+        _LOGGER.error("Unable to find content files for project %s", resource_id)
+        raise InputError("Unable to find content files for project %s", resource_id)
+
+    vref_bounds: list[int] = get_global_state(GlobalStates.VREF_INDEX)[ref.book][ref.chapter]
+    # verses: list[list[str]] = []
+
+    # TODO: Handle writing into verse ranges
+    with fileinput.input(files=(str(project_path / f"{resource_id}.txt")), inplace=True) as bible_file:
+        for line in bible_file:
+            # 0th index is first verse in chapter
+            # 1st index is last verse in chapter
+
+            if fileinput.filelineno() in range(vref_bounds[0], vref_bounds[1]+1):
+                # TODO: Test more to see if this has issues
+                _LOGGER.debug(fileinput.filelineno())
+                _LOGGER.debug(vref_bounds[0])
+                print(verses[fileinput.filelineno()-vref_bounds[0]][1])
+            else:
+                print(line, end="")
