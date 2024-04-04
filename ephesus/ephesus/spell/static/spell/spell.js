@@ -6,6 +6,38 @@ import {
 
 const detailsPane = document.getElementById("details-pane");
 
+// Mouseover interaction for words/tokens
+const wordDetailsTemplate = document.querySelector("#word-details-template");
+const spellSuggestionsTemplate = document.querySelector(
+  "#spell-suggestions-template"
+);
+function detailsPaneMouseoverHandler(event) {
+  // Show word/token details
+  const tokenSpan = event.target.closest('span[class~="token"]');
+  if (tokenSpan) {
+    // Update details pane
+    const wordDetails = JSON.parse(tokenSpan.dataset.details);
+    const wordDetailsDiv = wordDetailsTemplate.content.cloneNode(true);
+    wordDetailsDiv.querySelector("div b").textContent = wordDetails["count"];
+    document.querySelector("#suggestions div").replaceWith(wordDetailsDiv);
+
+    // Update spell suggestions pane, if any
+    if ("spellSuggestions" in wordDetails) {
+      const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
+      const spellSuggestionsList = spellSuggestions.querySelector("ul");
+      wordDetails["spellSuggestions"].forEach((suggestion) => {
+        const suggestionEntry = document.createElement("li");
+        suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
+        suggestionEntry.textContent = suggestion["alternativeSpelling"];
+        spellSuggestionsList.appendChild(suggestionEntry);
+      });
+      document.querySelector("#suggestions div").append(spellSuggestions);
+    }
+    return;
+  }
+}
+detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);
+
 // Redefine the parent event listener for the spell checker
 detailsPane.addEventListener("click", (event) => {
   const booksPane = document.querySelector(
@@ -41,6 +73,7 @@ detailsPane.addEventListener("click", (event) => {
       chapterSpan.dataset.chapterLabel = chapter;
       chapters.appendChild(chapterSpan);
     });
+    return;
   }
 
   // Interactive Chapter navigation
@@ -78,6 +111,7 @@ detailsPane.addEventListener("click", (event) => {
         );
       }
     );
+    return;
   }
 
   // Handle token click
@@ -85,36 +119,27 @@ detailsPane.addEventListener("click", (event) => {
   if (tokenSpan) {
     detailsPane.removeEventListener("mouseover", detailsPaneMouseoverHandler);
     tokenSpan.classList.add("highlight");
+    document.querySelector("#suggestions div small").classList.remove("hide");
+    return;
+  }
+
+  // Handle clear word details/suggestions
+  const clearTokenDetails = event.target.closest(
+    'small[class~="clear-suggestions"]'
+  );
+  if (clearTokenDetails) {
+    document
+      .querySelector("span.token.highlight")
+      .classList.remove("highlight");
+    const spellDetailsPlaceholder = document
+      .querySelector("#spell-details-placeholder-template")
+      .content.cloneNode(true);
+    document
+      .querySelector("#suggestions div")
+      .replaceWith(spellDetailsPlaceholder);
+
+    // Reactivate mouseover action for tokens
+    detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);
+    return;
   }
 });
-
-// Mouseover interaction for words/tokens
-const wordDetailsTemplate = document.querySelector("#word-details-template");
-const spellSuggestionsTemplate = document.querySelector(
-  "#spell-suggestions-template"
-);
-function detailsPaneMouseoverHandler(event) {
-  // Show word/token details
-  const tokenSpan = event.target.closest('span[class~="token"]');
-  if (tokenSpan) {
-    // Update details pane
-    const wordDetails = JSON.parse(tokenSpan.dataset.details);
-    const wordDetailsDiv = wordDetailsTemplate.content.cloneNode(true);
-    wordDetailsDiv.querySelector("div b").textContent = wordDetails["count"];
-    document.querySelector("#suggestions div").replaceWith(wordDetailsDiv);
-
-    // Update spell suggestions pane, if any
-    const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
-    const spellSuggestionsList = spellSuggestions.querySelector("ul");
-    wordDetails["spellSuggestions"].forEach((suggestion) => {
-      const suggestionEntry = document.createElement("li");
-      suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
-      suggestionEntry.textContent = suggestion["alternativeSpelling"];
-      spellSuggestionsList.appendChild(suggestionEntry);
-    });
-
-    document.querySelector("#suggestions div").append(spellSuggestions);
-  }
-}
-
-detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);

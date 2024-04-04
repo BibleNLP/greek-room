@@ -73,3 +73,15 @@
 .highlight {
   background-color: #ffff00;
 }
+
+.clear-suggestions {
+  float: right;
+}
+.clear-suggestions:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hide {
+  visibility: hidden;
+}

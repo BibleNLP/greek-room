@@ -17,12 +17,19 @@
 
 <link rel="stylesheet" type="text/css" href="static-spell/spell/spell.css" />
 <template id="word-details-template">
-  <div>Count: <b>235</b></div>
+  <div>
+    Count: <b>235</b><small class="clear-suggestions blue hide">clear</small>
+  </div>
 </template>
 <template id="spell-suggestions-template">
   <br />
   <br />
   <h4 class="subtitle">Spelling Suggestions</h4>
   <ul></ul>
+</template>
+<template id="spell-details-placeholder-template">
+  <div>
+    <p><i>Select a word to see any suggestions and details.</i></p>
+  </div>
 </template>
 <script type="module" src="static-spell/spell/spell.js"></script>
