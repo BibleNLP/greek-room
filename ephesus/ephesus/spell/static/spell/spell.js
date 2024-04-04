@@ -4,6 +4,11 @@ import {
   setInnerHtml,
 } from "../../static/home/greekroom.js";
 
+// Setup mutation observer
+const observer = new MutationObserver(() => {
+  console.log("callback that runs when observer is triggered");
+});
+
 const detailsPane = document.getElementById("details-pane");
 
 // Mouseover interaction for words/tokens
@@ -28,6 +33,7 @@ function detailsPaneMouseoverHandler(event) {
       wordDetails["spellSuggestions"].forEach((suggestion) => {
         const suggestionEntry = document.createElement("li");
         suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
+        suggestionEntry.classList.add("spell-suggestion", "blue");
         suggestionEntry.textContent = suggestion["alternativeSpelling"];
         spellSuggestionsList.appendChild(suggestionEntry);
       });
@@ -103,6 +109,13 @@ detailsPane.addEventListener("click", (event) => {
     getDataFromElementURL(event.target).then(
       (content) => {
         setInnerHtml(verses, content);
+
+        // Start/reset observing for text edits.
+        observer.observe(document.querySelector("#verses-content"), {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
       },
       (reason) => {
         setInnerHtml(
@@ -111,12 +124,23 @@ detailsPane.addEventListener("click", (event) => {
         );
       }
     );
+
+    // Reset the mouseover listener,
+    // incase it was disabled from a previous interaction
+    detailsPane.removeEventListener("mouseover", detailsPaneMouseoverHandler);
+    detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);
+
     return;
   }
 
   // Handle token click
   const tokenSpan = event.target.closest('span[class~="token"]');
   if (tokenSpan) {
+    // If already clicked on a token, ignore
+    if (document.querySelector("span.token.highlight") !== null) {
+      //noop
+      return;
+    }
     detailsPane.removeEventListener("mouseover", detailsPaneMouseoverHandler);
     tokenSpan.classList.add("highlight");
     document.querySelector("#suggestions div small").classList.remove("hide");
@@ -141,5 +165,23 @@ detailsPane.addEventListener("click", (event) => {
     // Reactivate mouseover action for tokens
     detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);
     return;
+  }
+
+  // Handle spell suggestion selection
+  const spellSuggestionLi = event.target.closest("li.spell-suggestion");
+  if (spellSuggestionLi) {
+    console.log(spellSuggestionLi.innerHTML);
+    document.querySelector("span.token.highlight").innerHTML =
+      spellSuggestionLi.innerHTML;
+
+    // // Refresh verse data
+    // document
+    //   .querySelector(
+    //     `span.bcv-nav-item[data-url*="${
+    //       document.querySelector("span.token.highlight").closest("div.verse")
+    //         .dataset.ref
+    //     }"]`
+    //   )
+    //   .click();
   }
 });

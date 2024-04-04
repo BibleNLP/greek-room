@@ -144,3 +144,17 @@ async def get_chapter(
             "dummy_data": dummy_data,
         },
     )
+
+@ui_router.post("/projects/{resource_id}/chapter", status_code=status.HTTP_200_OK)
+async def persist_chapter(
+        resource_id: str,
+        verses: list[list[str]],
+        ref: str,
+) -> None:
+    """Save updated verses content"""
+    bible_ref: BibleReference = BibleReference.from_string(ref)
+
+
+    return {
+        "detail": f"Successfuly updated content for {ref}"
+    }
