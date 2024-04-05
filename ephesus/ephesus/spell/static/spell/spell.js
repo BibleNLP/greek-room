@@ -4,20 +4,38 @@ import {
   setInnerHtml,
 } from "../../static/home/greekroom.js";
 
+// Global dirty flag for setting text edit state
+var editFlag = false;
+
 // Setup mutation observer
 const observer = new MutationObserver(() => {
-  console.log("callback that runs when observer is triggered");
+  // Set for flagging edits to text
+  editFlag = true;
 });
 
-// Method to post data to backend
-async function saveChapter(verses, url) {
+// Refresh verse data from the backend
+function reloadVerses() {
+  document
+    .querySelector(
+      `span.bcv-nav-item[data-ref="${
+        document
+          .querySelector("span.token.highlight")
+          .closest("div.verse")
+          .dataset.ref.split(":")[0]
+      }"]`
+    )
+    .click();
+}
+
+// Method to persist verse content in the backend
+async function saveVerse(verse, url) {
   const response = await fetch(url, {
     method: "POST",
     headers: new Headers({
       Accept: "application/json",
       "Content-Type": "application/json",
     }),
-    body: JSON.stringify(verses),
+    body: JSON.stringify({ verse: verse }),
   });
   if (response.status === 200) {
     return Promise.resolve(await response.json());
@@ -37,6 +55,35 @@ async function saveChapter(verses, url) {
       "There was an error while processing this request. Please try again."
     );
   }
+}
+
+// Handle editor blur event
+function verseBlurHandler(event) {
+  // Save updated verse on blur
+
+  // Bail if no edits present
+  if (!editFlag) {
+    return;
+  }
+
+  saveVerse(
+    Array.from(event.target.querySelectorAll("span.token"))
+      .map((tokenSpan) => tokenSpan.innerHTML)
+      .join(" "),
+    event.target.dataset.saveUrl
+  ).then(
+    (content) => {
+      // Reset edit flag
+      editFlag = false;
+
+      // reload verses
+      reloadVerses();
+    },
+    (reason) => {
+      console.log(reason);
+      reloadVerses();
+    }
+  );
 }
 
 const detailsPane = document.getElementById("details-pane");
@@ -83,36 +130,6 @@ detailsPane.addEventListener("click", (event) => {
     "#details-pane .bcv-nav:nth-child(2)"
   );
 
-  // Testing
-  const detailsTitle = event.target.closest("#suggestions h4[class='title']");
-  if (detailsTitle) {
-    // console.log(detailsTitle);
-
-    // Array.from(
-    //   document.querySelectorAll("#verses-content div.verse-container div.verse")
-    // ).forEach((verseDiv) => {
-    //   Array.from(
-    //     document.querySelectorAll("span")
-    // )
-    //   console.log(verseDiv.innerHTML);
-    // });
-    // saveChapter(
-    //   [
-    //     ["GEN 1:1", "In the beginning..."],
-    //     ["GEN 1:2", "The earth was formless..."],
-    //   ],
-    //   `${document.querySelector("#verses-content").dataset.url}?ref=TIT 1`
-    // ).then(
-    //   (content) => {
-    //     console.log(content);
-    //   },
-    //   (reason) => {
-    //     console.log(reason);
-    //   }
-    // );
-    return;
-  }
-
   // Interactive Book navigation
   const bookSpan = event.target.closest("span[data-chapters]");
   if (bookSpan) {
@@ -137,6 +154,7 @@ detailsPane.addEventListener("click", (event) => {
       chapterSpan.textContent = chapter;
       chapterSpan.dataset.url = `${event.target.dataset.url}?ref=${event.target.dataset.bookCode} ${chapter}`;
       chapterSpan.dataset.chapterLabel = chapter;
+      chapterSpan.dataset.ref = `${bookSpan.dataset.bookCode} ${chapter}`;
       chapters.appendChild(chapterSpan);
     });
     return;
@@ -175,6 +193,12 @@ detailsPane.addEventListener("click", (event) => {
           childList: true,
           subtree: true,
           characterData: true,
+        });
+
+        Array.from(
+          document.querySelectorAll("div.verse-container div.verse")
+        ).forEach((verseDiv) => {
+          verseDiv.addEventListener("blur", verseBlurHandler);
         });
       },
       (reason) => {
@@ -230,18 +254,31 @@ detailsPane.addEventListener("click", (event) => {
   // Handle spell suggestion selection
   const spellSuggestionLi = event.target.closest("li.spell-suggestion");
   if (spellSuggestionLi) {
-    console.log(spellSuggestionLi.innerHTML);
     document.querySelector("span.token.highlight").innerHTML =
       spellSuggestionLi.innerHTML;
 
-    // // Refresh verse data
-    // document
-    //   .querySelector(
-    //     `span.bcv-nav-item[data-url*="${
-    //       document.querySelector("span.token.highlight").closest("div.verse")
-    //         .dataset.ref
-    //     }"]`
-    //   )
-    //   .click();
+    // Save updated verse
+    const verseDiv = document
+      .querySelector("span.token.highlight")
+      .closest("div.verse");
+
+    saveVerse(
+      Array.from(verseDiv.querySelectorAll("span.token"))
+        .map((tokenSpan) => tokenSpan.innerHTML)
+        .join(" "),
+      verseDiv.dataset.saveUrl
+    ).then(
+      (content) => {
+        // Reset edit flag
+        editFlag = false;
+
+        // reload verses
+        reloadVerses();
+      },
+      (reason) => {
+        console.log(reason);
+        reloadVerses();
+      }
+    );
   }
 });

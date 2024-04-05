@@ -68,10 +68,10 @@ def get_chapter_content(resource_id: str, ref: BibleReference) -> list[str]:
 
     return verses
 
-def set_chapter_content(resource_id: str, ref: BibleReference, verses: list[list[str]]) -> None:
-    """Write verses text to file. Used for updating text."""
-    if not ref.chapter:
-        raise BoundsError("Unable to find the chapter reference")
+def set_verse_content(resource_id: str, ref: BibleReference, verse: str) -> None:
+    """Write verse text to file. Used for updating text."""
+    if not ref.chapter or not ref.verse:
+        raise BoundsError("Unable to find the chapter or verse from reference")
 
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
@@ -91,18 +91,17 @@ def set_chapter_content(resource_id: str, ref: BibleReference, verses: list[list
         raise InputError("Unable to find content files for project %s", resource_id)
 
     vref_bounds: list[int] = get_global_state(GlobalStates.VREF_INDEX)[ref.book][ref.chapter]
-    # verses: list[list[str]] = []
 
-    # TODO: Handle writing into verse ranges
+    # Handle verse ranges
+    if "-" in ref.verse:
+        ref.verse = ref.verse.split("-")[0]
+
+    bible_line_no: int = vref_bounds[0] + int(ref.verse)
+
     with fileinput.input(files=(str(project_path / f"{resource_id}.txt")), inplace=True) as bible_file:
         for line in bible_file:
-            # 0th index is first verse in chapter
-            # 1st index is last verse in chapter
-
-            if fileinput.filelineno() in range(vref_bounds[0], vref_bounds[1]+1):
+            if fileinput.filelineno() == bible_line_no:
                 # TODO: Test more to see if this has issues
-                _LOGGER.debug(fileinput.filelineno())
-                _LOGGER.debug(vref_bounds[0])
-                print(verses[fileinput.filelineno()-vref_bounds[0]][1])
+                print(verse)
             else:
                 print(line, end="")

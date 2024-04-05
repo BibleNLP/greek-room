@@ -1,6 +1,6 @@
 <div class="verse-container">
   <div class="bold verse-number">{{ verse[0] }}</div>
-  <div data-ref="{{ ref }}" class="verse" contenteditable="true">
+  <div data-ref="{{ ref }}:{{ verse[0] }}" class="verse" contenteditable="true" data-save-url="{{ url_for('save_verse', resource_id=resource_id) }}?ref={{ ref }}:{{ verse[0] }}">
     {% for word in verse[1].split() %}
       {% set font_color %}
       {% if dummy_data[verse_loop.index0][loop.index0]["count"] < 3 %}

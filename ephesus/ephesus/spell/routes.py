@@ -48,7 +48,7 @@ from ..database import crud, schemas
 from ..exceptions import InputError, OutputError
 from .core.editor_utils import (
     get_chapter_content,
-    set_chapter_content,
+    set_verse_content,
 )
 
 from ..vendor.spell_checker.bin.spell_check import (
@@ -147,17 +147,14 @@ async def get_chapter(
         },
     )
 
-@ui_router.post("/projects/{resource_id}/chapter", status_code=status.HTTP_200_OK)
-async def save_chapter(
+@ui_router.post("/projects/{resource_id}/verse", status_code=status.HTTP_200_OK)
+async def save_verse(
         resource_id: str,
-        verses: list[list[str]],
+        verse: schemas.VerseContent,
         ref: str,
 ) -> None:
-    """Save updated verses content"""
-    # bible_ref: BibleReference = BibleReference.from_string(ref)
-    _LOGGER.debug(ref)
-    _LOGGER.debug(verses)
-    set_chapter_content(resource_id, BibleReference.from_string(ref), verses)
+    """Save updated verse content to file"""
+    set_verse_content(resource_id, BibleReference.from_string(ref), verse.verse)
 
     return {
         "detail": f"Successfuly updated content for {ref}"

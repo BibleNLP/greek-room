@@ -70,3 +70,9 @@ class WildebeestResultsModel(TypedDict):
     report_create_time: datetime
     project_name: str
     lang_code: str
+
+
+# Editor specific
+class VerseContent(BaseModel):
+    """Model for verse content sent from editor"""
+    verse: str
