@@ -70,6 +70,7 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
           role="loader"
           class="loader-small hide"
         />
+      </li>
     </ul>
   </li>
   <li class="disabled">
@@ -78,6 +79,12 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
       <li><strong>Pending</strong></li>
     </ul>
   </li>
+  <!-- <li class="disabled"> -->
+  <!--   <strong>Alignment Visualization</strong> -->
+  <!--   <ul> -->
+  <!--     <li><strong>Pending</strong></li> -->
+  <!--   </ul> -->
+  <!-- </li> -->
 </ul>
 {% else %}
 <p>Could not find project.</p>

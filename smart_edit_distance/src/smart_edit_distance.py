@@ -39,10 +39,10 @@ import re
 import sys
 from typing import List, Optional, Tuple, TextIO, Union
 
-log.basicConfig(level=log.INFO)
+log.basicConfig(level=log.WARNING)
 
-__version__ = '0.1'
-last_mod_date = 'September 5, 2020'
+__version__ = '0.2.0'
+last_mod_date = 'April 4, 2024'
 
 
 def slot_value_in_double_colon_del_list(line: str, slot: str, default: Optional[str] = None) -> str:
