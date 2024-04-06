@@ -121,8 +121,14 @@ def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggest
     super_set: set = set(list(range(len(verse)+1)))
 
     for word_edge in suggestions.d.keys():
+        # Populate edges_set
         for simple_word_edge in word_edge.edges:
             edges_set.update(list(range(simple_word_edge.start, simple_word_edge.end)))
+
+        # Also, use this loop for
+        # marshalling the suggestions for UI
+        suggestions.d[word_edge] = [{"word": alt.txt, "count": alt.count, "cost": alt.cost} for alt in suggestions.d[word_edge].alt_spellings]
+
 
     _LOGGER.debug(sorted(super_set-edges_set))
 

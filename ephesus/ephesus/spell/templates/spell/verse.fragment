@@ -8,7 +8,10 @@
   >
     {% for word_edge, suggestion in suggestions[verse_loop.index0].d.items()
     %}{% set word = verse[1][word_edge.edges[0].start:word_edge.edges[0].end]
-    %}{% if word.strip()|length > 0 %}<span>{{ word }}</span>{% else %} {% endif
-    %}{% endfor %}
+    %}{% if word.strip()|length > 0 and suggestion %}<span
+      data-details="{{ suggestion|tojson|forceescape }}"
+      class="token spell-error"
+      >{{ word }}</span
+    >{% else %}{{ word }}{% endif %}{% endfor %}
   </div>
 </div>

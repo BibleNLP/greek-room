@@ -99,23 +99,23 @@ function detailsPaneMouseoverHandler(event) {
   if (tokenSpan) {
     // Update details pane
     const wordDetails = JSON.parse(tokenSpan.dataset.details);
-    const wordDetailsDiv = wordDetailsTemplate.content.cloneNode(true);
-    wordDetailsDiv.querySelector("div b").textContent = wordDetails["count"];
-    document.querySelector("#suggestions div").replaceWith(wordDetailsDiv);
+    const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
 
-    // Update spell suggestions pane, if any
-    if ("spellSuggestions" in wordDetails) {
-      const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
+    // Update spell suggestions, if any
+    if (wordDetails != null && wordDetails.length > 0) {
+      // const spellSuggestions = spellSuggestionsTemplate.content.cloneNode(true);
       const spellSuggestionsList = spellSuggestions.querySelector("ul");
-      wordDetails["spellSuggestions"].forEach((suggestion) => {
+      wordDetails.forEach((suggestion) => {
         const suggestionEntry = document.createElement("li");
-        suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
+        // suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
         suggestionEntry.classList.add("spell-suggestion", "blue");
-        suggestionEntry.textContent = suggestion["alternativeSpelling"];
+        suggestionEntry.textContent = `${suggestion["word"]} x${suggestion["count"]}, 💰${suggestion["cost"]}`;
+        suggestionEntry.dataset.word = `${suggestion["word"]}`;
         spellSuggestionsList.appendChild(suggestionEntry);
       });
-      document.querySelector("#suggestions div").append(spellSuggestions);
     }
+
+    document.querySelector("#suggestions div").replaceWith(spellSuggestions);
     return;
   }
 }
