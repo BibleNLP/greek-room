@@ -26,6 +26,12 @@ from ...constants import (
 # Get vendored deps
 from ...vendor.spell_checker.bin import spell_check
 
+# from ...vendor.spell_checker.bin.spell_check import (
+#     SpellCheckSuggestions,
+#     SimpleWordEdge,
+#     WordEdge,
+# )
+
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
 
@@ -71,7 +77,7 @@ def get_spell_check_model(current_username: str, resource_id: str, lang_code: st
     """
     # Attempt to obtain model from cache
     if (current_username, resource_id) in _spell_check_model_cache:
-        _LOGGER.debug("Cache hit for spell_checkmodel")
+        _LOGGER.debug("Cache hit for spell_check_model")
         return _spell_check_model_cache[(current_username, resource_id)]
 
     project_path: Path = ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME / PROJECT_CLEAN_DIR_NAME
@@ -79,22 +85,71 @@ def get_spell_check_model(current_username: str, resource_id: str, lang_code: st
     # Initialize Greek Room spell checker model
     greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(lang_code)
 
-    greek_room_spell_checker.corpus, greek_room_spell_checker.word_count = get_spell_checker_data(project_path, resource_id, lang_code)
+    # Load data in model
+    greek_room_spell_checker.load_text_corpus(text_filename=str(project_path/f"{resource_id}.txt"),
+                                              snt_id_data=str(project_path/PROJECT_VREF_FILE_NAME))
+
+    # greek_room_spell_checker.corpus, greek_room_spell_checker.word_count = get_spell_checker_data(project_path, resource_id, lang_code)
 
     # Set cache
     _spell_check_model_cache[(current_username, resource_id)] = greek_room_spell_checker
 
     return greek_room_spell_checker
 
-    test_snt1 = 'advisors heven blesing son Beersheba'
-    test_snt2 = 'advisers heaven blessing son California'
-    print(test_snt1)
-    sc_suggestions = greek_room_spell_checker.spell_check_snt(test_snt1, 'test')
-    print(sc_suggestions)
-    wc_words = ['the', 'heven', 'advisers', 'advisors', 'California']
-    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
-    greek_room_spell_checker.update_snt(test_snt1, 'test', log=sys.stdout)
-    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
-    greek_room_spell_checker.update_snt(test_snt2, 'test', old_snt=test_snt1, log=sys.stdout)
-    print(greek_room_spell_checker.show_selected_word_counts(wc_words))
-    print(greek_room_spell_checker.spell_check_snt('Californie', 'test'))
+
+def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggestions):
+    """
+    Incorporate the checking suggestions to the full
+    verse text for easier manipulation in the UI.
+    """
+    # Tokenize the text based on suggestions boundaries
+
+    _LOGGER.debug(verse)
+
+    # List of the list of tuples with the start and
+    # end idx in the`SimpleWordEdge`
+    # suggestion_edges: list[list[tuple(int)]] = [[(simple_word_edge.start, simple_word_edge.end) for simple_word_edge in word_edge.edges] for word_edge in suggestions.d.keys()]
+
+    flatteded_suggestion_edges = [[simple_word_edge.start, simple_word_edge.end] for word_edge in suggestions.d.keys() for simple_word_edge in word_edge.edges]
+
+    # _LOGGER.debug(flatteded_suggestion_edges)
+
+
+    # Crazy logic to find the tuple of indices
+    # that are *not* covered by `suggestsions`
+    edges_set: set = set()
+    super_set: set = set(list(range(len(verse)+1)))
+
+    for word_edge in suggestions.d.keys():
+        for simple_word_edge in word_edge.edges:
+            edges_set.update(list(range(simple_word_edge.start, simple_word_edge.end)))
+
+    _LOGGER.debug(sorted(super_set-edges_set))
+
+    leftovers = sorted(super_set-edges_set)
+    leftover_edges = []
+    i = 0
+    while i<len(leftovers)-1:
+        leftover_edge = [leftovers[i]]
+        y=i
+        while y<len(leftovers)-1:
+            if leftovers[y+1] == leftovers[y] + 1:
+                i += 1
+                y += 1
+                continue
+            else:
+                break
+
+        leftover_edge.append(leftovers[i]+1)
+        leftover_edges.append(leftover_edge)
+        i += 1
+
+    _LOGGER.debug(leftover_edges)
+
+    # Stitch-in the leftover indices with no real suggestions
+    for leftover_edge in leftover_edges:
+        suggestions.d[spell_check.WordEdge([spell_check.SimpleWordEdge('', leftover_edge[0], leftover_edge[1])])] = None
+
+    suggestions.d = dict(sorted(suggestions.d.items(), key=lambda x: x[0].edges[0].start))
+
+    return suggestions

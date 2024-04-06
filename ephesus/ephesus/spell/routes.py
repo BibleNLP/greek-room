@@ -38,7 +38,9 @@ from ..common.utils import (
     get_scope_from_vref,
 )
 from .core.spell_check_utils import (
+    _spell_check_model_cache,
     get_spell_check_model,
+    get_verse_suggestions,
 )
 from ..dependencies import (
     get_db,
@@ -119,10 +121,21 @@ async def get_chapter(
         request: Request,
         resource_id: str,
         ref: str,
+        db: Session = Depends(get_db),
+        current_username: str = Depends(get_current_username),
 ):
     """Get the verses content"""
+    project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
+
     bible_ref: BibleReference = BibleReference.from_string(ref)
     verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
+
+    # Get suggestions
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, project_mapping["Project"].lang_code)
+    suggestions: list[SpellCheckSuggestions] = [get_verse_suggestions(verse[1], spell_check_model.spell_check_snt(verse[1], verse[0])) for verse in verses]
+    # for verse in verses:
+        # Pass in verse_ref and verse_text
+        # suggestions.append(spell_check_model.spell_check_snt(verse[1], verse[0]))
 
     # Create dummy data
     dummy_data: list[list] = []
@@ -143,6 +156,7 @@ async def get_chapter(
             "resource_id": resource_id,
             "ref": f"{bible_ref.book} {bible_ref.chapter}",
             "verses": verses,
+            "suggestions": suggestions,
             "dummy_data": dummy_data,
         },
     )

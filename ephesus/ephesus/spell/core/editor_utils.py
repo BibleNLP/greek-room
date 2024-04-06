@@ -23,6 +23,7 @@ from ...constants import (
     BibleReference,
 )
 
+
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
 
