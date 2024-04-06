@@ -664,7 +664,7 @@
 ::s1 g ::s2 gh ::cost 0.3
 ::s1 g ::s2 ch ::cost 0.4 ::left1 /[eiy]$/ ::right1 [-,$ ] ::comment German: Ludwig, Braunschweig
 ::s1 gh ::s2 f ::cost 0.2 ::lc1 eng ::comment laughter
-::s1 gh ::s2 "" ::cost 0.2 ::lc1 eng ::comment daughter
+::s1 gh ::s2 ::cost 0.2 ::lc1 eng ::comment daughter
 ::s1 gh ::s2 g ::cost 0.2 ::lc1 eng ::comment Afghanistan
 ::s1 gl ::s2 l ::cost 0.2 ::lc1 eng ::right1 [i]
 ::s1 gn ::s2 n ::cost 0.05 ::left1 /^(.* )?$/ ::lc1 eng
@@ -864,6 +864,12 @@
 ::s1 j ::s2 kh ::cost 0.25 ::lc1 som ::lc2 som
 ::s1 ch ::s2 sh ::cost 0.2 ::lc1 som ::lc2 som
 
+# English
+::s1 ti ::s2 sh ::cost 0.3 ::right1 on ::lc1 eng ::comment -tion
+
+# German
+::s1 ia ::s2 ien ::cost 0.5 ::right1 [-,$ ] ::comment Kalifornien
+
 # French
 ::s1 aud ::s2 o ::cost 0.3 ::right1 [-,$ ] ::lc1 eng, fra
 ::s1 aux ::s2 o ::cost 0.05 ::right1 [-,$ ]
@@ -873,6 +879,10 @@
 
 ::s1 - ::s2 " " ::cost 0.1
 ::s1 : ::s2 , ::cost 0.1 ::lc1 amh
+
+# Chinese
+::s1 l ::s2 r ::cost 0.2 ::lc1 zho
+::s1 n ::s2 m ::cost 0.2 ::lc1 zho ::right1 [-,$ ]
 
 # mini dictionary Amharic-English
 ::s1 dabube ::s2 south ::cost 0 ::lc1 amh ::lc2 eng
