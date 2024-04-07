@@ -16,14 +16,7 @@ const observer = new MutationObserver(() => {
 // Refresh verse data from the backend
 function reloadVerses() {
   document
-    .querySelector(
-      `span.bcv-nav-item[data-ref="${
-        document
-          .querySelector("span.token.highlight")
-          .closest("div.verse")
-          .dataset.ref.split(":")[0]
-      }"]`
-    )
+    .querySelector("#details-pane .bcv-nav:nth-child(2) span.bcv-nav-item.bold")
     .click();
 }
 
@@ -129,7 +122,6 @@ detailsPane.addEventListener("click", (event) => {
   const bookSpan = event.target.closest("span[data-chapters]");
   if (bookSpan) {
     // Show selected book
-
     const previouslySelectedBook = booksPane.querySelector(
       'span[class~="bold"]'
     );
@@ -182,9 +174,18 @@ detailsPane.addEventListener("click", (event) => {
       : true;
     event.target.classList.add("bold");
 
+    // Show loader
+    document.querySelector('#details-pane img[src*="loader"]').style.display =
+      "";
+
     // Get verse content
     getDataFromElementURL(event.target).then(
       (content) => {
+        // Hide loader
+        document.querySelector(
+          '#details-pane img[src*="loader"]'
+        ).style.display = "none";
+
         setInnerHtml(verses, content);
 
         // Start/reset observing for text edits.

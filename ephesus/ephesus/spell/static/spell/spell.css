@@ -56,19 +56,28 @@
 }
 
 .orange {
-  color: #ca4c00;
+  color: #ff9900;
 }
 
-.green {
-  color: #008800;
+.dark-green {
+  color: #007700;
+}
+
+.medium-green {
+  color: #00cc00;
+  /* #008800; */
+}
+
+.yellowish {
+  color: #e6e600;
 }
 
 .blue {
-  color: #0000ff;
+  color: #4d79ff;
 }
 
 .red {
-  color: #ff3028;
+  color: #ff3300;
 }
 
 .spell-error {

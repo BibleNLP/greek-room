@@ -9,10 +9,13 @@ from typing import Any
 from pathlib import Path
 from collections import defaultdict
 
+from sqlalchemy.orm import Session
+
 from ...config import (
     get_ephesus_settings,
     get_global_state,
 )
+from ...database import crud, schemas
 from ...exceptions import FormatError
 from ...constants import (
     LATEST_PROJECT_VERSION_NAME,
@@ -70,7 +73,7 @@ def get_spell_checker_data(project_path: Path, resource_id: str, lang_code: str)
         raise FormatError("Error while creating corpus object.")
 
 
-def get_spell_check_model(current_username: str, resource_id: str, lang_code: str) -> spell_check.SpellCheckModel:
+def get_spell_check_model(current_username: str, resource_id: str, db:Session) -> spell_check.SpellCheckModel:
     """
     Initialize and get the Greek Room spell
     checker model for a given `resource_id`
@@ -80,10 +83,13 @@ def get_spell_check_model(current_username: str, resource_id: str, lang_code: st
         _LOGGER.debug("Cache hit for spell_check_model")
         return _spell_check_model_cache[(current_username, resource_id)]
 
+    # For retrieving lang_code
+    project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
+
     project_path: Path = ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME / PROJECT_CLEAN_DIR_NAME
 
     # Initialize Greek Room spell checker model
-    greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(lang_code)
+    greek_room_spell_checker: spell_check.SpellCheckModel = spell_check.SpellCheckModel(project_mapping["Project"].lang_code)
 
     # Load data in model
     greek_room_spell_checker.load_text_corpus(text_filename=str(project_path/f"{resource_id}.txt"),
@@ -114,7 +120,7 @@ def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggest
 
         # Also, use this loop for
         # marshalling the suggestions for UI
-        suggestions.d[word_edge] = [{"word": alt.txt, "count": alt.count, "cost": alt.cost} for alt in suggestions.d[word_edge].alt_spellings]
+        suggestions.d[word_edge] = {"vizClue": str(suggestions.d[word_edge].viz_clue), "alts": [{"word": alt.txt, "count": alt.count, "cost": alt.cost} for alt in suggestions.d[word_edge].alt_spellings]}
 
 
     leftovers = sorted(super_set-edges_set)

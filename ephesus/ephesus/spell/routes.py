@@ -106,7 +106,7 @@ async def get_editor(
                         / PROJECT_CLEAN_DIR_NAME
                         / PROJECT_VREF_FILE_NAME)
 
-    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, project_mapping["Project"].lang_code)
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
 
     return templates.TemplateResponse(
         "spell/editor-pane.html",
@@ -129,18 +129,13 @@ async def get_chapter(
         current_username: str = Depends(get_current_username),
 ):
     """Get the verses content"""
-    project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
-
     bible_ref: BibleReference = BibleReference.from_string(ref)
     verses: list[list[str]] = get_chapter_content(resource_id, bible_ref)
 
     # Get suggestions
-    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, project_mapping["Project"].lang_code)
-    suggestions: list[SpellCheckSuggestions] = [get_verse_suggestions(verse[1], spell_check_model.spell_check_snt(verse[1], verse[0])) for verse in verses]
-    # for verse in verses:
-        # Pass in verse_ref and verse_text
-        # suggestions.append(spell_check_model.spell_check_snt(verse[1], verse[0]))
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
 
+    suggestions: list[SpellCheckSuggestions] = [get_verse_suggestions(verse[1], spell_check_model.spell_check_snt(verse[1], verse[0])) for verse in verses]
 
     return templates.TemplateResponse(
         "spell/chapter.fragment",
@@ -160,10 +155,33 @@ async def save_verse(
         resource_id: str,
         verse: schemas.VerseContent,
         ref: str,
+        db: Session = Depends(get_db),
+        current_username: str = Depends(get_current_username),
 ) -> None:
     """Save updated verse content to file"""
     set_verse_content(resource_id, BibleReference.from_string(ref), verse.verse)
 
+    # Update spell check model
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+    spell_check_model.update_snt(verse.verse, ref)
+
     return {
         "detail": f"Successfuly updated content for {ref}"
     }
+
+
+# @ui_router.get("/projects/{resource_id}/verse", , response_class=HTMLResponse)
+# async def get_verse(
+#         resource_id: str,
+#         ref: str,
+#         db: Session = Depends(get_db),
+#         current_username: str = Depends(get_current_username),
+# ):
+#     """Get verse content with suggestions"""
+#     # Update spell check model
+#     spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+#     spell_check_model.update_snt(verse.verse, ref)
+
+#     return {
+#         "detail": f"Successfuly updated content for {ref}"
+#     }

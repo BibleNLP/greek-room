@@ -29,7 +29,7 @@ body {
 
 .left {
   background: #b9b9b940;
-  min-width: 15%;
+  min-width: 10%;
   flex-grow: 0;
 }
 
@@ -97,7 +97,7 @@ body {
 
 .button {
   position: relative;
-  left: 93%;
+  left: 88%;
   top: 1%;
   font-size: 1.3em;
   /* padding: 10px; */
@@ -200,6 +200,7 @@ div.listing > ul {
 }
 div.listing > ul li {
   list-style: none;
+  word-wrap: anywhere;
   /* margin: 0em 0.5em; */
 }
 .selected {

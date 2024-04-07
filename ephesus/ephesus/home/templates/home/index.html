@@ -1,11 +1,13 @@
 {% extends "home/base.html" %} {% block right_content %}
-<div id="details-pane">Click on a project name to load data.</div>
+<div id="details-pane"><i>Click on a project name to load data.</i></div>
 {% endblock %} {% block left_content %}
 <a class="button" href="#createPopup">&plus;</a>
 
 <div class="listing">
   {% if not projects %}
-  <p>No projects found. <br />Create(+) one to get started!</p>
+  <p>
+    <i>No projects found. <br />Create(+) one to get started!</i>
+  </p>
   {% else %}
   <ul>
     {% for project in projects %}
