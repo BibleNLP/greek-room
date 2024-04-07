@@ -5,12 +5,12 @@
     data-chapters="{{ chapters|map('int')|sort|join('|') }}"
     data-url="{{ url_for('get_chapter', resource_id=resource_id) }}"
     data-book-code="{{ book }}"
-    >{{ book }}</span
+    >{{ BookNames[BookCodes(book).name].value }}</span
   >
   {% endfor %}
 </div>
 <div class="bcv-nav">
-  <span>Click on a Book name to select chapters.</span>
+  <small><i>Click on a Book name to select chapters.</i></small>
 </div>
 <hr />
 <div role="main">{% include "spell/chapter.fragment" %}</div>

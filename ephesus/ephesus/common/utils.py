@@ -336,8 +336,8 @@ def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
 
 def get_scope_from_vref(vref_file: Path) -> dict[str, set] | None:
     """
-    Read the project's `vref.txt` return
-    a dict with the names of book and the
+    Read the project's `vref.txt` return a dict
+    with the 3-letter codes of the books and the
     numbers of chapters (as str) in each of them
     """
     if not vref_file or not vref_file.exists():

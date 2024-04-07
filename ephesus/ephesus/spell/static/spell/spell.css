@@ -1,7 +1,8 @@
 .bcv-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em;
+  gap: 0.6em;
+  padding-top: 0.8em;
 }
 
 .bcv-nav-item:hover {

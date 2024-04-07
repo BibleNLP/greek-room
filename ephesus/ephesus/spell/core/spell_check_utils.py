@@ -102,19 +102,6 @@ def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggest
     Incorporate the checking suggestions to the full
     verse text for easier manipulation in the UI.
     """
-    # Tokenize the text based on suggestions boundaries
-
-    _LOGGER.debug(verse)
-
-    # List of the list of tuples with the start and
-    # end idx in the`SimpleWordEdge`
-    # suggestion_edges: list[list[tuple(int)]] = [[(simple_word_edge.start, simple_word_edge.end) for simple_word_edge in word_edge.edges] for word_edge in suggestions.d.keys()]
-
-    flatteded_suggestion_edges = [[simple_word_edge.start, simple_word_edge.end] for word_edge in suggestions.d.keys() for simple_word_edge in word_edge.edges]
-
-    # _LOGGER.debug(flatteded_suggestion_edges)
-
-
     # Crazy logic to find the tuple of indices
     # that are *not* covered by `suggestsions`
     edges_set: set = set()
@@ -129,8 +116,6 @@ def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggest
         # marshalling the suggestions for UI
         suggestions.d[word_edge] = [{"word": alt.txt, "count": alt.count, "cost": alt.cost} for alt in suggestions.d[word_edge].alt_spellings]
 
-
-    _LOGGER.debug(sorted(super_set-edges_set))
 
     leftovers = sorted(super_set-edges_set)
     leftover_edges = []
@@ -149,8 +134,6 @@ def get_verse_suggestions(verse: str, suggestions: spell_check.SpellCheckSuggest
         leftover_edge.append(leftovers[i]+1)
         leftover_edges.append(leftover_edge)
         i += 1
-
-    _LOGGER.debug(leftover_edges)
 
     # Stitch-in the leftover indices with no real suggestions
     for leftover_edge in leftover_edges:

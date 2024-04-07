@@ -29,6 +29,8 @@ from sqlalchemy.exc import DBAPIError
 
 from ..config import get_ephesus_settings
 from ..constants import (
+    BookCodes,
+    BookNames,
     BibleReference,
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_CLEAN_DIR_NAME,
@@ -111,7 +113,9 @@ async def get_editor(
         {
             "request": request,
             "resource_id": resource_id,
-            "project_scope": project_scope
+            "project_scope": project_scope,
+            "BookCodes": BookCodes,
+            "BookNames": BookNames,
         },
     )
 
@@ -137,17 +141,6 @@ async def get_chapter(
         # Pass in verse_ref and verse_text
         # suggestions.append(spell_check_model.spell_check_snt(verse[1], verse[0]))
 
-    # Create dummy data
-    dummy_data: list[list] = []
-    for verse in verses:
-        verse_dummy_data = []
-        for word in verse[1].split():
-            if random.randint(0, 10) < 5:
-                verse_dummy_data.append({"count": random.randint(0, 10), "spellSuggestions": [{"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}, {"alternativeSpelling": secrets.token_urlsafe(5), "count": random.randint(0, 100), "smartEditDistance": round(random.uniform(0, 3), 2)}]})
-            else:
-                verse_dummy_data.append({"count": random.randint(0, 10)})
-        dummy_data.append(verse_dummy_data)
-
 
     return templates.TemplateResponse(
         "spell/chapter.fragment",
@@ -157,7 +150,8 @@ async def get_chapter(
             "ref": f"{bible_ref.book} {bible_ref.chapter}",
             "verses": verses,
             "suggestions": suggestions,
-            "dummy_data": dummy_data,
+            "BookCodes": BookCodes,
+            "BookNames": BookNames,
         },
     )
 

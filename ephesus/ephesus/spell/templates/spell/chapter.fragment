@@ -1,9 +1,13 @@
 <div class="editor-container">
   <div id="verses-content">
     {% if verses is none() or verses|length == 0 %}
-    <p>Select a Book and Chapter to load its contents.</p>
+    <p>
+      <small><i>Select a Book and Chapter to load its contents.</i></small>
+    </p>
     {% else %}
-    <h2>{{ ref }}</h2>
+    <h2>
+      {{ BookNames[BookCodes(ref.split()[0]).name].value }} {{ ref.split()[1] }}
+    </h2>
     <div>
       {% for verse in verses %} {% set verse_loop = loop %} {% include
       "spell/verse.fragment" %} {% endfor %}
