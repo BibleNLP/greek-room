@@ -66,12 +66,7 @@ function verseBlurHandler(event) {
     return;
   }
 
-  saveVerse(
-    Array.from(event.target.querySelectorAll("span.token"))
-      .map((tokenSpan) => tokenSpan.innerHTML)
-      .join(" "),
-    event.target.dataset.saveUrl
-  ).then(
+  saveVerse(event.target.innerText, event.target.dataset.saveUrl).then(
     (content) => {
       // Reset edit flag
       editFlag = false;
@@ -168,10 +163,14 @@ detailsPane.addEventListener("click", (event) => {
       "#details-pane .bcv-nav:nth-child(2)"
     );
 
-    // Clear existing verses, if any
-    const existingContent = document.querySelector('div[id="verses-content"]');
-    if (existingContent !== undefined) {
+    // Clear existing verses and suggestions, if any
+    const existingContent = document.querySelector("#verses-content");
+    if (existingContent != null) {
       existingContent.remove();
+    }
+    const existingSuggestions = document.querySelector("#suggestions");
+    if (existingSuggestions != null) {
+      existingSuggestions.remove();
     }
 
     // Show selected chapter
@@ -254,20 +253,19 @@ detailsPane.addEventListener("click", (event) => {
   // Handle spell suggestion selection
   const spellSuggestionLi = event.target.closest("li.spell-suggestion");
   if (spellSuggestionLi) {
+    // Ignore suggestion selection when word not selected
+    if (document.querySelector("span.token.highlight") == null) {
+      return;
+    }
     document.querySelector("span.token.highlight").innerHTML =
-      spellSuggestionLi.innerHTML;
+      spellSuggestionLi.dataset.word;
 
     // Save updated verse
     const verseDiv = document
       .querySelector("span.token.highlight")
       .closest("div.verse");
 
-    saveVerse(
-      Array.from(verseDiv.querySelectorAll("span.token"))
-        .map((tokenSpan) => tokenSpan.innerHTML)
-        .join(" "),
-      verseDiv.dataset.saveUrl
-    ).then(
+    saveVerse(verseDiv.innerText, verseDiv.dataset.saveUrl).then(
       (content) => {
         // Reset edit flag
         editFlag = false;

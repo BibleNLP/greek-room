@@ -10,10 +10,12 @@
     </div>
     {% endif %}
   </div>
+  {% if verses is not none() and verses|length > 0 %}
   <div id="suggestions">
     <h4 class="title">Details</h4>
     <div>
       <p><i>Select a word to see any suggestions and details.</i></p>
     </div>
   </div>
+  {% endif %}
 </div>
