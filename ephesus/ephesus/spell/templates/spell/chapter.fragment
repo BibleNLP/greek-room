@@ -9,8 +9,9 @@
       {{ BookNames[BookCodes(ref.split()[0]).name].value }} {{ ref.split()[1] }}
     </h2>
     <div>
-      {% for verse in verses %} {% set verse_loop = loop %} {% include
-      "spell/verse.fragment" %} {% endfor %}
+      {% for verse in verses %} {% set verse_suggestions =
+      suggestions[loop.index0] %} {% include "spell/verse.fragment" %} {% endfor
+      %}
     </div>
     {% endif %}
   </div>

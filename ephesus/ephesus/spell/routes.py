@@ -170,18 +170,28 @@ async def save_verse(
     }
 
 
-# @ui_router.get("/projects/{resource_id}/verse", , response_class=HTMLResponse)
-# async def get_verse(
-#         resource_id: str,
-#         ref: str,
-#         db: Session = Depends(get_db),
-#         current_username: str = Depends(get_current_username),
-# ):
-#     """Get verse content with suggestions"""
-#     # Update spell check model
-#     spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
-#     spell_check_model.update_snt(verse.verse, ref)
+@ui_router.put("/projects/{resource_id}/verse", response_class=HTMLResponse)
+async def verse_suggestions(
+        request: Request,
+        resource_id: str,
+        ref: str,
+        verse: schemas.VerseContent,
+        db: Session = Depends(get_db),
+        current_username: str = Depends(get_current_username),
+):
+    """Get verse content with suggestions"""
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+    suggestions: SpellCheckSuggestions = get_verse_suggestions(verse.verse, spell_check_model.spell_check_snt(verse.verse, ref))
 
-#     return {
-#         "detail": f"Successfuly updated content for {ref}"
-#     }
+    _LOGGER.debug(suggestions)
+
+    return templates.TemplateResponse(
+        "spell/verse.fragment",
+        {
+            "request": request,
+            "resource_id": resource_id,
+            "ref": ref.split(':')[-1],
+            "verse": [ref.split(':')[-1], verse.verse],
+            "verse_suggestions": suggestions,
+        },
+    )

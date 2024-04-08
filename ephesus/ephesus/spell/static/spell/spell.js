@@ -50,10 +50,41 @@ async function saveVerse(verse, url) {
   }
 }
 
+// Method to get a single verse's suggestions
+async function getVerseSuggestions(verse, url) {
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: new Headers({
+      Accept: "text/html",
+      "Content-Type": "application/json",
+    }),
+    body: JSON.stringify({ verse: verse }),
+  });
+  if (response.status === 200) {
+    return Promise.resolve(await response.text());
+  } else if (response.status === 500) {
+    let data = undefined;
+    if (response.headers.get("content-type") === "application/json") {
+      data = await response.json();
+    } else {
+      data = {
+        detail:
+          "There was an error while processing this request. Please try again.",
+      };
+    }
+    return Promise.reject(data);
+  } else {
+    return Promise.reject(
+      "There was an error while processing this request. Please try again."
+    );
+  }
+}
+
 // Handle editor blur event
 function verseBlurHandler(event) {
   // Save updated verse on blur
 
+  // console.log(`editFlag=${editFlag}`);
   // Bail if no edits present
   if (!editFlag) {
     return;
@@ -66,6 +97,12 @@ function verseBlurHandler(event) {
 
       // reload verses
       reloadVerses();
+      // getVerseSuggestions(
+      //   event.target.innerText,
+      //   event.target.dataset.suggestionsUrl
+      // ).then((suggestionContent) => {
+      //   event.target.parentElement.outerHTML = suggestionContent;
+      // });
     },
     (reason) => {
       console.log(reason);
@@ -97,7 +134,7 @@ function detailsPaneMouseoverHandler(event) {
         const suggestionEntry = document.createElement("li");
         // suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
         suggestionEntry.classList.add("spell-suggestion", "blue");
-        suggestionEntry.textContent = `${suggestion["word"]} x${suggestion["count"]}, 💰${suggestion["cost"]}`;
+        suggestionEntry.textContent = `${suggestion["word"]} (n:${suggestion["count"]}, c:${suggestion["cost"]})`;
         suggestionEntry.dataset.word = `${suggestion["word"]}`;
         spellSuggestionsList.appendChild(suggestionEntry);
       });
@@ -273,6 +310,12 @@ detailsPane.addEventListener("click", (event) => {
 
         // reload verses
         reloadVerses();
+        // getVerseSuggestions(
+        //   verseDiv.innerText,
+        //   verseDiv.dataset.suggestionsUrl
+        // ).then((suggestionContent) => {
+        //   verseDiv.parentElement.outerHTML = suggestionContent;
+        // });
       },
       (reason) => {
         console.log(reason);

@@ -5,10 +5,11 @@
     class="verse"
     contenteditable="true"
     data-save-url="{{ url_for('save_verse', resource_id=resource_id) }}?ref={{ ref }}:{{ verse[0] }}"
+    data-suggestions-url="{{ url_for('verse_suggestions', resource_id=resource_id) }}?ref={{ ref }}:{{ verse[0] }}"
   >
-    {% for word_edge, suggestion in suggestions[verse_loop.index0].d.items()
-    %}{% set word = verse[1][word_edge.edges[0].start:word_edge.edges[0].end]
-    %}{% if word.strip()|length > 0 and suggestion %} {% set font_color %} {% if
+    {% for word_edge, suggestion in verse_suggestions.d.items() %}{% set word =
+    verse[1][word_edge.edges[0].start:word_edge.edges[0].end] %}{% if
+    word.strip()|length > 0 and suggestion %} {% set font_color %} {% if
     suggestion["vizClue"] == "KD" %} dark-green {% elif suggestion["vizClue"] ==
     "KM" %} medium-green {% elif suggestion["vizClue"] == "KW" %} yellowish {%
     elif suggestion["vizClue"] == "UC" %} red {% elif suggestion["vizClue"] ==
