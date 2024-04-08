@@ -155,8 +155,14 @@ function detailsPaneMouseoverHandler(event) {
         const suggestionEntry = document.createElement("li");
         // suggestionEntry.setAttribute("title", `${JSON.stringify(suggestion)}`);
         suggestionEntry.classList.add("spell-suggestion", "blue");
-        suggestionEntry.textContent = `${suggestion["word"]} (n:${suggestion["count"]}, c:${suggestion["cost"]})`;
+        suggestionEntry.textContent = `${suggestion["word"]}`;
         suggestionEntry.dataset.word = `${suggestion["word"]}`;
+
+        const suggestionStats = document.createElement("span");
+        suggestionStats.classList.add("suggestion-stats");
+        suggestionStats.textContent = ` (n:${suggestion["count"]}, c:${suggestion["cost"]})`;
+        suggestionEntry.appendChild(suggestionStats);
+
         spellSuggestionsList.appendChild(suggestionEntry);
       });
     }

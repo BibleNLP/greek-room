@@ -24,7 +24,7 @@
 }
 
 #suggestions {
-  width: 20%;
+  width: 22%;
   border-left: 1px solid black;
   padding-left: 0.5em;
 }
@@ -45,6 +45,10 @@
   padding: 0 0.3em 0 0;
   /* position: absolute; */
   /* left: 0; */
+}
+
+.suggestion-stats {
+  font-size: 0.8em;
 }
 
 .token:hover {
