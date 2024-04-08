@@ -162,8 +162,8 @@ async def save_verse(
     set_verse_content(resource_id, BibleReference.from_string(ref), verse.verse)
 
     # Update spell check model
-    # spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
-    # spell_check_model.update_snt(verse.verse, ref)
+    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+    spell_check_model.update_snt(verse.verse, ref)
 
     return {
         "detail": f"Successfuly updated content for {ref}"

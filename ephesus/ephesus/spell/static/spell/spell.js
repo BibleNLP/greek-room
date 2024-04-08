@@ -25,7 +25,7 @@ function reloadVerse(verseDiv) {
   if (!verseDiv) {
     return;
   }
-  editFlag = true;
+  editFlag = false;
 
   getVerseSuggestions(verseDiv.innerText, verseDiv.dataset.suggestionsUrl).then(
     (suggestionContent) => {

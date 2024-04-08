@@ -94,7 +94,7 @@ def get_spell_check_model(current_username: str, resource_id: str, db:Session) -
     # Load data in model
     greek_room_spell_checker.load_text_corpus(text_filename=str(project_path/f"{resource_id}.txt"),
                                               snt_id_data=str(project_path/PROJECT_VREF_FILE_NAME),
-                                              exclude=['TIT', 'MAT'])
+                                              include=['MAT', 'MRK', 'LUK', 'JHN'])
 
     # greek_room_spell_checker.corpus, greek_room_spell_checker.word_count = get_spell_checker_data(project_path, resource_id, lang_code)
 
