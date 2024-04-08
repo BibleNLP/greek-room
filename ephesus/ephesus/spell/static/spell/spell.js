@@ -277,27 +277,13 @@ detailsPane.addEventListener("click", (event) => {
     document.querySelector("span.token.highlight").innerHTML =
       spellSuggestionLi.dataset.word;
 
-    // Save updated verse
-    const verseDiv = document
-      .querySelector("span.token.highlight")
-      .closest("div.verse");
-
-    saveVerse(verseDiv.innerText, verseDiv.dataset.saveUrl).then(
-      (content) => {
-        // reload verses
-        reloadVerse(verseDiv);
-        // getVerseSuggestions(
-        //   verseDiv.innerText,
-        //   verseDiv.dataset.suggestionsUrl
-        // ).then((suggestionContent) => {
-        //   verseDiv.parentElement.outerHTML = suggestionContent;
-        // });
-      },
-      (reason) => {
-        console.log(reason);
-        reloadVerses();
-      }
+    // Clear suggestions and highlights
+    const clearSuggestions = document.querySelector(
+      '#suggestions small[class~="clear-suggestions"]'
     );
+    if (clearSuggestions) {
+      clearSuggestions.click();
+    }
   }
 
   // Handle verse commit icon click
