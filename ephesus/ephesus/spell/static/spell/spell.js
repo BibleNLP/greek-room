@@ -20,6 +20,37 @@ function reloadVerses() {
     .click();
 }
 
+// Refresh a single verse from the backend
+function reloadVerse(verseDiv) {
+  if (!verseDiv) {
+    return;
+  }
+  editFlag = true;
+
+  getVerseSuggestions(verseDiv.innerText, verseDiv.dataset.suggestionsUrl).then(
+    (suggestionContent) => {
+      verseDiv.parentElement.outerHTML = suggestionContent;
+
+      // Start/reset observing for text edits.
+      observer.observe(document.querySelector("#verses-content"), {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+
+      Array.from(
+        document.querySelectorAll("div.verse-container div.verse")
+      ).forEach((verseDiv) => {
+        verseDiv.addEventListener("blur", verseBlurHandler);
+      });
+      // suggestionContent.documentSelector("div.verse").addEventListener("blur", verseBlurHandler);
+    },
+    (reason) => {
+      console.log(reason);
+    }
+  );
+}
+
 // Method to persist verse content in the backend
 async function saveVerse(verse, url) {
   const response = await fetch(url, {
@@ -89,20 +120,13 @@ function verseBlurHandler(event) {
   if (!editFlag) {
     return;
   }
+  // Reset edit flag
+  editFlag = false;
 
   saveVerse(event.target.innerText, event.target.dataset.saveUrl).then(
     (content) => {
-      // Reset edit flag
-      editFlag = false;
-
       // reload verses
-      reloadVerses();
-      // getVerseSuggestions(
-      //   event.target.innerText,
-      //   event.target.dataset.suggestionsUrl
-      // ).then((suggestionContent) => {
-      //   event.target.parentElement.outerHTML = suggestionContent;
-      // });
+      reloadVerse(event.target);
     },
     (reason) => {
       console.log(reason);
@@ -303,13 +327,13 @@ detailsPane.addEventListener("click", (event) => {
       .querySelector("span.token.highlight")
       .closest("div.verse");
 
+    // Reset edit flag
+    editFlag = false;
+
     saveVerse(verseDiv.innerText, verseDiv.dataset.saveUrl).then(
       (content) => {
-        // Reset edit flag
-        editFlag = false;
-
         // reload verses
-        reloadVerses();
+        reloadVerse(verseDiv);
         // getVerseSuggestions(
         //   verseDiv.innerText,
         //   verseDiv.dataset.suggestionsUrl

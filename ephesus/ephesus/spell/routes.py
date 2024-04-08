@@ -162,8 +162,8 @@ async def save_verse(
     set_verse_content(resource_id, BibleReference.from_string(ref), verse.verse)
 
     # Update spell check model
-    spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
-    spell_check_model.update_snt(verse.verse, ref)
+    # spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+    # spell_check_model.update_snt(verse.verse, ref)
 
     return {
         "detail": f"Successfuly updated content for {ref}"
@@ -181,16 +181,23 @@ async def verse_suggestions(
 ):
     """Get verse content with suggestions"""
     spell_check_model: SpellCheckModel = get_spell_check_model(current_username, resource_id, db)
+
+    # _LOGGER.debug(verse.verse)
+    # _LOGGER.debug(ref)
+
+    # _LOGGER.debug(spell_check_model.spell_check_snt(verse.verse, ref))
+
+
     suggestions: SpellCheckSuggestions = get_verse_suggestions(verse.verse, spell_check_model.spell_check_snt(verse.verse, ref))
 
-    _LOGGER.debug(suggestions)
+    # _LOGGER.debug(suggestions.d)
 
     return templates.TemplateResponse(
         "spell/verse.fragment",
         {
             "request": request,
             "resource_id": resource_id,
-            "ref": ref.split(':')[-1],
+            "ref": ref.split(':')[0],
             "verse": [ref.split(':')[-1], verse.verse],
             "verse_suggestions": suggestions,
         },
