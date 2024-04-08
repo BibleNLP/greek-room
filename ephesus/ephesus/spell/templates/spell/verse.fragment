@@ -21,4 +21,5 @@
     >{% else %}{{ word }}{% endif %}{% endfor %}
   </div>
   <div class="commit-icon hidden">&nbsp;✔</div>
+  <div class="refresh-icon hidden">&nbsp;↻</div>
 </div>

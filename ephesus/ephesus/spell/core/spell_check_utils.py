@@ -96,13 +96,13 @@ def get_spell_check_model(current_username: str, resource_id: str, db:Session) -
     ## DEMO Code
     ## TODO: Cleanup after
     # For Berean Bible project
-    if resource_id in ["kCEuHe_1", "F0ujSTD8"]:
+    if resource_id in ["RLrDIXx0"]:
         greek_room_spell_checker.load_text_corpus(text_filename=str(project_path/f"{resource_id}.txt"),
                                                   snt_id_data=str(project_path/PROJECT_VREF_FILE_NAME),
                                                   exclude=['MAT', 'TIT'])
 
     # For Hindi IRV Project
-    elif resource_id == "N393v0BV":
+    elif resource_id == "_X0nrdeO":
         greek_room_spell_checker.load_text_corpus(text_filename=str(project_path/f"{resource_id}.txt"),
                                                   snt_id_data=str(project_path/PROJECT_VREF_FILE_NAME),
                                                   include=['MAT', 'MRK', 'LUK', 'JHN'])

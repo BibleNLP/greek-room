@@ -56,6 +56,36 @@ async function saveVerse(verse, url) {
   }
 }
 
+// Method to persist verse content in the backend
+async function updateModel(verse, url) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: new Headers({
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    }),
+    body: JSON.stringify({ verse: verse }),
+  });
+  if (response.status === 200) {
+    return Promise.resolve(await response.json());
+  } else if (response.status === 500) {
+    let data = undefined;
+    if (response.headers.get("content-type") === "application/json") {
+      data = await response.json();
+    } else {
+      data = {
+        detail:
+          "There was an error while processing this request. Please try again.",
+      };
+    }
+    return Promise.reject(data);
+  } else {
+    return Promise.reject(
+      "There was an error while processing this request. Please try again."
+    );
+  }
+}
+
 // Method to get a single verse's suggestions
 async function getVerseSuggestions(verse, url) {
   const response = await fetch(url, {
@@ -290,6 +320,14 @@ detailsPane.addEventListener("click", (event) => {
   const commitIcon = event.target.closest("div.commit-icon");
   if (commitIcon) {
     verseCommitHandler(commitIcon);
+    return;
+  }
+
+  // Refresh suggestions without updating model
+  const refreshIcon = event.target.closest("div.refresh-icon");
+  if (refreshIcon) {
+    const verseDiv = refreshIcon.previousElementSibling.previousElementSibling;
+    reloadVerse(verseDiv);
     return;
   }
 });
