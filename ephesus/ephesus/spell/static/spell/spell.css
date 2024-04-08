@@ -51,9 +51,9 @@
   font-weight: bold;
 }
 
-.hide {
-  visibility: hidden;
-}
+/* .hide { */
+/*   visibility: hidden; */
+/* } */
 
 .orange {
   color: #ff9900;
@@ -99,4 +99,14 @@
 .spell-suggestion:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.hidden {
+  visibility: hidden;
+}
+.commit-icon {
+  cursor: pointer;
+}
+.verse-container:hover > .commit-icon {
+  visibility: visible;
 }

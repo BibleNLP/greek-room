@@ -4,15 +4,6 @@ import {
   setInnerHtml,
 } from "../../static/home/greekroom.js";
 
-// Global dirty flag for setting text edit state
-var editFlag = false;
-
-// Setup mutation observer
-const observer = new MutationObserver(() => {
-  // Set for flagging edits to text
-  editFlag = true;
-});
-
 // Refresh verse data from the backend
 function reloadVerses() {
   document
@@ -25,25 +16,9 @@ function reloadVerse(verseDiv) {
   if (!verseDiv) {
     return;
   }
-  editFlag = false;
-
   getVerseSuggestions(verseDiv.innerText, verseDiv.dataset.suggestionsUrl).then(
     (suggestionContent) => {
       verseDiv.parentElement.outerHTML = suggestionContent;
-
-      // Start/reset observing for text edits.
-      observer.observe(document.querySelector("#verses-content"), {
-        childList: true,
-        subtree: true,
-        characterData: true,
-      });
-
-      Array.from(
-        document.querySelectorAll("div.verse-container div.verse")
-      ).forEach((verseDiv) => {
-        verseDiv.addEventListener("blur", verseBlurHandler);
-      });
-      // suggestionContent.documentSelector("div.verse").addEventListener("blur", verseBlurHandler);
     },
     (reason) => {
       console.log(reason);
@@ -111,22 +86,14 @@ async function getVerseSuggestions(verse, url) {
   }
 }
 
-// Handle editor blur event
-function verseBlurHandler(event) {
-  // Save updated verse on blur
-
-  // console.log(`editFlag=${editFlag}`);
-  // Bail if no edits present
-  if (!editFlag) {
-    return;
-  }
-  // Reset edit flag
-  editFlag = false;
-
-  saveVerse(event.target.innerText, event.target.dataset.saveUrl).then(
+// Handle verse commit event
+function verseCommitHandler(commitIcon) {
+  // Save updated verse on commit
+  const verseDiv = commitIcon.previousElementSibling;
+  saveVerse(verseDiv.innerText, verseDiv.dataset.saveUrl).then(
     (content) => {
-      // reload verses
-      reloadVerse(event.target);
+      // reload the single verse
+      reloadVerse(verseDiv);
     },
     (reason) => {
       console.log(reason);
@@ -168,6 +135,7 @@ function detailsPaneMouseoverHandler(event) {
     return;
   }
 }
+
 detailsPane.addEventListener("mouseover", detailsPaneMouseoverHandler);
 
 // Redefine the parent event listener for the spell checker
@@ -248,19 +216,6 @@ detailsPane.addEventListener("click", (event) => {
         ).style.display = "none";
 
         setInnerHtml(verses, content);
-
-        // Start/reset observing for text edits.
-        observer.observe(document.querySelector("#verses-content"), {
-          childList: true,
-          subtree: true,
-          characterData: true,
-        });
-
-        Array.from(
-          document.querySelectorAll("div.verse-container div.verse")
-        ).forEach((verseDiv) => {
-          verseDiv.addEventListener("blur", verseBlurHandler);
-        });
       },
       (reason) => {
         setInnerHtml(
@@ -327,9 +282,6 @@ detailsPane.addEventListener("click", (event) => {
       .querySelector("span.token.highlight")
       .closest("div.verse");
 
-    // Reset edit flag
-    editFlag = false;
-
     saveVerse(verseDiv.innerText, verseDiv.dataset.saveUrl).then(
       (content) => {
         // reload verses
@@ -346,5 +298,12 @@ detailsPane.addEventListener("click", (event) => {
         reloadVerses();
       }
     );
+  }
+
+  // Handle verse commit icon click
+  const commitIcon = event.target.closest("div.commit-icon");
+  if (commitIcon) {
+    verseCommitHandler(commitIcon);
+    return;
   }
 });
