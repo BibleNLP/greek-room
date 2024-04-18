@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 from typing import Annotated
 from datetime import datetime, timezone
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from fastapi import (
     APIRouter,
@@ -49,6 +49,7 @@ from ..common.utils import (
     parse_files,
     get_scope_from_vref,
     send_email,
+    get_datetime,
 )
 
 # Get app logger
@@ -62,6 +63,7 @@ BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_PATH / "templates"))
 ## Register custom Jinja2 filters
 templates.env.filters["timedeltaformat"] = format_timedelta
+templates.env.filters["todatetime"] = get_datetime
 
 ##############
 # API Routes #
@@ -255,14 +257,11 @@ PS: Please consider automating the Greek Room spell check analysis.
                    to_addr=ephesus_settings.ephesus_recipient_email,
                    body=body)
 
-        # Follow key names from constants.py
-    # upload_time = ProjectMetadata(
-    #     **project_mapping.Project.project_metadata
-    # ).get_upload_time()
-
-        # crud.update_user_project_metadata(db, resource_id, {"manualAnalysisRequestTime": datetime.now(tz=timezone.utc).strftime(
-        #     DATETIME_TZ_FORMAT_STRING
-        # )})
+        # Update project metadata in the DB
+        crud.set_user_project_metadata(db, resource_id, replace(crud.get_user_project_metadata(db, resource_id),
+                manualAnalysisRequestTime=datetime.now(tz=timezone.utc).strftime(
+            DATETIME_TZ_FORMAT_STRING
+        )))
 
     except OutputError as ote:
         _LOGGER.exception(ote)

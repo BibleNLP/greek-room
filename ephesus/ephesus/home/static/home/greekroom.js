@@ -218,9 +218,10 @@ document.addEventListener("DOMContentLoaded", () => {
       getDataFromElementURL(spellLinkTarget).then(
         (content) => {
           detailsPane.classList.remove("cursor-wait");
-          spellLinkTarget.nextElementSibling.classList.remove("hide");
-          spellLinkTarget.innerHTML =
-            "Successfully sent request. We will send you an email when the results are ready.";
+          spellLinkTarget.nextElementSibling.classList.add("hide");
+          spellLinkTarget.replaceWith(
+            "Successfully sent request. We will send you an email when the results are ready."
+          );
         },
         (reason) => {
           detailsPane.classList.remove("cursor-wait");
