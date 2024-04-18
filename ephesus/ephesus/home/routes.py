@@ -237,16 +237,16 @@ def request_manual_analysis(
     db: Session = Depends(get_db),
 ):
     """Send an email requesting manual Greek Room analysis to be run on the `resource_id`"""
-    body = f"Dear friend,\n"
+    body = f"Subject: Spell Check Analysis Request\n\n"
+    f"Dear moderator,\n"
     f"I kindly request you to run the Greek Room spell check analysis for my project."
     f"You can find the files at {(ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME)}\n\n"
     f"Warmly,\n{current_username}\n\n"
     f"PS: Please consider automating the Greek Room spell check analysis."
 
     try:
-        send_email(from_addr="support@greekroom.org",
-                   to_addr=ephesus_settings.ephesus_moderator_emails,
-                   subject="Greek Room Analysis Request",
+        send_email(from_addr=ephesus_settings.ephesus_support_email,
+                   to_addr=ephesus_settings.ephesus_recipient_email,
                    body=body)
 
         # Follow key names from constants.py
@@ -254,9 +254,9 @@ def request_manual_analysis(
     #     **project_mapping.Project.project_metadata
     # ).get_upload_time()
 
-        crud.update_user_project_metadata(db, resource_id, {"manualAnalysisRequestTime": datetime.now(tz=timezone.utc).strftime(
-            DATETIME_TZ_FORMAT_STRING
-        )})
+        # crud.update_user_project_metadata(db, resource_id, {"manualAnalysisRequestTime": datetime.now(tz=timezone.utc).strftime(
+        #     DATETIME_TZ_FORMAT_STRING
+        # )})
 
     except OutputError as ote:
         _LOGGER.exception(ote)

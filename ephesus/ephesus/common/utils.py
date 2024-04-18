@@ -11,7 +11,7 @@ import zipfile
 import tempfile
 import subprocess
 import unicodedata
-import smtplib, ssl
+from smtplib import SMTP
 from pathlib import Path
 from collections import Counter, defaultdict
 from datetime import (
@@ -26,6 +26,7 @@ from machine.corpora import (
     ParatextTextCorpus,
 )
 
+from ..config import get_ephesus_settings
 from ..constants import (
     PROJECT_VREF_FILE_NAME,
     USFM_FILE_PATTERNS,
@@ -43,6 +44,8 @@ from ..exceptions import (
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
 
+# Get app settings
+ephesus_settings = get_ephesus_settings()
 
 # For stuff (legally) taken from Pallets project
 """
@@ -394,22 +397,15 @@ def iter_file(filepath: str, mode: str, delete: bool = False):
         raise OutputError("Error while downloading file")
 
 
-def send_email(from_addr: str, to_addr: str, subject: str, body:str) -> bool:
-    """Uses the host machines CLI to send a simple email"""
-    pass
-    # port = 587  # For starttls
-    # smtp_server = "smtp.gmail.com"
-    # password = input("Type your password and press enter:")
-    # message = """\
-    # Subject: Hi there
+def send_email(from_addr: str, to_addr: str, body:str) -> bool:
+    """Uses the host machines settings to send a simple email"""
+    try:
+        with SMTP(ephesus_settings.ephesus_email_host,
+                  ephesus_settings.ephesus_email_port,
+                  # domain is greekroom.org
+                  ephesus_settings.ephesus_support_email.split('@')[-1]) as s:
+            s.sendmail(from_addr, to_addr, body)
 
-    # This message is sent from Python."""
-    # try:
-    #     context = ssl.create_default_context()
-    #     with smtplib.SMTP(smtp_server, port) as server:
-    #         server.starttls(context=context)
-    #         server.login(sender_email, password)
-    #         server.sendmail(sender_email, receiver_email, message)
-    # except Exception as exc:
-    #     _LOGGER.exception("Error while sending email. %s", exc)
-    #     raise OutputError("Error while sending email")
+    except Exception as exc:
+        _LOGGER.exception("Error while sending email. %s", exc)
+        raise OutputError("Error while sending email")
