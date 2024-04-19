@@ -1,9 +1,10 @@
 """
-CRUD operations for the Home section of the app
+CRUD operations for the Ephesus app
 """
 import logging
+from dataclasses import asdict
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from .models.user_projects import (
@@ -11,7 +12,10 @@ from .models.user_projects import (
     Project,
     ProjectAccess,
 )
-from ..constants import ProjectAccessType
+from ..constants import (
+    ProjectAccessType,
+    ProjectMetadata,
+)
 
 from . import schemas
 
@@ -114,4 +118,34 @@ def delete_project(
 
     db.delete(project)
 
+    db.commit()
+
+
+# Getter and setter for project metadata
+def get_user_project_metadata(
+        db: Session, resource_id: str
+) -> ProjectMetadata:
+    """Get the initialized `ProjectMetadata` object from DB"""
+    project = db.scalars(
+        (select(Project).where(Project.resource_id == resource_id))
+    ).first()
+
+    return ProjectMetadata(**project.project_metadata)
+
+
+def set_user_project_metadata(
+    db: Session, resource_id: str, project_metadata: ProjectMetadata
+) -> None:
+    """Update the metadata for the project `resource_id`"""
+    project = db.scalars(
+        (select(Project).where(Project.resource_id == resource_id))
+    ).first()
+
+    db.execute(
+        (
+            update(Project)
+            .where(Project.resource_id == resource_id)
+            .values(project_metadata=asdict(project_metadata))
+        )
+    )
     db.commit()

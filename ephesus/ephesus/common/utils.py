@@ -9,7 +9,9 @@ import logging
 import secrets
 import zipfile
 import tempfile
+import subprocess
 import unicodedata
+from smtplib import SMTP
 from pathlib import Path
 from collections import Counter, defaultdict
 from datetime import (
@@ -24,6 +26,7 @@ from machine.corpora import (
     ParatextTextCorpus,
 )
 
+from ..config import get_ephesus_settings
 from ..constants import (
     PROJECT_VREF_FILE_NAME,
     USFM_FILE_PATTERNS,
@@ -41,6 +44,8 @@ from ..exceptions import (
 # Get app logger
 _LOGGER = logging.getLogger(__name__)
 
+# Get app settings
+ephesus_settings = get_ephesus_settings()
 
 # For stuff (legally) taken from Pallets project
 """
@@ -390,3 +395,17 @@ def iter_file(filepath: str, mode: str, delete: bool = False):
     except Exception as exc:
         _LOGGER.exception("Error while downloading file. %s", exc)
         raise OutputError("Error while downloading file")
+
+
+def send_email(from_addr: str, to_addr: str, body:str) -> bool:
+    """Uses the host machines settings to send a simple email"""
+    try:
+        with SMTP(ephesus_settings.ephesus_email_host,
+                  ephesus_settings.ephesus_email_port,
+                  # domain is greekroom.org
+                  ephesus_settings.ephesus_support_email.split('@')[-1]) as s:
+            s.sendmail(from_addr, to_addr, body)
+
+    except Exception as exc:
+        _LOGGER.exception("Error while sending email. %s", exc)
+        raise OutputError("Error while sending email")

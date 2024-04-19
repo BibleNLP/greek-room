@@ -8,7 +8,7 @@ import shutil
 from pathlib import Path
 from typing import Annotated
 from datetime import datetime, timezone
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from fastapi import (
     APIRouter,
@@ -36,17 +36,20 @@ from ..constants import (
     PROJECT_VREF_FILE_NAME,
     ProjectAccessType,
     ProjectMetadata,
+    DATETIME_TZ_FORMAT_STRING,
 )
 from ..dependencies import (
     get_db,
     get_current_username,
 )
 from ..database import crud, schemas
-from ..exceptions import InputError
+from ..exceptions import InputError, OutputError
 from ..common.utils import (
     secure_filename,
     parse_files,
     get_scope_from_vref,
+    send_email,
+    get_datetime,
 )
 
 # Get app logger
@@ -60,6 +63,7 @@ BASE_PATH = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_PATH / "templates"))
 ## Register custom Jinja2 filters
 templates.env.filters["timedeltaformat"] = format_timedelta
+templates.env.filters["todatetime"] = get_datetime
 
 ##############
 # API Routes #
@@ -227,6 +231,52 @@ def delete_user_project(
     shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
     return {"detail": "Successfully deleted project."}
 
+
+@api_router.get("/projects/{resource_id}/manual-analysis", status_code=status.HTTP_200_OK)
+def request_manual_analysis(
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Send an email requesting manual Greek Room analysis to be run on the `resource_id`"""
+    body = f"""Subject: Spell Check Analysis Request
+
+Dear moderator,
+I kindly request you to run the Greek Room spell check analysis for my project.
+
+You can find the files at {(ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME)}
+
+Warmly,
+{current_username},
+
+PS: Please consider automating the Greek Room spell check analysis.
+"""
+
+    try:
+        send_email(from_addr=ephesus_settings.ephesus_support_email,
+                   to_addr=ephesus_settings.ephesus_support_email,
+                   body=body)
+
+        # Update project metadata in the DB
+        crud.set_user_project_metadata(db, resource_id, replace(crud.get_user_project_metadata(db, resource_id),
+                manualAnalysisRequestTime=datetime.now(tz=timezone.utc).strftime(
+            DATETIME_TZ_FORMAT_STRING
+        )))
+
+    except OutputError as ote:
+        _LOGGER.exception(ote)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"There was an error processing your request. Please try again.",
+        )
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while processing this request. Please try again.",
+        )
 
 #############
 # UI Routes #

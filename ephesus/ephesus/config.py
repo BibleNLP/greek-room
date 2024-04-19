@@ -10,6 +10,10 @@ class EphesusSettings(BaseSettings):
     ephesus_projects_dir: Path
     ephesus_default_vref_file: Path
 
+    ephesus_email_port: int
+    ephesus_email_host: str
+    ephesus_support_email: str
+
     sqlalchemy_database_uri: str
 
     redis_connection_uri: str
