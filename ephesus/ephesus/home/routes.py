@@ -254,7 +254,7 @@ PS: Please consider automating the Greek Room spell check analysis.
 
     try:
         send_email(from_addr=ephesus_settings.ephesus_support_email,
-                   to_addr=ephesus_settings.ephesus_recipient_email,
+                   to_addr=ephesus_settings.ephesus_support_email,
                    body=body)
 
         # Update project metadata in the DB

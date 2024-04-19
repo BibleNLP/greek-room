@@ -14,8 +14,6 @@ class EphesusSettings(BaseSettings):
     ephesus_email_host: str
     ephesus_support_email: str
 
-    ephesus_recipient_email: str
-
     sqlalchemy_database_uri: str
 
     redis_connection_uri: str
