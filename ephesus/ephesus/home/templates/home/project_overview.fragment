@@ -33,69 +33,67 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
   %}{{ comma() }}<strong>{{ book }}</strong>({{ chapters|length }} chapter{% if
   chapters|length>1 %}s{% endif %}){% endfor %}
 </details>
-<h3>Tools</h3>
+<h4>Tools</h4>
+<button
+  class="link"
+  data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
+  name="wildebeest-analysis"
+>
+  Summary notes
+</button>
 <ul>
   <li>
-    <strong>Wildebeest</strong>
-    <ul>
-      <li>
-        <button
-          class="link"
-          data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
-          name="wildebeest-analysis"
-        >
-          See results
-        </button>
-        <img
-          src="static/home/assets/eclipse-loader.svg"
-          role="loader"
-          class="loader-small hide"
-        />
-      </li>
-    </ul>
+    <strong>Wildebeest </strong>
+
+    <button
+      class="link"
+      data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
+      name="wildebeest-analysis"
+    >
+      Results
+    </button>
+    <img
+      src="static/home/assets/eclipse-loader.svg"
+      role="loader"
+      class="loader-small hide"
+    />
   </li>
   <li>
     <strong>Spellings</strong>
-    <ul>
-      <li>
-        {% if project["Project"].project_metadata.manualAnalysisRequestTime and
-        project["Project"].project_metadata.manualAnalysisRequestTime|length > 0
-        %}
-        <span
-          title="{{ project['Project'].project_metadata.manualAnalysisRequestTime }}"
-          >Request sent {{ (current_datetime -
-          project["Project"].project_metadata.manualAnalysisRequestTime|todatetime)|timedeltaformat
-          }} ago</span
-        >
-        {% else %}
-        <button
-          class="link"
-          data-url="{{ url_for('request_manual_analysis', resource_id=project['Project'].resource_id) }}"
-          name="spell-analysis"
-        >
-          Request Analysis
-        </button>
-        <img
-          src="static/home/assets/eclipse-loader.svg"
-          role="loader"
-          class="loader-small hide"
-        />
-        {% endif %}
-      </li>
-    </ul>
+
+    {% if project["Project"].project_metadata.manualAnalysisRequestTime and
+    project["Project"].project_metadata.manualAnalysisRequestTime|length > 0 %}
+    <span
+      title="{{ project['Project'].project_metadata.manualAnalysisRequestTime }}"
+      >Request sent {{ (current_datetime -
+      project["Project"].project_metadata.manualAnalysisRequestTime|todatetime)|timedeltaformat
+      }} ago</span
+    >
+    {% else %}
+    <button
+      class="link"
+      data-url="{{ url_for('request_manual_analysis', resource_id=project['Project'].resource_id) }}"
+      name="spell-analysis"
+    >
+      Request analysis
+    </button>
+    <img
+      src="static/home/assets/eclipse-loader.svg"
+      role="loader"
+      class="loader-small hide"
+    />
+    {% endif %}
   </li>
-  <!-- <li class="disabled"> -->
-  <!--   <strong>Alignment Visualization</strong> -->
-  <!--   <ul> -->
-  <!--     <li><strong>Pending</strong></li> -->
-  <!--   </ul> -->
-  <!-- </li> -->
-  <!-- <li class="disabled"> -->
-  <!--   <strong>Alignment Visualization</strong> -->
-  <!--   <ul> -->
-  <!--     <li><strong>Pending</strong></li> -->
-  <!--   </ul> -->
-  <!-- </li> -->
+  <li>
+    <strong>Alignment Viz</strong>
+    <button
+      class="link"
+      data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
+      name="wildebeest-analysis"
+    >
+      Results
+    </button>
+  </li>
 </ul>
 {% else %}
 <p>Could not find project.</p>
