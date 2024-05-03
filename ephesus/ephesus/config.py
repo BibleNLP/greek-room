@@ -8,6 +8,7 @@ from pydantic import BaseModel
 class EphesusSettings(BaseSettings):
     ephesus_env: str
     ephesus_projects_dir: Path
+    ephesus_static_results_dir: Path
     ephesus_default_vref_file: Path
 
     ephesus_email_port: int

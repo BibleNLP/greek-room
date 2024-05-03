@@ -34,9 +34,10 @@ from ..constants import (
     PROJECT_UPLOAD_DIR_NAME,
     PROJECT_CLEAN_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
+    DATETIME_TZ_FORMAT_STRING,
     ProjectAccessType,
     ProjectMetadata,
-    DATETIME_TZ_FORMAT_STRING,
+    StaticAnalysisResults,
 )
 from ..dependencies import (
     get_db,
@@ -50,6 +51,7 @@ from ..common.utils import (
     get_scope_from_vref,
     send_email,
     get_datetime,
+    get_static_analysis_results_paths,
 )
 
 # Get app logger
@@ -323,6 +325,8 @@ async def get_project_overview(
 
     project = crud.get_user_project(db, resource_id, current_username)
 
+    static_analysis_results_paths: StaticAnalysisResults = get_static_analysis_results_paths(resource_id)
+
     return templates.TemplateResponse(
         "home/project_overview.fragment",
         {
@@ -338,5 +342,6 @@ async def get_project_overview(
                 )
             ),
             "current_datetime": datetime.now(timezone.utc),
+            "static_analysis_results_paths": static_analysis_results_paths
         },
     )

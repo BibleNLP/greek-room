@@ -1,6 +1,7 @@
 """
 Constants used in this application
 """
+from pathlib import Path
 from enum import Enum, unique, EnumMeta
 from collections import namedtuple
 from dataclasses import dataclass, field
@@ -79,6 +80,25 @@ class ProjectAcessRights(Enum):
 
     READ = 1  # Has the read access on the project
     WRITE = 2  # Has the write access on the project
+
+
+@dataclass(init=False)
+class StaticAnalysisResults:
+    """
+    The container to hold the relative filepaths
+    on disk where the results for static
+    or manual analysis are saved
+    """
+    WILDEBEEST_DIR: Path = None
+    SPELL_DIR: Path = None
+    ALIGN_VIZ_DIR: Path = None
+    NOTES_DIR: Path = None
+
+    def __init__(self, base_path: Path) -> None:
+        self.WILDEBEEST_DIR = base_path / "wildebeest" if (base_path / "wildebeest").exists() else None
+        self.SPELL_DIR = base_path / "spell" if (base_path / "spell").exists() else None
+        self.ALIGN_VIZ_DIR = base_path / "align" if (base_path / "align").exists() else None
+        self.NOTES_DIR = base_path / "notes" if (base_path / "notes").exists() else None
 
 
 # The String to call the 'latest' version of the project

@@ -34,13 +34,10 @@ Language Code: <strong>{{ project["Project"].lang_code }}</strong>
   chapters|length>1 %}s{% endif %}){% endfor %}
 </details>
 <h4>Tools</h4>
-<button
-  class="link"
-  data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
-  name="wildebeest-analysis"
->
-  Summary notes
-</button>
+{% if static_analysis_results_paths is not none and
+static_analysis_results_paths.NOTES_DIR is not none %}
+<a href="{{ static_analysis_results_paths.NOTES_DIR }}">Summary notes</a>
+{% endif %}
 <ul>
   <li>
     <strong>Wildebeest </strong>
