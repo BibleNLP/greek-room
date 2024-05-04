@@ -325,7 +325,7 @@ async def get_project_overview(
 
     project = crud.get_user_project(db, resource_id, current_username)
 
-    static_analysis_results_paths: StaticAnalysisResults = get_static_analysis_results_paths(resource_id)
+    static_analysis_results_paths: StaticAnalysisResults = get_static_analysis_results_paths(resource_id, current_username)
 
     return templates.TemplateResponse(
         "home/project_overview.fragment",
