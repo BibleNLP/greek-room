@@ -15,27 +15,23 @@ body {
 }
 .header {
     display: flex;
+    justify-content: space-between;
+}
+.greekroom-logo {
+    align-self: center;
 }
 .title {
-    flex: 8;
-    /* align-self: center; */
-    text-align: center;
+    align-self: center;
 }
 a {
     font-size: 0.833em;
     text-decoration: none;
 }
-
 a:hover {
     text-decoration: underline;
 }
 .username {
     font-weight: bold;
-    display: inline-block;
-}
-.logout {
-    flex: 1;
-    text-align: right;
     display: inline-block;
 }
 .flexbox {

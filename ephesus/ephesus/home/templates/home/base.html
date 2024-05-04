@@ -3,14 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <title>Greek Room</title>
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://greekroom.org/favicon-32x32.png"
+    />
     <link rel="stylesheet" type="text/css" href="static/home/greekroom.css" />
   </head>
   <body spellcheck="false">
     <div class="header">
+      <div class="greekroom-logo">
+        <a href="/" class="header__logo" title="Home" rel="_self">
+          <img src="https://greekroom.org/images/logo.png" alt="Home" />
+        </a>
+      </div>
       <div class="title">
         <h1>Greek Room</h1>
       </div>
-      <div class="logout">
+      <div>
         <p class="username">{{ current_username }}</p>
         |
         <a href="/oauth2/sign_out">Logout</a>
