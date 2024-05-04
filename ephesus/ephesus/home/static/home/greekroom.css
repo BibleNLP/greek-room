@@ -24,7 +24,6 @@ body {
     align-self: center;
 }
 a.ephesus-link {
-    font-size: 0.833em;
     text-decoration: none;
 }
 a.ephesus-link:hover {
@@ -88,6 +87,7 @@ a.ephesus-link:hover {
     background: none;
     border: none;
     color: blue;
+    font-size: 1em;
 }
 
 .link:hover {

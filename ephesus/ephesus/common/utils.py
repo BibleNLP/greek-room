@@ -413,19 +413,19 @@ def send_email(from_addr: str, to_addr: str, body:str) -> bool:
         raise OutputError("Error while sending email")
 
 
-def get_static_analysis_results_paths(resource_id: str, version: str| None = None) -> StaticAnalysisResults | None:
+def get_static_analysis_results_paths(resource_id: str, username: str, version: str| None = None) -> StaticAnalysisResults | None:
     """
     Return relative filepaths of the manually analysed
     Greek Room results `version` from disk, if available.
     `version` is one of `latest` or a `YYYY-MM-DD` string.
     """
-    if not resource_id:
+    if not resource_id or not username:
         return None
 
     if not version:
         version = LATEST_PROJECT_VERSION_NAME
 
-    if (ephesus_settings.ephesus_static_results_dir / resource_id / version).exists():
-        return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / resource_id / version)
+    if (ephesus_settings.ephesus_static_results_dir / username / resource_id / version).exists():
+        return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / username / resource_id / version)
 
     return None
