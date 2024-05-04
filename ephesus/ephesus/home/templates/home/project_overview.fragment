@@ -40,6 +40,7 @@ static_analysis_results_paths.NOTES_DIR is not none %}
   href="{{ static_analysis_results_paths.NOTES_DIR }}"
   target="_blank"
   rel="noopener noreferrer"
+  class="ephesus-link"
   >Summary notes↗</a
 >
 {% endif %}
@@ -52,6 +53,7 @@ static_analysis_results_paths.NOTES_DIR is not none %}
       href="{{ static_analysis_results_paths.WILDEBEEST_DIR }}"
       target="_blank"
       rel="noopener noreferrer"
+      class="ephesus-link"
       >Results↗</a
     >
     {% else %}
@@ -77,6 +79,7 @@ static_analysis_results_paths.NOTES_DIR is not none %}
       href="{{ static_analysis_results_paths.SPELL_DIR }}"
       target="_blank"
       rel="noopener noreferrer"
+      class="ephesus-link"
       >Results↗</a
     >
     {% elif project["Project"].project_metadata.manualAnalysisRequestTime and
@@ -110,6 +113,7 @@ static_analysis_results_paths.NOTES_DIR is not none %}
       href="{{ static_analysis_results_paths.ALIGN_VIZ_DIR }}"
       target="_blank"
       rel="noopener noreferrer"
+      class="ephesus-link"
       >Results↗</a
     >
   </li>

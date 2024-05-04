@@ -23,11 +23,11 @@ body {
 .title {
     align-self: center;
 }
-a {
+a.ephesus-link {
     font-size: 0.833em;
     text-decoration: none;
 }
-a:hover {
+a.ephesus-link:hover {
     text-decoration: underline;
 }
 .username {
