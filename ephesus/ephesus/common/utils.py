@@ -32,7 +32,9 @@ from ..constants import (
     USFM_FILE_PATTERNS,
     ZIP_FILE_PATTERN,
     DATETIME_TZ_FORMAT_STRING,
+    LATEST_PROJECT_VERSION_NAME,
     BookCodes,
+    StaticAnalysisResults,
 )
 
 from ..exceptions import (
@@ -409,3 +411,21 @@ def send_email(from_addr: str, to_addr: str, body:str) -> bool:
     except Exception as exc:
         _LOGGER.exception("Error while sending email. %s", exc)
         raise OutputError("Error while sending email")
+
+
+def get_static_analysis_results_paths(resource_id: str, version: str| None = None) -> StaticAnalysisResults | None:
+    """
+    Return relative filepaths of the manually analysed
+    Greek Room results `version` from disk, if available.
+    `version` is one of `latest` or a `YYYY-MM-DD` string.
+    """
+    if not resource_id:
+        return None
+
+    if not version:
+        version = LATEST_PROJECT_VERSION_NAME
+
+    if (ephesus_settings.ephesus_static_results_dir / resource_id / version).exists():
+        return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / resource_id / version)
+
+    return None
