@@ -86,3 +86,13 @@ async def get_current_username(
     Auth is assumed to be handled upstream by proxy servers
     """
     return x_forwarded_preferred_username
+
+
+async def get_current_user_email(
+    x_forwarded_email: Annotated[str, Header(include_in_schema=False)],
+) -> str:
+    """
+    Get authenticated user email address from headers.
+    Auth is assumed to be handled upstream by proxy servers
+    """
+    return x_forwarded_email

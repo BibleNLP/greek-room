@@ -56,7 +56,7 @@ if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower
         # internal representation, while injecting.
         headers = dict(request.scope["headers"])
         headers[b"x-forwarded-user"] = b"bob"
-        headers[b"x-forwarded-email"] = b"bob@greekroom.org"
+        headers[b"x-forwarded-email"] = b"bob@example.com"
         headers[b"x-forwarded-preferred-username"] = b"bob"
         headers[b"x-access-token"] = b"my_development_token"
 
