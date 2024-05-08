@@ -277,12 +277,13 @@ Request Datetime: {datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_UI_FORMAT
 
 Sincerely,
 {current_username}
+{current_user_email}
 
 PS: Please consider automating the Greek Room analysis steps.
 """
 
         # Send the email message
-        send_email(from_addr=current_user_email,
+        send_email(from_addr=ephesus_settings.ephesus_support_email,
                    to_addr=ephesus_settings.ephesus_support_email,
                    body=body)
 
