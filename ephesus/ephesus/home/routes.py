@@ -35,6 +35,7 @@ from ..constants import (
     PROJECT_CLEAN_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
     DATETIME_TZ_FORMAT_STRING,
+    DATETIME_UTC_UI_FORMAT_STRING,
     ProjectAccessType,
     ProjectMetadata,
     StaticAnalysisResults,
@@ -42,6 +43,7 @@ from ..constants import (
 from ..dependencies import (
     get_db,
     get_current_username,
+    get_current_user_email,
 )
 from ..database import crud, schemas
 from ..exceptions import InputError, OutputError
@@ -202,7 +204,7 @@ def delete_user_project(
 ):
     """Delete a user's project identified by `resource_id`"""
     try:
-        project_mapping = crud.get_user_project(db, resource_id, current_username)
+        project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
 
         # Project not found.
         # Not returning a 404 for security sake.
@@ -237,25 +239,50 @@ def delete_user_project(
 @api_router.get("/projects/{resource_id}/manual-analysis", status_code=status.HTTP_200_OK)
 def request_manual_analysis(
     resource_id: str,
+    current_user_email: str = Depends(get_current_user_email),
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Send an email requesting manual Greek Room analysis to be run on the `resource_id`"""
-    body = f"""Subject: Spell Check Analysis Request
-
-Dear moderator,
-I kindly request you to run the Greek Room spell check analysis for my project.
-
-You can find the files at {(ephesus_settings.ephesus_projects_dir / resource_id / LATEST_PROJECT_VERSION_NAME)}
-
-Warmly,
-{current_username},
-
-PS: Please consider automating the Greek Room spell check analysis.
-"""
 
     try:
-        send_email(from_addr=ephesus_settings.ephesus_support_email,
+        # Get the user-project details
+        project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, resource_id, current_username)
+
+        # Project not found.
+        # Not returning a 404 for security sake.
+        if not project_mapping:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="There was an error while processing this request. Please try again.",
+            )
+
+        # User not project owner
+        if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have the required permissions for this project. Contact the project owner.",
+            )
+
+        # Create message body
+        body = f"""Subject: Greek Room Analysis Request
+
+Dear Greek Room Architects,
+I kindly request you to run the Greek Room analysis for my project:
+
+Name: {project_mapping['Project'].name}
+ID: {resource_id}/{LATEST_PROJECT_VERSION_NAME}
+Language Code: {project_mapping['Project'].lang_code}
+Request Datetime: {datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}
+
+Sincerely,
+{current_username}
+
+PS: Please consider automating the Greek Room analysis steps.
+"""
+
+        # Send the email message
+        send_email(from_addr=current_user_email,
                    to_addr=ephesus_settings.ephesus_support_email,
                    body=body)
 
