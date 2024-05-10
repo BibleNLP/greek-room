@@ -55,6 +55,7 @@ class Project(Base):
     )
     name: Mapped[str] = mapped_column(String(1000))
     lang_code: Mapped[str] = mapped_column(String(10))
+    lang_name: Mapped[str] = mapped_column(String(100))
     tags: Mapped[JSON | None] = mapped_column(JSON, default=[])
     status: Mapped[Enum] = mapped_column(
         Enum(StatusType), default=StatusType.ACTIVE.name

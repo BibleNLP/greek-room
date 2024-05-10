@@ -75,6 +75,7 @@ def create_user_project(
     project_name: str,
     resource_id: str,
     lang_code: str,
+    lang_name: str,
     username: str,
     project_metadata: dict = {},
 ) -> None:
@@ -84,6 +85,7 @@ def create_user_project(
         resource_id=resource_id,
         name=project_name,
         lang_code=lang_code,
+        lang_name=lang_name,
         project_metadata=project_metadata,
     )
     project_access = ProjectAccess(

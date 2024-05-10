@@ -15,6 +15,7 @@
         data-url="{{ url_for('get_project_overview', resource_id=project.resource_id) }}"
         data-resource-id="{{ project.resource_id }}"
         data-lang-code="{{ project.lang_code }}"
+        data-lang-name="{{ project.lang_name or '' }}"
         name="resourceId"
       >
         {{ project.name }}

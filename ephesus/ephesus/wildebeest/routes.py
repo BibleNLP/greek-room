@@ -98,6 +98,7 @@ async def get_wildebeest_analysis(
         "greek_room_metadata": {
             "project_name": wb_results["project_name"],
             "language_code": wb_results["lang_code"],
+            "language_name": wb_results["lang_name"],
             "report_create_time": wb_results["report_create_time"].strftime(
                 DATETIME_TZ_FORMAT_STRING
             ),
@@ -138,6 +139,7 @@ async def get_formatted_wildebeest_analysis(
             "ref_id_dict": wb_results["ref_id_dict"],
             "project_name": wb_results["project_name"],
             "lang_code": wb_results["lang_code"],
+            "lang_name": wb_results["lang_name"],
             "report_create_time": wb_results["report_create_time"].strftime(
                 DATETIME_UTC_UI_FORMAT_STRING
             ),
@@ -176,7 +178,7 @@ def download_formatted_wildebeest_analysis(
         # Write out Project metadata
         with open(wb_prettyprint_filepath, mode="a") as f:
             f.write(
-                f"\nGREEK ROOM METADATA\n    Project Name: {project_mapping.Project.name}\n    Language Code: {project_mapping.Project.lang_code}\n    Report Create Time: {datetime.now(timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}"
+                f"\nGREEK ROOM METADATA\n    Project Name: {project_mapping.Project.name}\n    Language Name: {'' if not project_mapping.Project.lang_name else project_mapping.Project.lang_name}\n    Language Code: {project_mapping.Project.lang_code}\n    Report Create Time: {datetime.now(timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}"
             )
 
         return StreamingResponse(
@@ -284,4 +286,5 @@ async def process_wildebeest_analysis_request(
         report_create_time=report_create_time,
         project_name=project_mapping.Project.name,
         lang_code=project_mapping.Project.lang_code,
+        lang_name=project_mapping.Project.lang_name,
     )

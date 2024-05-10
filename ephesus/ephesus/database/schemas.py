@@ -27,6 +27,7 @@ class ProjectListModel(BaseModel):
     resource_id: str
     name: str
     lang_code: str
+    lang_name: str | None
     create_datetime: datetime
 
 
@@ -70,3 +71,4 @@ class WildebeestResultsModel(TypedDict):
     report_create_time: datetime
     project_name: str
     lang_code: str
+    lang_name: str | None

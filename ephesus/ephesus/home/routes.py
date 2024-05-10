@@ -109,11 +109,11 @@ def create_user_project(
     files: list[UploadFile],
     project_name: Annotated[str, Form(min_length=3, max_length=50)],
     lang_code: Annotated[str, Form(min_length=2, max_length=8)],
+    lang_name: Annotated[str, Form(min_length=2, max_length=70)],
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
     """Create a user project using uploaded data"""
-    # _LOGGER.debug(f"{files}, {project_name}, {lang_code}")
 
     # Save file in a new randomly named dir
     resource_id: str = secrets.token_urlsafe(6)
@@ -126,7 +126,6 @@ def create_user_project(
     # Create the project directories.
     # including any missing parents
     (project_path / PROJECT_UPLOAD_DIR_NAME).mkdir(parents=True)
-    # (project_path / PROJECT_UPLOADED_DIR_NAME).mkdir(parents=True)
 
     # Store to the upload dir within the project dir
     for file in files:
@@ -166,6 +165,7 @@ def create_user_project(
             project_name,
             resource_id,
             lang_code,
+            lang_name,
             current_username,
             project_metadata=asdict(ProjectMetadata()),
         )
@@ -273,6 +273,7 @@ I kindly request you to run the Greek Room analysis for my project:
 Name: {project_mapping['Project'].name}
 ID: {resource_id}/{LATEST_PROJECT_VERSION_NAME}
 Language Code: {project_mapping['Project'].lang_code}
+Language Name: {project_mapping['Project'].lang_name if project_mapping['Project'].lang_name else ''}
 Request Datetime: {datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}
 
 Sincerely,
@@ -281,11 +282,11 @@ Sincerely,
 
 PS: Please consider automating the Greek Room analysis steps.
 """
-
-        # Send the email message
-        send_email(from_addr=ephesus_settings.ephesus_support_email,
-                   to_addr=ephesus_settings.ephesus_support_email,
-                   body=body)
+        print(body)
+        # # Send the email message
+        # send_email(from_addr=ephesus_settings.ephesus_support_email,
+        #            to_addr=ephesus_settings.ephesus_support_email,
+        #            body=body)
 
         # Update project metadata in the DB
         crud.set_user_project_metadata(db, resource_id, replace(crud.get_user_project_metadata(db, resource_id),
