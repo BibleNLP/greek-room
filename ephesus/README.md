@@ -13,6 +13,13 @@ cd docker-compose
 docker compose up -d
 ```
 
+### Alembic DB Migrations
+Alembic Scripts location is: `greek-room/ephesus/ephesus/database/alembic`
+```sh
+cd greek-room/ephesus
+alembic -c ephesus/database/alembic.ini upgrade head
+```
+
 ### Backups
 There are two levels of backups setup:
 - Volume: The whole volume is snapshot and kept on disk (see `docker-compose.yml` for location details). This is setup automatically via `docker-compose`.

@@ -12,8 +12,9 @@
   </div>
 </div>
 <hr />
-Language Code: <strong>{{ project["Project"].lang_code }}</strong>
-<br />Created:
+{% if project["Project"].lang_name is not none %} Language Name:
+<strong>{{ project["Project"].lang_name }}</strong> <br />{% endif %} Language
+Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
 <strong
   >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
   ago</strong
