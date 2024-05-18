@@ -36,6 +36,7 @@ from ..constants import (
     PROJECT_VREF_FILE_NAME,
     DATETIME_TZ_FORMAT_STRING,
     DATETIME_UTC_UI_FORMAT_STRING,
+    EphesusEnvType,
     ProjectAccessType,
     ProjectMetadata,
     StaticAnalysisResults,
@@ -282,11 +283,14 @@ Sincerely,
 
 PS: Please consider automating the Greek Room analysis steps.
 """
-        print(body)
-        # # Send the email message
-        # send_email(from_addr=ephesus_settings.ephesus_support_email,
-        #            to_addr=ephesus_settings.ephesus_support_email,
-        #            body=body)
+        # Send the email message
+        # only if in production
+        if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower():
+            _LOGGER.debug(body)
+        else:
+            send_email(from_addr=ephesus_settings.ephesus_support_email,
+                       to_addr=ephesus_settings.ephesus_support_email,
+                       body=body)
 
         # Update project metadata in the DB
         crud.set_user_project_metadata(db, resource_id, replace(crud.get_user_project_metadata(db, resource_id),
