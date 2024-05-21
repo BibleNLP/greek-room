@@ -37,7 +37,7 @@ params:
 #   contact: "info@example.org"
   copyright: " "
 #   dateformat: ""            # Set the date format, default to "2 January, 2006"
-#   description: ""           # Set site description, used in meta tags and JSON-LD
+  description: "Greek Room Tools for Bible Translation Quailty Checking"           # Set site description, used in meta tags and JSON-LD
 #   favicon: ""               # Relative path to favicon in json feed, no leading slash.
 #   feedlinks: true           # Show feed links in the footer.
 #   footer: "A [example.org](https://example.org/) production."
@@ -51,7 +51,7 @@ params:
 #   logoPath:                 # Relative path to site logo, defaults to "images/logo.png", no leading slash.
 #   logoHeight:               # Set logo height, defaults to none.
 #   logoWidth:                # Set logo width, defaults to none.
-  mainSections:             # The sections you want to have listed on the front page.
+  # mainSections:             # The sections you want to have listed on the front page.
 #     - "section1"            # Default to the section with most content if not set.
 #     - "section2"            # Set to empty if no section should be listed.
 #   math: true                # Turn on math typesetting with KaTeX, default false.
