@@ -1,3 +1,5 @@
+> **To try *Greek Room*, register at <a target="_GR" href="https://app.greekroom.org">app.greekroom.org</a> now!**
+
 The *Greek Room* is a project to improve the quality and efficiency of Bible translation with software tools that help translators and quality control consultants with spell-checking, terminology consistency, translation drafting and other tasks.
 
 Thousands of languages around the world still lack Bible translations; most of them have extremely few resources such as extensive lexicons, existing translations, spell checkers or even spelling standards. Such ultra-low resource languages present challenges for natural language processing tools.
