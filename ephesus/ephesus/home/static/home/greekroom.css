@@ -23,15 +23,13 @@ body {
 .title {
     align-self: center;
 }
-a.ephesus-link {
-    text-decoration: none;
-}
-a.ephesus-link:hover {
-    text-decoration: underline;
-}
 .username {
     font-weight: bold;
     display: inline-block;
+}
+.logout {
+    text-decoration: none;
+    font-size: 1em;
 }
 .flexbox {
     display: flex;
@@ -39,13 +37,21 @@ a.ephesus-link:hover {
     min-height: 50%;
     height: auto;
 }
-
+.projects-pane {
+    height: 0.4em;
+}
+.project-header {
+    margin: 0.4em;
+}
+a.project-header {
+    margin: 0.4em;
+    font-size: 1.5em;
+}
 .left {
     background: #b9b9b940;
     min-width: 15%;
     flex-grow: 0;
 }
-
 .right {
     /* background: #a0a0ff; */
     flex-grow: 1;
@@ -88,6 +94,7 @@ a.ephesus-link:hover {
     border: none;
     color: blue;
     font-size: 1em;
+    text-decoration: none;
 }
 
 .link:hover {
@@ -195,6 +202,7 @@ a.ephesus-link:hover {
 /* File listing */
 .listing {
     padding: 10px;
+    font-size: 1.05em;
 }
 
 /* #ingredients { */

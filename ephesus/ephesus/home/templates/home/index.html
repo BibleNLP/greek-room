@@ -1,7 +1,14 @@
 {% extends "home/base.html" %} {% block right_content %}
 <div id="details-pane">Click on a project name to load data.</div>
 {% endblock %} {% block left_content %}
-<a class="button" href="#createPopup">&plus;</a>
+<div class="header projects-pane">
+  <div>
+    <h3 class="project-header">Projects</h3>
+  </div>
+  <div>
+    <a class="link project-header" href="#createPopup">&plus;</a>
+  </div>
+</div>
 
 <div class="listing">
   {% if not projects %}
