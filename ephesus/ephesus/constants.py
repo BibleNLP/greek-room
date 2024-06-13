@@ -132,7 +132,7 @@ WILDEBEEST_DOWNLOAD_FILENAME = "wildebeest-report-{name}.txt"
 ## Patterns
 # Patterns for USFM files.
 # Not regex but usable in Path.glob()
-USFM_FILE_PATTERNS: list[str] = ["*.[sS][fF][mM]", "*.[uU][sS][fF][mM]"]
+USFM_FILE_PATTERNS: list[str] = ["**/*.[sS][fF][mM]", "**/*.[uU][sS][fF][mM]"]
 
 # Pattern for .zip files.
 # Not regex but usable in Path.glob()
