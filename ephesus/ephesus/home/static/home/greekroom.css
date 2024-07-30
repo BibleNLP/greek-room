@@ -178,6 +178,7 @@ div.listing > ul li {
 }
 .flex:hover .delete-icon {
     display: block;
+    cursor: pointer;
 }
 .delete-icon {
     margin: auto 0.5em auto 0.5em;
