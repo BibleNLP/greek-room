@@ -108,7 +108,7 @@ async def get_user_project(
 @api_router.post("/projects", status_code=status.HTTP_201_CREATED)
 def create_user_project(
     files: list[UploadFile],
-    project_name: Annotated[str, Form(min_length=3, max_length=50)],
+    project_name: Annotated[str, Form(min_length=3, max_length=100)],
     lang_code: Annotated[str, Form(min_length=2, max_length=8)],
     lang_name: Annotated[str, Form(min_length=2, max_length=70)],
     current_username: str = Depends(get_current_username),

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -29,8 +29,14 @@
 
     <div id="createPopup" class="overlay">
       <div class="popup">
-        <h3>Create Project</h3>
-        <a class="close" href="#">&times;</a>
+        <div class="header">
+          <div>
+            <h3>Create Project</h3>
+          </div>
+          <div>
+            <a class="close" href="#">&times;</a>
+          </div>
+        </div>
         <div class="content">
           <form
             action="{{ url_for('create_user_project') }}"
@@ -43,7 +49,7 @@
                 type="text"
                 name="project_name"
                 minlength="3"
-                maxlength="15"
+                maxlength="100"
                 required
             /></label>
             <br />
@@ -69,7 +75,12 @@
                 required
             /></label>
             <br />
-            <br />
+            <p class="note">
+              <b>Note:</b> Please upload all available content in the language
+              (no matter the quality) even if you are only interested in
+              analyzing a part of the data. This is important for the Greek Room
+              tools to learn and provide you with higher quality results.
+            </p>
             <label for="file-upload"
               >Upload USFM files or Paratext Project (.zip):</label
             >
