@@ -24,8 +24,9 @@
         data-lang-code="{{ project.lang_code }}"
         data-lang-name="{{ project.lang_name or '' }}"
         name="resourceId"
+        title="{{ project.resource_id }} ({{ project.name }})"
       >
-        {{ project.name }}
+        {{ project.name|truncate(27, True) }}
       </button>
     </li>
     <!-- <li class="selected"><a href="#">Item 1</a></li> -->
