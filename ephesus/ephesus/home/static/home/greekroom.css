@@ -60,6 +60,7 @@ a.project-header {
 }
 .left {
     text-align: left;
+    border-radius: 0.5em;
 }
 .bold {
     font-weight: bold;
@@ -126,6 +127,7 @@ a.project-header {
     border: 1px solid black;
     width: 25em;
     background: white;
+    border-radius: 0.5em;
 }
 .popup h3 {
     margin-top: 0;
@@ -189,6 +191,9 @@ div.listing > ul li {
 }
 .disabled {
     color: gray;
+}
+.red {
+    color: red;
 }
 .hide {
     display: none;

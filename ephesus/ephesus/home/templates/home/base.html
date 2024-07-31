@@ -18,7 +18,7 @@
         </a>
       </div>
       <div class="title">
-        <h1>Greek Room</h1>
+        <h1 title="Soli Deo gloria">Greek Room</h1>
       </div>
       <div>
         <p class="username">{{ current_username }}</p>
@@ -44,7 +44,7 @@
             enctype="multipart/form-data"
           >
             <label
-              >Project Name:
+              >Project Name<sup class="red">*</sup>
               <input
                 type="text"
                 name="project_name"
@@ -55,7 +55,7 @@
             <br />
             <br />
             <label
-              >Language Name:
+              >Language Name<sup class="red">*</sup>
               <input
                 type="text"
                 name="lang_name"
@@ -66,7 +66,7 @@
             <br />
             <br />
             <label
-              >Language Code:
+              >Language Code<sup class="red">*</sup>
               <input
                 type="text"
                 name="lang_code"
@@ -76,13 +76,15 @@
             /></label>
             <br />
             <p class="note">
-              <b>Note:</b> Please upload all available content in the language
-              (no matter the quality) even if you are only interested in
-              analyzing a part of the data. This is important for the Greek Room
-              tools to learn and provide you with higher quality results.
+              <b>Note:</b> Please upload <b>ALL</b> available content in the
+              language (no matter the quality) even if you are only interested
+              in analyzing a part of the data. This is important for the Greek
+              Room tools to learn and provide you with higher quality results.
             </p>
             <label for="file-upload"
-              >Upload USFM files or Paratext Project (.zip):</label
+              >Upload USFM files or Paratext Project (.zip)<sup class="red"
+                >*</sup
+              ></label
             >
             <input
               type="file"
