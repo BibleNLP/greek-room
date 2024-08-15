@@ -109,7 +109,7 @@ async def get_user_project(
 def create_user_project(
     files: list[UploadFile],
     project_name: Annotated[str, Form(min_length=3, max_length=100)],
-    lang_code: Annotated[str, Form(min_length=2, max_length=8)],
+    lang_code: Annotated[str, Form(min_length=2, max_length=10)],
     lang_name: Annotated[str, Form(min_length=2, max_length=70)],
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),

@@ -50,6 +50,7 @@
                 name="project_name"
                 minlength="3"
                 maxlength="100"
+                placeholder="My New Version"
                 required
             /></label>
             <br />
@@ -61,6 +62,7 @@
                 name="lang_name"
                 minlength="2"
                 maxlength="70"
+                placeholder="English"
                 required
             /></label>
             <br />
@@ -71,9 +73,21 @@
                 type="text"
                 name="lang_code"
                 minlength="2"
-                maxlength="8"
+                maxlength="10"
+                placeholder="eng"
                 required
-            /></label>
+              /><br /><small
+                >Please use
+                <a href="https://iso639-3.sil.org/code_tables/639/data"
+                  >ISO 639-3</a
+                >
+                or
+                <a href="https://en.wikipedia.org/wiki/IETF_language_tag"
+                  >BCP 47</a
+                >
+                language codes</small
+              ></label
+            >
             <br />
             <p class="note">
               <b>Note:</b> Please upload <b>ALL</b> available content in the
