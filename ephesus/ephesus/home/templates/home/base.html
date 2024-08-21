@@ -85,17 +85,33 @@
               ></label
             >
             <br />
-            <p class="note">
-              <b>Note:</b> Please upload <b>ALL</b> available content in the
-              language (no matter the quality) even if you are only interested
-              in analyzing a part of the data. This is important for the Greek
-              Room tools to learn and provide you with higher quality results.
-            </p>
+            <br />
+            <label
+              >Notes
+              <br />
+              <textarea
+                name="notes"
+                class="notes"
+                rows="3"
+                cols="20"
+                maxlength="10000"
+                placeholder="Optionally share any details about this project that may help us with the analysis. This includes details of the source text used (language and version), current stage in the translation process, geographical region, etc."
+              ></textarea>
+            </label>
+            <br />
+            <hr />
             <label for="file-upload"
               >Upload USFM files or Paratext Project (.zip)<sup class="red"
                 >*</sup
               ></label
             >
+            <p class="tip">
+              Please upload <b>ALL</b> available content (e.g. full New or Old
+              Testament or both) in the language (no matter the quality) even if
+              you are only interested in analyzing a part of the data. This is
+              important for the Greek Room tools to learn and provide you with
+              higher quality results.
+            </p>
             <input
               type="file"
               id="file-upload"
