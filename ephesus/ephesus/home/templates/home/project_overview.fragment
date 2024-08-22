@@ -17,13 +17,24 @@
 {% if project["Project"].lang_name is not none %} Language Name:
 <strong>{{ project["Project"].lang_name }}</strong> <br />{% endif %} Language
 Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
-<strong
+<strong title="{{ project_create_datetime_ui }}"
   >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
   ago</strong
 >
 <br />Access Type:
-<strong>{{ project["ProjectAccess"].access_type.name }}</strong>
+<strong>{{ project["ProjectAccess"].access_type.name|capitalize }}</strong>
+
 <br />
+{% if project["Project"].project_metadata.notes and
+project["Project"].project_metadata.notes|length > 0 %}
+<details>
+  <summary>Notes</summary>
+  <div class="project-detail notes-text">
+    {{ project["Project"].project_metadata.notes }}
+  </div>
+</details>
+{% endif %}
+
 <details>
   <summary>
     Contents:
@@ -32,9 +43,12 @@ Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
       %}</strong
     >
   </summary>
-  {% set comma = joiner(", ") %} {% for book, chapters in project_scope.items()
-  %}{{ comma() }}<strong>{{ book }}</strong>({{ chapters|length }} chapter{% if
-  chapters|length>1 %}s{% endif %}){% endfor %}
+  <div class="project-detail">
+    {% set comma = joiner(", ") %} {% for book, chapters in
+    project_scope.items() %}{{ comma() }}<strong>{{ book }}</strong>({{
+    chapters|length }} chapter{% if chapters|length>1 %}s{% endif %}){% endfor
+    %}
+  </div>
 </details>
 <h4>Tools</h4>
 {% if static_analysis_results_paths is not none and
@@ -44,7 +58,7 @@ static_analysis_results_paths.NOTES_DIR is not none %}
   target="_blank"
   rel="noopener noreferrer"
   class="link"
-  >Summary notes↗</a
+  >Analysis summary notes↗</a
 >
 {% endif %}
 <ul>

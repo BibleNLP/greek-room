@@ -144,10 +144,10 @@ a.project-header {
     overflow: auto;
 }
 .popup .notes {
-    min-width: 20em;
+    min-width: 30em;
     max-width: 35em;
     max-height: 15em;
-    overflow: scroll;
+    overflow: auto;
 }
 .popup .tip {
     font-size: 0.75em;
@@ -218,4 +218,15 @@ div.listing > ul li {
 }
 .loader-small {
     height: 0.95em;
+}
+.project-detail {
+    font-size: 0.9em;
+    margin-left: 1em;
+    max-height: 20em;
+    max-width: 70em;
+    background: #fafad2;
+}
+.notes-text {
+    white-space: pre-wrap;
+    overflow: auto;
 }

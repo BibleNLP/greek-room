@@ -46,8 +46,19 @@ class ProjectMetadata:
     # for this project was requested
     manualAnalysisRequestTime: str = None
 
+    # Project notes set by user
+    # during project creation
+    notes: str = None
+
+
     def get_upload_time(self) -> datetime:
         return datetime.strptime(self.uploadTime, DATETIME_TZ_FORMAT_STRING)
+
+    @staticmethod
+    def dict_factory(x) -> dict:
+        exclude_fields = ()
+        return {k: v for (k, v) in x if ((v is not None) and (k not in exclude_fields))}
+
 
 
 class EphesusEnvType(Enum):

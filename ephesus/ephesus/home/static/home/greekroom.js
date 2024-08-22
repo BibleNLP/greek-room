@@ -37,9 +37,15 @@ export async function postForm(formElement) {
       };
     }
     return Promise.reject(data);
+  } else if (response.status === 422) {
+    // Handling Pydantic errors
+    return Promise.reject({
+      detail:
+        "There was an error while processing this request. Please try again.",
+    });
   } else {
     return Promise.reject(
-      "There was an error while processing this request. Please try again."
+      "There was an error while processing this request. Please try again.",
     );
   }
 }
@@ -105,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Unselect any existing and highlight selected link
       Array.from(document.getElementsByClassName("link underline")).forEach(
-        (el) => el.classList.remove("underline")
+        (el) => el.classList.remove("underline"),
       );
 
       // Underline selected resource link
@@ -119,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         (reason) => {
           detailsPane.innerHTML =
             "There was an error while fetching the project data. Try again.";
-        }
+        },
       );
     }
   });
@@ -127,10 +133,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Handle delete popup actions
   const deletePopup = document.getElementById("deletePopup");
   const deleteCancelButton = document.querySelector(
-    '#deletePopup button[role="close"]'
+    '#deletePopup button[role="close"]',
   );
   const deleteConfirmButton = document.querySelector(
-    '#deletePopup button[role="confirm"]'
+    '#deletePopup button[role="confirm"]',
   );
   var deleteEndpoint = {};
 
@@ -139,10 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#deletePopup .flex").style.display = "none";
     // Show response
     document.querySelector(
-      '#deletePopup p[role="notification"] > b'
+      '#deletePopup p[role="notification"] > b',
     ).innerHTML = responseData.detail;
     document.querySelector(
-      '#deletePopup p[role="notification"]'
+      '#deletePopup p[role="notification"]',
     ).style.display = "";
 
     // Refresh page
@@ -158,10 +164,10 @@ document.addEventListener("DOMContentLoaded", () => {
   deleteConfirmButton.addEventListener("click", (event) => {
     if ("deleteEndpoint" in deleteEndpoint) {
       document.querySelector(
-        '#deletePopup button[role="close"]'
+        '#deletePopup button[role="close"]',
       ).style.display = "none";
       document.querySelector(
-        '#deletePopup button[role="confirm"]'
+        '#deletePopup button[role="confirm"]',
       ).style.display = "none";
       document.querySelector('#deletePopup img[role="loader"]').style.display =
         "";
@@ -171,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (reason) => {
           handleDeleteProjectResult(reason);
-        }
+        },
       );
     }
   });
@@ -181,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply onClick listener for the analysis results links in the right pane
     // Handle Wildebeest Analysis Click
     const wbLinkTarget = event.target.closest(
-      'button[name="wildebeest-analysis"]'
+      'button[name="wildebeest-analysis"]',
     );
     if (wbLinkTarget) {
       // Show loader
@@ -199,14 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
           detailsPane.classList.remove("cursor-wait");
           detailsPane.innerHTML =
             "There was an error while processing the request. Try again.";
-        }
+        },
       );
       return;
     }
 
     // Handle Spell Check Analysis Click
     const spellLinkTarget = event.target.closest(
-      'button[name="spell-analysis"]'
+      'button[name="spell-analysis"]',
     );
     if (spellLinkTarget) {
       // Show loader
@@ -220,14 +226,14 @@ document.addEventListener("DOMContentLoaded", () => {
           detailsPane.classList.remove("cursor-wait");
           spellLinkTarget.nextElementSibling.classList.add("hide");
           spellLinkTarget.replaceWith(
-            "Successfully sent request. We will send you an email when the results are ready."
+            "Successfully sent request. We will send you an email when the results are ready.",
           );
         },
         (reason) => {
           detailsPane.classList.remove("cursor-wait");
           detailsPane.innerHTML =
             "There was an error while processing the request. Try again.";
-        }
+        },
       );
       return;
     }
@@ -243,18 +249,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Apply onClick listener for Wildebeest download button
     const wildebeestDownloadIcon = event.target.closest(
-      'img[role="wildebeest-download"]'
+      'img[role="wildebeest-download"]',
     );
     if (wildebeestDownloadIcon) {
       const downloadHandle = window.open(
         wildebeestDownloadIcon.dataset.url,
-        "GreekRoomContext"
+        "GreekRoomContext",
       );
       if (!downloadHandle) {
         // Handle download error
         showInfoPopup(
           "Wildebeest Download Error",
-          "There was an error while attempting to download the Wildebeest analysis report. Please try again."
+          "There was an error while attempting to download the Wildebeest analysis report. Please try again.",
         );
       } else {
         // noop if download was successful
@@ -291,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (reason) => {
           handleCreateProjectFormResult(reason);
-        }
+        },
       );
     });
 });

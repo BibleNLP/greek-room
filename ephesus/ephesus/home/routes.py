@@ -111,6 +111,8 @@ def create_user_project(
     project_name: Annotated[str, Form(min_length=3, max_length=100)],
     lang_code: Annotated[str, Form(min_length=2, max_length=10)],
     lang_name: Annotated[str, Form(min_length=2, max_length=70)],
+    # This >10k to accommodate for browser inserted newline chars
+    notes: Annotated[str, Form(max_length=11000)] = None,
     current_username: str = Depends(get_current_username),
     db: Session = Depends(get_db),
 ):
@@ -168,7 +170,7 @@ def create_user_project(
             lang_code,
             lang_name,
             current_username,
-            project_metadata=asdict(ProjectMetadata()),
+            project_metadata=asdict(ProjectMetadata(notes=notes)),
         )
 
     except InputError as ine:
@@ -375,6 +377,7 @@ async def get_project_overview(
                 )
             ),
             "current_datetime": datetime.now(timezone.utc),
+            "project_create_datetime_ui": project["Project"].create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING),
             "static_analysis_results_paths": static_analysis_results_paths
         },
     )
