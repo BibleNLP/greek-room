@@ -125,7 +125,7 @@ a.project-header {
     margin: 15em auto;
     padding: 0.75em;
     border: 1px solid black;
-    width: 25em;
+    width: 30em;
     background: white;
     border-radius: 0.5em;
 }
@@ -143,8 +143,15 @@ a.project-header {
     max-height: 30%;
     overflow: auto;
 }
-.popup .note {
+.popup .notes {
+    min-width: 30em;
+    max-width: 35em;
+    max-height: 15em;
+    overflow: auto;
+}
+.popup .tip {
     font-size: 0.75em;
+    margin-top: 0.3em;
 }
 .popup .create {
     float: right;
@@ -211,4 +218,15 @@ div.listing > ul li {
 }
 .loader-small {
     height: 0.95em;
+}
+.project-detail {
+    font-size: 0.9em;
+    margin-left: 1em;
+    max-height: 20em;
+    max-width: 70em;
+    background: #fafad2;
+}
+.notes-text {
+    white-space: pre-wrap;
+    overflow: auto;
 }
