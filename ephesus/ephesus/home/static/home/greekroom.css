@@ -125,7 +125,7 @@ a.project-header {
     margin: 15em auto;
     padding: 0.75em;
     border: 1px solid black;
-    width: 30em;
+    width: 25em;
     background: white;
     border-radius: 0.5em;
 }
@@ -145,7 +145,7 @@ a.project-header {
 }
 .popup .notes {
     min-width: 30em;
-    max-width: 35em;
+    max-width: 30em;
     max-height: 15em;
     overflow: auto;
 }
