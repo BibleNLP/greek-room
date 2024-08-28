@@ -23,6 +23,7 @@ from ..custom import (
 
 
 class User(Base):
+    """Model to hold user specific information"""
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -70,7 +71,7 @@ class Project(Base):
         onupdate=partial(datetime.now, tz=timezone.utc),
     )
 
-    # Store arbitary project metadata
+    # Store arbitrary project metadata
     project_metadata: Mapped[JSON] = mapped_column(JSON, default={})
 
     users: Mapped[List["User"]] = relationship(
