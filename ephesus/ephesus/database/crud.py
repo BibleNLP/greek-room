@@ -15,6 +15,7 @@ from .models.user_projects import (
 from ..constants import (
     ProjectAccessType,
     ProjectMetadata,
+    ProjectTags,
 )
 
 from . import schemas
@@ -110,13 +111,16 @@ def create_project_reference(
 ) -> None:
     """
     Create a reference (linked to a `project_resource_id`) in
-    the DB. The reference is modeled as a project in the DB.
+    the DB. The reference is modeled as a project in the DB and
+    is linked to another project via `parent_id` column
+    in the same table. Sets a tag to markup the type.
     """
     reference = Project(
         resource_id=resource_id,
         name=reference_name,
         lang_code=lang_code,
         lang_name=lang_name,
+        tags=[ProjectTags.REF.name],
         project_metadata=reference_metadata,
     )
     reference.parent_id = db.scalars((select(Project).where(Project.resource_id == project_resource_id))).first().id

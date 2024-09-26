@@ -93,6 +93,12 @@ class ProjectAcessRights(Enum):
     WRITE = 2  # Has the write access on the project
 
 
+class ProjectTags(Enum):
+    """Tags that maybe assigned to a project"""
+
+    REF = 1
+
+
 @dataclass(init=False)
 class StaticAnalysisResults:
     """
