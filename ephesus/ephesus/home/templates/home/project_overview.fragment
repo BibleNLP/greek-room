@@ -11,7 +11,7 @@
     </div>
     <div class="content">
       <form
-        action="{{ url_for('create_project_reference', target_resource_id=project['Project'].resource_id) }}"
+        action="{{ url_for('create_project_reference', project_resource_id=project['Project'].resource_id) }}"
         method="POST"
         enctype="multipart/form-data"
       >

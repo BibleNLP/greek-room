@@ -317,9 +317,9 @@ PS: Please consider automating the Greek Room analysis steps.
         )
 
 
-@api_router.post("/projects/{target_resource_id}/reference", status_code=status.HTTP_201_CREATED)
+@api_router.post("/projects/{project_resource_id}/reference", status_code=status.HTTP_201_CREATED)
 def create_project_reference(
-    target_resource_id: str,
+    project_resource_id: str,
     files: list[UploadFile],
     reference_name: Annotated[str, Form(min_length=3, max_length=100)],
     lang_code: Annotated[str, Form(min_length=2, max_length=10)],
@@ -332,10 +332,11 @@ def create_project_reference(
     """Create a reference translation project"""
 
     # Save file in a new randomly named dir
+    # Create a new `resource_id` for the reference
     resource_id: str = secrets.token_urlsafe(6)
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
-        / target_resource_id
+        / project_resource_id
         / PROJECT_REFERENCES_DIR_NAME
         / resource_id
         / LATEST_PROJECT_VERSION_NAME
@@ -378,15 +379,14 @@ def create_project_reference(
         )
 
         # Save project to DB
-        crud.create_user_project(
+        crud.create_project_reference(
             db,
             reference_name,
             resource_id,
             lang_code,
             lang_name,
-            current_username,
-            project_metadata=asdict(ProjectMetadata(notes=notes)),
-            parent_resource_id=target_resource_id
+            project_resource_id=project_resource_id,
+            reference_metadata=asdict(ProjectMetadata(notes=notes))
         )
 
     except InputError as ine:

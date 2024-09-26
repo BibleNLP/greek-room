@@ -77,8 +77,7 @@ def create_user_project(
     lang_code: str,
     lang_name: str,
     username: str,
-    project_metadata: dict = {},
-    parent_resource_id: str = None
+    project_metadata: dict = {}
 ) -> None:
     """Create a project entry in the DB for a user"""
     user = db.scalars((select(User).where(User.username == username))).first()
@@ -96,10 +95,33 @@ def create_user_project(
     )
     project.users.append(project_access)
 
-    if parent_resource_id:
-        project.parent_id = db.scalars((select(Project).where(Project.resource_id == parent_resource_id))).first().id
-
     db.add(project)
+    db.commit()
+
+
+def create_project_reference(
+    db: Session,
+    reference_name: str,
+    resource_id: str,
+    lang_code: str,
+    lang_name: str,
+    project_resource_id: str,
+    reference_metadata: dict = {},
+) -> None:
+    """
+    Create a reference (linked to a `project_resource_id`) in
+    the DB. The reference is modeled as a project in the DB.
+    """
+    reference = Project(
+        resource_id=resource_id,
+        name=reference_name,
+        lang_code=lang_code,
+        lang_name=lang_name,
+        project_metadata=reference_metadata,
+    )
+    reference.parent_id = db.scalars((select(Project).where(Project.resource_id == project_resource_id))).first().id
+
+    db.add(reference)
     db.commit()
 
 
