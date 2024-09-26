@@ -78,6 +78,7 @@ def create_user_project(
     lang_name: str,
     username: str,
     project_metadata: dict = {},
+    parent_resource_id: str = None
 ) -> None:
     """Create a project entry in the DB for a user"""
     user = db.scalars((select(User).where(User.username == username))).first()
@@ -94,6 +95,10 @@ def create_user_project(
         access_type=ProjectAccessType.OWNER.name,
     )
     project.users.append(project_access)
+
+    if parent_resource_id:
+        project.parent_id = db.scalars((select(Project).where(Project.resource_id == parent_resource_id))).first().id
+
     db.add(project)
     db.commit()
 

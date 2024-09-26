@@ -33,6 +33,7 @@ from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_UPLOAD_DIR_NAME,
     PROJECT_CLEAN_DIR_NAME,
+    PROJECT_REFERENCES_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
     DATETIME_TZ_FORMAT_STRING,
     DATETIME_UTC_UI_FORMAT_STRING,
@@ -195,7 +196,7 @@ def create_user_project(
         )
 
     return {
-        "detail": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
+        "detail": f"Successfully created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
 
 
@@ -314,6 +315,104 @@ PS: Please consider automating the Greek Room analysis steps.
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error while processing this request. Please try again.",
         )
+
+
+@api_router.post("/projects/{target_resource_id}/reference", status_code=status.HTTP_201_CREATED)
+def create_project_reference(
+    target_resource_id: str,
+    files: list[UploadFile],
+    reference_name: Annotated[str, Form(min_length=3, max_length=100)],
+    lang_code: Annotated[str, Form(min_length=2, max_length=10)],
+    lang_name: Annotated[str, Form(min_length=2, max_length=70)],
+    # This >10k to accommodate for browser inserted newline chars
+    notes: Annotated[str, Form(max_length=11000)] = None,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Create a reference translation project"""
+
+    # Save file in a new randomly named dir
+    resource_id: str = secrets.token_urlsafe(6)
+    project_path: Path = (
+        ephesus_settings.ephesus_projects_dir
+        / target_resource_id
+        / PROJECT_REFERENCES_DIR_NAME
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
+    )
+
+    # Create the project directories.
+    # including any missing parents
+    (project_path / PROJECT_UPLOAD_DIR_NAME).mkdir(parents=True)
+
+    # Store to the upload dir within the project dir
+    for file in files:
+        try:
+            with (
+                project_path
+                / PROJECT_UPLOAD_DIR_NAME
+                / Path(secure_filename(file.filename))
+            ).open("wb") as f:
+                shutil.copyfileobj(file.file, f)
+        except Exception as e:
+            _LOGGER.exception(e)
+
+            # clean-up
+            shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="There was an error uploading the file(s). Try again.",
+            )
+        finally:
+            # clean-up
+            file.file.close()
+
+    try:
+        # Parse the uploaded files and
+        # save them to the clean dir
+        parse_files(
+            (project_path / PROJECT_UPLOAD_DIR_NAME),
+            (project_path / PROJECT_CLEAN_DIR_NAME),
+            resource_id,
+        )
+
+        # Save project to DB
+        crud.create_user_project(
+            db,
+            reference_name,
+            resource_id,
+            lang_code,
+            lang_name,
+            current_username,
+            project_metadata=asdict(ProjectMetadata(notes=notes)),
+            parent_resource_id=target_resource_id
+        )
+
+    except InputError as ine:
+        _LOGGER.exception(ine)
+
+        # clean-up
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"There was an error creating the project. {str(ine)} Try again.",
+        )
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        # clean-up
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project. Try again.",
+        )
+
+    return {
+        "detail": f"Successfully created project reference using the {len([file.filename for file in files])} uploaded file(s)."
+    }
 
 #############
 # UI Routes #

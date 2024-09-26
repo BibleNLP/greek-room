@@ -78,7 +78,7 @@ a.project-header {
 .verse-number {
     padding-right: 1em;
 }
-.right .content {
+.right > .content {
     padding-left: 10px;
 }
 .link {
