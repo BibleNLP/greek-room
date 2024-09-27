@@ -267,7 +267,44 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return;
     }
+
+    // Event listener for create reference form submission
+    const createReferenceForm = event.target.closest(
+      "#createReferencePopup form",
+    );
+    const createReferenceFormSubmit = event.target.closest(
+      "#createReferencePopup form input[type='submit']",
+    );
+    if (createReferenceFormSubmit) {
+      event.preventDefault();
+      document.querySelector(
+        "#createReferencePopup input.create",
+      ).style.display = "none";
+      document.querySelector("#createReferencePopup img.create").style.display =
+        "";
+      postForm(createReferenceForm).then(
+        (responseData) => {
+          handleCreateReferenceFormResult(responseData);
+        },
+        (reason) => {
+          handleCreateReferenceFormResult(reason);
+        },
+      );
+    }
   });
+
+  // Function to handle the results after 'createReference'
+  function handleCreateReferenceFormResult(responseData) {
+    document.querySelector("img.create").style.display = "none";
+    // Show response
+    document.querySelector("#reference-form-notification > b").innerHTML =
+      responseData.detail;
+    document.querySelector("#reference-form-notification").style.display = "";
+    // Refresh page
+    setTimeout(() => {
+      location.replace(location.pathname);
+    }, 4000);
+  }
 
   // Function to handle the results after CreateProject
   function handleCreateProjectFormResult(responseData) {

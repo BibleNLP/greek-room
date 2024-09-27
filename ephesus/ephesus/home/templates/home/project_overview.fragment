@@ -94,7 +94,7 @@
           style="display: none"
         />
       </form>
-      <p id="form-notification" style="display: none">
+      <p id="reference-form-notification" style="display: none">
         <b></b>
         <b>This page will refresh in a moment.</b>
       </p>
