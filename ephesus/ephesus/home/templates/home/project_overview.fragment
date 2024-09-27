@@ -120,7 +120,8 @@
 {% if project["Project"].lang_name is not none %} Language Name:
 <strong>{{ project["Project"].lang_name }}</strong> <br />{% endif %} Language
 Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
-<strong title="{{ project_create_datetime_ui }}"
+<strong
+  title="{{ project['Project'].create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}"
   >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
   ago</strong
 >
@@ -154,12 +155,34 @@ project["Project"].project_metadata.notes|length > 0 %}
   </div>
 </details>
 
-<h4>References <a class="link" href="#createReferencePopup">&plus;</a></h4>
-<ul>
-  <li>
-    <strong>My ref 1</strong>
-  </li>
-</ul>
+<details>
+  <summary>
+    References{% if project["Project"].children %}:
+    <strong>{{ project["Project"].children|length }}</strong>{% endif %}
+    (<strong><a class="link" href="#createReferencePopup">&plus;</a></strong
+    >)
+  </summary>
+  <div class="project-detail">
+    {% if not project["Project"].children %}
+    <p>
+      No references found. Create one by clicking (<strong
+        ><a class="link" href="#createReferencePopup">&plus;</a></strong
+      >)
+    </p>
+    {% else %}
+    <ol>
+      {% for reference in project["Project"].children %}
+      <li
+        title="{{ reference.resource_id }} ({{ reference.name|truncate(27, True) }}). Uploaded on {{ reference.create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}. {{ reference.project_metadata.notes }}"
+      >
+        <strong> {{ reference.name|truncate(27, True) }} </strong>
+        {{ reference.lang_name }} ({{ reference.lang_code }})
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+  </div>
+</details>
 
 <h4>Tools</h4>
 {% if static_analysis_results_paths is not none and

@@ -476,7 +476,7 @@ async def get_project_overview(
                 )
             ),
             "current_datetime": datetime.now(timezone.utc),
-            "project_create_datetime_ui": project["Project"].create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING),
-            "static_analysis_results_paths": static_analysis_results_paths
+            "DATETIME_UTC_UI_FORMAT_STRING": DATETIME_UTC_UI_FORMAT_STRING,
+            "static_analysis_results_paths": static_analysis_results_paths,
         },
     )
