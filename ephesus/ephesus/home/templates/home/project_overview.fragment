@@ -162,7 +162,7 @@ project["Project"].project_metadata.notes|length > 0 %}
     (<strong><a class="link" href="#createReferencePopup">&plus;</a></strong
     >)
   </summary>
-  <div class="project-detail">
+  <div name="reference-listing" class="project-detail">
     {% if not project["Project"].children %}
     <p>
       No references found. Create one by clicking (<strong
@@ -173,10 +173,16 @@ project["Project"].project_metadata.notes|length > 0 %}
     <ol>
       {% for reference in project["Project"].children %}
       <li
-        title="{{ reference.resource_id }} ({{ reference.name|truncate(27, True) }}). Uploaded on {{ reference.create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}. {{ reference.project_metadata.notes }}"
+        title="{{ reference.resource_id }} ({{ reference.name|truncate(27, True) }}). Uploaded on {{ reference.create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}.{% if reference.project_metadata.notes and reference.project_metadata.notes|length > 0 %} {{ reference.project_metadata.notes }}{% endif %}"
       >
         <strong> {{ reference.name|truncate(27, True) }} </strong>
         {{ reference.lang_name }} ({{ reference.lang_code }})
+        <span class="ref-delete-icon">
+          <img
+            src="static/home/assets/recycle-bin-icon.webp"
+            role="delete-project"
+            data-url="{{ url_for('delete_project_reference', project_resource_id=project['Project'].resource_id, resource_id=reference.resource_id) }}"
+        /></span>
       </li>
       {% endfor %}
     </ol>

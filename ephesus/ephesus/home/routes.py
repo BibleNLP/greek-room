@@ -265,7 +265,7 @@ def request_manual_analysis(
         if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have the required permissions for this project. Contact the project owner.",
+                detail="You do not have the required permissions for this project. Please contact the project owner.",
             )
 
         # Create message body
@@ -413,6 +413,51 @@ def create_project_reference(
     return {
         "detail": f"Successfully created project reference using the {len([file.filename for file in files])} uploaded file(s)."
     }
+
+
+@api_router.delete("/projects/{project_resource_id}/reference/{resource_id}", status_code=status.HTTP_200_OK)
+def delete_project_reference(
+    project_resource_id: str,
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Delete a reference (`resource_id`) associated to a project (`project_resource_id`)"""
+    try:
+        project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, project_resource_id, current_username)
+
+        # Project not found.
+        # Not returning a 404 for security sake.
+        if not project_mapping:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="There was an error while processing this request. Please try again.",
+            )
+
+        # User not project owner
+        if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have the rights to delete this reference. Please contact the project owner.",
+            )
+
+        crud.delete_project(db, resource_id)
+
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while processing this request. Please try again.",
+        )
+
+    # Delete files, if DB deletion was successful.
+    shutil.rmtree((ephesus_settings.ephesus_projects_dir /
+                   project_resource_id /
+                   PROJECT_REFERENCES_DIR_NAME /
+                   resource_id))
+    return {"detail": "Successfully deleted reference."}
+
 
 #############
 # UI Routes #
