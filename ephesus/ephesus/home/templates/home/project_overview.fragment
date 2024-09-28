@@ -175,14 +175,16 @@ project["Project"].project_metadata.notes|length > 0 %}
       <li
         title="{{ reference.resource_id }} ({{ reference.name|truncate(27, True) }}). Uploaded on {{ reference.create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}.{% if reference.project_metadata.notes and reference.project_metadata.notes|length > 0 %} {{ reference.project_metadata.notes }}{% endif %}"
       >
-        <strong> {{ reference.name|truncate(27, True) }} </strong>
-        {{ reference.lang_name }} ({{ reference.lang_code }})
+        <strong> {{ reference.name|truncate(27, True) }} </strong> - {{
+        reference.lang_name }} ({{ reference.lang_code }}) {% if
+        static_analysis_results_paths is none %}
         <span class="ref-delete-icon">
           <img
             src="static/home/assets/recycle-bin-icon.webp"
             role="delete-project"
             data-url="{{ url_for('delete_project_reference', project_resource_id=project['Project'].resource_id, resource_id=reference.resource_id) }}"
         /></span>
+        {% endif %}
       </li>
       {% endfor %}
     </ol>
