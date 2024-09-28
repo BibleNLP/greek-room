@@ -429,3 +429,22 @@ def get_static_analysis_results_paths(resource_id: str, username: str, version: 
         return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / username / resource_id / version)
 
     return None
+
+def generate_resource_id() -> str:
+    """
+    Create a random alpha-numeric resource ID.
+    Make sure it does not contain `_` or `-`.
+    """
+    # Uses the base64 alphabet
+    resource_id: str = secrets.token_urlsafe(6)
+
+    # We don't want `_` and `-` in the ID.
+    # Try for a finite number of times.
+    for _ in range(20):
+        if '_' in resource_id or \
+           '_' in resource_id:
+            resource_id = secrets.token_urlsafe(6)
+        else:
+            break
+
+    return resource_id

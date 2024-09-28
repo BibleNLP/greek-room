@@ -3,7 +3,6 @@ API and UI routes for the home page of the application
 """
 
 import logging
-import secrets
 import shutil
 from pathlib import Path
 from typing import Annotated
@@ -56,6 +55,7 @@ from ..common.utils import (
     send_email,
     get_datetime,
     get_static_analysis_results_paths,
+    generate_resource_id,
 )
 
 # Get app logger
@@ -120,7 +120,18 @@ def create_user_project(
     """Create a user project using uploaded data"""
 
     # Save file in a new randomly named dir
-    resource_id: str = secrets.token_urlsafe(6)
+    # Create a new `resource_id` for the project
+    resource_id: str = generate_resource_id()
+
+    # Check if `resource_id` is truly unique in the DB.
+    # Over-engineered!
+    if crud.is_project_exists(db, resource_id):
+        _LOGGER.warning(f"Generated {resource_id=} already exists in the database!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project. Please try again.",
+        )
+
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
         / resource_id
@@ -148,7 +159,7 @@ def create_user_project(
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="There was an error uploading the file(s). Try again.",
+                detail="There was an error uploading the file(s). Please try again.",
             )
         finally:
             # clean-up
@@ -182,7 +193,7 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"There was an error creating the project. {str(ine)} Try again.",
+            detail=f"There was an error creating the project. {str(ine)} Please try again.",
         )
     except DBAPIError as dbe:
         _LOGGER.exception(dbe)
@@ -192,7 +203,7 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="There was an error while creating the project. Try again.",
+            detail="There was an error while creating the project. Please try again.",
         )
 
     return {
@@ -333,7 +344,17 @@ def create_project_reference(
 
     # Save file in a new randomly named dir
     # Create a new `resource_id` for the reference
-    resource_id: str = secrets.token_urlsafe(6)
+    resource_id: str = generate_resource_id()
+
+    # Check if `resource_id` is truly unique in the DB.
+    # Over-engineered!
+    if crud.is_project_exists(db, resource_id):
+        _LOGGER.warning(f"Generated {resource_id=} already exists in the database!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project reference. Please try again.",
+        )
+
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
         / project_resource_id
@@ -363,7 +384,7 @@ def create_project_reference(
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="There was an error uploading the file(s). Try again.",
+                detail="There was an error uploading the file(s). Please try again.",
             )
         finally:
             # clean-up
@@ -397,7 +418,7 @@ def create_project_reference(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"There was an error creating the project. {str(ine)} Try again.",
+            detail=f"There was an error creating the project reference. {str(ine)} Please try again.",
         )
     except DBAPIError as dbe:
         _LOGGER.exception(dbe)
@@ -407,7 +428,7 @@ def create_project_reference(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="There was an error while creating the project. Try again.",
+            detail="There was an error while creating the project reference. Please try again.",
         )
 
     return {

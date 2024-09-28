@@ -36,6 +36,11 @@ def is_user_exists(db: Session, username: str) -> bool:
     return db.scalars(select(User).where(User.username == username)).first() is not None
 
 
+def is_project_exists(db: Session, resource_id: str) -> bool:
+    """Check if a project/reference with `resource_id` already exists in the database """
+    return db.scalars(select(Project).where(Project.resource_id == resource_id)).first() is not None
+
+
 def get_user_projects(
     db: Session, username: str
 ) -> list[schemas.ProjectListModel] | None:
