@@ -110,12 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const resourceId = linkTarget.dataset.resourceId;
 
       // Unselect any existing and highlight selected link
-      Array.from(document.getElementsByClassName("link underline")).forEach(
-        (el) => el.classList.remove("underline"),
+      Array.from(document.getElementsByClassName("link bold")).forEach((el) =>
+        el.classList.remove("bold"),
       );
 
-      // Underline selected resource link
-      linkTarget.classList.add("underline");
+      // Bold selected resource link
+      linkTarget.classList.add("bold");
 
       // Get project overview content to display on right pane
       getDataFromElementURL(linkTarget).then(
