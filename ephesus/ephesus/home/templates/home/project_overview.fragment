@@ -104,7 +104,9 @@
 
 <div class="flex">
   <div>
-    <h2>{{ project["Project"].name }}</h2>
+    <h2 data-resource-id="{{ project['Project'].resource_id }}">
+      {{ project["Project"].name }}
+    </h2>
   </div>
   {% if static_analysis_results_paths is none %}
   <div class="delete-icon">

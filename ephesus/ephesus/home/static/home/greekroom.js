@@ -282,27 +282,35 @@ document.addEventListener("DOMContentLoaded", () => {
       ).style.display = "none";
       document.querySelector("#createReferencePopup img.create").style.display =
         "";
+      // Get the selected project Resource ID
+      const resourceId = document.querySelector(
+        "#details-pane h2[data-resource-id]",
+      ).dataset.resourceId;
       postForm(createReferenceForm).then(
         (responseData) => {
-          handleCreateReferenceFormResult(responseData);
+          handleCreateReferenceFormResult(responseData, resourceId);
         },
         (reason) => {
-          handleCreateReferenceFormResult(reason);
+          handleCreateReferenceFormResult(reason, resourceId);
         },
       );
     }
   });
 
   // Function to handle the results after 'createReference'
-  function handleCreateReferenceFormResult(responseData) {
+  function handleCreateReferenceFormResult(responseData, resourceId) {
     document.querySelector("img.create").style.display = "none";
     // Show response
     document.querySelector("#reference-form-notification > b").innerHTML =
       responseData.detail;
     document.querySelector("#reference-form-notification").style.display = "";
-    // Refresh page
+    // Simulate project name click for partial refresh
     setTimeout(() => {
-      location.replace(location.pathname);
+      document
+        .querySelector(
+          `div.content div.listing button.link[data-resource-id="${resourceId}"]`,
+        )
+        .click();
     }, 4000);
   }
 
