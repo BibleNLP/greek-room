@@ -3,7 +3,6 @@ API and UI routes for the home page of the application
 """
 
 import logging
-import secrets
 import shutil
 from pathlib import Path
 from typing import Annotated
@@ -33,6 +32,7 @@ from ..constants import (
     LATEST_PROJECT_VERSION_NAME,
     PROJECT_UPLOAD_DIR_NAME,
     PROJECT_CLEAN_DIR_NAME,
+    PROJECT_REFERENCES_DIR_NAME,
     PROJECT_VREF_FILE_NAME,
     DATETIME_TZ_FORMAT_STRING,
     DATETIME_UTC_UI_FORMAT_STRING,
@@ -55,6 +55,7 @@ from ..common.utils import (
     send_email,
     get_datetime,
     get_static_analysis_results_paths,
+    generate_resource_id,
 )
 
 # Get app logger
@@ -119,7 +120,18 @@ def create_user_project(
     """Create a user project using uploaded data"""
 
     # Save file in a new randomly named dir
-    resource_id: str = secrets.token_urlsafe(6)
+    # Create a new `resource_id` for the project
+    resource_id: str = generate_resource_id()
+
+    # Check if `resource_id` is truly unique in the DB.
+    # Over-engineered!
+    if crud.is_project_exists(db, resource_id):
+        _LOGGER.warning(f"Generated {resource_id=} already exists in the database!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project. Please try again.",
+        )
+
     project_path: Path = (
         ephesus_settings.ephesus_projects_dir
         / resource_id
@@ -147,7 +159,7 @@ def create_user_project(
 
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="There was an error uploading the file(s). Try again.",
+                detail="There was an error uploading the file(s). Please try again.",
             )
         finally:
             # clean-up
@@ -181,7 +193,7 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"There was an error creating the project. {str(ine)} Try again.",
+            detail=f"There was an error creating the project. {str(ine)} Please try again.",
         )
     except DBAPIError as dbe:
         _LOGGER.exception(dbe)
@@ -191,11 +203,11 @@ def create_user_project(
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="There was an error while creating the project. Try again.",
+            detail="There was an error while creating the project. Please try again.",
         )
 
     return {
-        "detail": f"Successfuly created project using the {len([file.filename for file in files])} uploaded file(s)."
+        "detail": f"Successfully created project using the {len([file.filename for file in files])} uploaded file(s)."
     }
 
 
@@ -264,7 +276,7 @@ def request_manual_analysis(
         if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="You do not have the required permissions for this project. Contact the project owner.",
+                detail="You do not have the required permissions for this project. Please contact the project owner.",
             )
 
         # Create message body
@@ -314,6 +326,159 @@ PS: Please consider automating the Greek Room analysis steps.
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error while processing this request. Please try again.",
         )
+
+
+@api_router.post("/projects/{project_resource_id}/reference", status_code=status.HTTP_201_CREATED)
+def create_project_reference(
+    project_resource_id: str,
+    files: list[UploadFile],
+    reference_name: Annotated[str, Form(min_length=3, max_length=100)],
+    lang_code: Annotated[str, Form(min_length=2, max_length=10)],
+    lang_name: Annotated[str, Form(min_length=2, max_length=70)],
+    # This >10k to accommodate for browser inserted newline chars
+    notes: Annotated[str, Form(max_length=11000)] = None,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Create a reference translation project"""
+
+    # Save file in a new randomly named dir
+    # Create a new `resource_id` for the reference
+    resource_id: str = generate_resource_id()
+
+    # Check if `resource_id` is truly unique in the DB.
+    # Over-engineered!
+    if crud.is_project_exists(db, resource_id):
+        _LOGGER.warning(f"Generated {resource_id=} already exists in the database!")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project reference. Please try again.",
+        )
+
+    project_path: Path = (
+        ephesus_settings.ephesus_projects_dir
+        / project_resource_id
+        / PROJECT_REFERENCES_DIR_NAME
+        / resource_id
+        / LATEST_PROJECT_VERSION_NAME
+    )
+
+    # Create the project directories.
+    # including any missing parents
+    (project_path / PROJECT_UPLOAD_DIR_NAME).mkdir(parents=True)
+
+    # Store to the upload dir within the project dir
+    for file in files:
+        try:
+            with (
+                project_path
+                / PROJECT_UPLOAD_DIR_NAME
+                / Path(secure_filename(file.filename))
+            ).open("wb") as f:
+                shutil.copyfileobj(file.file, f)
+        except Exception as e:
+            _LOGGER.exception(e)
+
+            # clean-up
+            shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="There was an error uploading the file(s). Please try again.",
+            )
+        finally:
+            # clean-up
+            file.file.close()
+
+    try:
+        # Parse the uploaded files and
+        # save them to the clean dir
+        parse_files(
+            (project_path / PROJECT_UPLOAD_DIR_NAME),
+            (project_path / PROJECT_CLEAN_DIR_NAME),
+            resource_id,
+        )
+
+        # Save project to DB
+        crud.create_project_reference(
+            db,
+            reference_name,
+            resource_id,
+            lang_code,
+            lang_name,
+            project_resource_id=project_resource_id,
+            reference_metadata=asdict(ProjectMetadata(notes=notes))
+        )
+
+    except InputError as ine:
+        _LOGGER.exception(ine)
+
+        # clean-up
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"There was an error creating the project reference. {str(ine)} Please try again.",
+        )
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        # clean-up
+        shutil.rmtree((ephesus_settings.ephesus_projects_dir / resource_id))
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while creating the project reference. Please try again.",
+        )
+
+    return {
+        "detail": f"Successfully created project reference using the {len([file.filename for file in files])} uploaded file(s)."
+    }
+
+
+@api_router.delete("/projects/{project_resource_id}/reference/{resource_id}", status_code=status.HTTP_200_OK)
+def delete_project_reference(
+    project_resource_id: str,
+    resource_id: str,
+    current_username: str = Depends(get_current_username),
+    db: Session = Depends(get_db),
+):
+    """Delete a reference (`resource_id`) associated to a project (`project_resource_id`)"""
+    try:
+        project_mapping: schemas.ProjectWithAccessModel | None = crud.get_user_project(db, project_resource_id, current_username)
+
+        # Project not found.
+        # Not returning a 404 for security sake.
+        if not project_mapping:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="There was an error while processing this request. Please try again.",
+            )
+
+        # User not project owner
+        if project_mapping["ProjectAccess"].access_type != ProjectAccessType.OWNER:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have the rights to delete this reference. Please contact the project owner.",
+            )
+
+        crud.delete_project(db, resource_id)
+
+    except DBAPIError as dbe:
+        _LOGGER.exception(dbe)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="There was an error while processing this request. Please try again.",
+        )
+
+    # Delete files, if DB deletion was successful.
+    shutil.rmtree((ephesus_settings.ephesus_projects_dir /
+                   project_resource_id /
+                   PROJECT_REFERENCES_DIR_NAME /
+                   resource_id))
+    return {"detail": "Successfully deleted reference."}
+
 
 #############
 # UI Routes #
@@ -377,7 +542,7 @@ async def get_project_overview(
                 )
             ),
             "current_datetime": datetime.now(timezone.utc),
-            "project_create_datetime_ui": project["Project"].create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING),
-            "static_analysis_results_paths": static_analysis_results_paths
+            "DATETIME_UTC_UI_FORMAT_STRING": DATETIME_UTC_UI_FORMAT_STRING,
+            "static_analysis_results_paths": static_analysis_results_paths,
         },
     )

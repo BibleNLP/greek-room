@@ -78,7 +78,7 @@ a.project-header {
 .verse-number {
     padding-right: 1em;
 }
-.right .content {
+.right > .content {
     padding-left: 10px;
 }
 .link {
@@ -125,7 +125,7 @@ a.project-header {
     margin: 15em auto;
     padding: 0.75em;
     border: 1px solid black;
-    width: 30em;
+    width: 25em;
     background: white;
     border-radius: 0.5em;
 }
@@ -145,7 +145,7 @@ a.project-header {
 }
 .popup .notes {
     min-width: 30em;
-    max-width: 35em;
+    max-width: 30em;
     max-height: 15em;
     overflow: auto;
 }
@@ -190,11 +190,22 @@ div.listing > ul li {
     cursor: pointer;
 }
 .delete-icon {
-    margin: auto 0.5em auto 0.5em;
+    margin: 1.7em 0.5em auto 0.5em;
     display: none;
 }
 .delete-icon img {
     height: 1em;
+}
+div[name="reference-listing"]:hover .ref-delete-icon {
+    display: inline;
+    cursor: pointer;
+}
+.ref-delete-icon {
+    margin-left: 1em;
+    display: none;
+}
+.ref-delete-icon img {
+    height: 0.8em;
 }
 .disabled {
     color: gray;

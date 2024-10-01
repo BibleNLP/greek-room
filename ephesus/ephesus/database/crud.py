@@ -15,6 +15,7 @@ from .models.user_projects import (
 from ..constants import (
     ProjectAccessType,
     ProjectMetadata,
+    ProjectTags,
 )
 
 from . import schemas
@@ -33,6 +34,11 @@ def create_user(db: Session, username: str) -> None:
 def is_user_exists(db: Session, username: str) -> bool:
     """Check if a user exists in the app database"""
     return db.scalars(select(User).where(User.username == username)).first() is not None
+
+
+def is_project_exists(db: Session, resource_id: str) -> bool:
+    """Check if a project/reference with `resource_id` already exists in the database """
+    return db.scalars(select(Project).where(Project.resource_id == resource_id)).first() is not None
 
 
 def get_user_projects(
@@ -77,7 +83,7 @@ def create_user_project(
     lang_code: str,
     lang_name: str,
     username: str,
-    project_metadata: dict = {},
+    project_metadata: dict = {}
 ) -> None:
     """Create a project entry in the DB for a user"""
     user = db.scalars((select(User).where(User.username == username))).first()
@@ -94,7 +100,37 @@ def create_user_project(
         access_type=ProjectAccessType.OWNER.name,
     )
     project.users.append(project_access)
+
     db.add(project)
+    db.commit()
+
+
+def create_project_reference(
+    db: Session,
+    reference_name: str,
+    resource_id: str,
+    lang_code: str,
+    lang_name: str,
+    project_resource_id: str,
+    reference_metadata: dict = {},
+) -> None:
+    """
+    Create a reference (linked to a `project_resource_id`) in
+    the DB. The reference is modeled as a project in the DB and
+    is linked to another project via `parent_id` column
+    in the same table. Sets a tag to markup the type.
+    """
+    reference = Project(
+        resource_id=resource_id,
+        name=reference_name,
+        lang_code=lang_code,
+        lang_name=lang_name,
+        tags=[ProjectTags.REF.name],
+        project_metadata=reference_metadata,
+    )
+    reference.parent_id = db.scalars((select(Project).where(Project.resource_id == project_resource_id))).first().id
+
+    db.add(reference)
     db.commit()
 
 

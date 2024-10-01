@@ -93,6 +93,12 @@ class ProjectAcessRights(Enum):
     WRITE = 2  # Has the write access on the project
 
 
+class ProjectTags(Enum):
+    """Tags that maybe assigned to a project"""
+
+    REF = 1
+
+
 @dataclass(init=False)
 class StaticAnalysisResults:
     """
@@ -115,12 +121,18 @@ class StaticAnalysisResults:
 # The String to call the 'latest' version of the project
 LATEST_PROJECT_VERSION_NAME: str = "latest"
 
+# The name of the directory where the references
+# for a project will be uploaded to.
+PROJECT_REFERENCES_DIR_NAME: str = "references"
+
 # The name of the directory where the
-# file(s) uploaded by the user are stored as-is
+# file(s) uploaded by the user are stored as-is.
+# This is meant for the target language data.
 PROJECT_UPLOAD_DIR_NAME: str = "upload"
 
 # The name of the directory where the
 # uploaded compressed files are extracted to.
+# This is meant for the target language data.
 PROJECT_CLEAN_DIR_NAME: str = "clean"
 
 # The name of the versification file

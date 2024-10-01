@@ -5,7 +5,13 @@ import secrets
 from functools import partial
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Enum, JSON, ForeignKey
+from sqlalchemy import (
+    String,
+    Enum,
+    JSON,
+    ForeignKey,
+    Integer,
+)
 from sqlalchemy.orm import (
     mapped_column,
     Mapped,
@@ -23,6 +29,7 @@ from ..custom import (
 
 
 class User(Base):
+    """Model to hold user specific information"""
     __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -56,6 +63,7 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(1000))
     lang_code: Mapped[str] = mapped_column(String(10))
     lang_name: Mapped[str] = mapped_column(String(100))
+
     tags: Mapped[JSON | None] = mapped_column(JSON, default=[])
     status: Mapped[Enum] = mapped_column(
         Enum(StatusType), default=StatusType.ACTIVE.name
@@ -70,12 +78,17 @@ class Project(Base):
         onupdate=partial(datetime.now, tz=timezone.utc),
     )
 
-    # Store arbitary project metadata
+    # Store arbitrary project metadata
     project_metadata: Mapped[JSON] = mapped_column(JSON, default={})
 
     users: Mapped[List["User"]] = relationship(
         "ProjectAccess", back_populates="project"
     )
+
+    # Self-referential key for handling things like references
+    parent_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("project.id"))
+    # Handle deletion manually (not via cascade) to avoid unintentional deletion
+    children: Mapped[List["Project"]] = relationship()
 
 
 # Join table for NxN relationship between

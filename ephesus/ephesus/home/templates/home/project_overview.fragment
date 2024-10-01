@@ -1,7 +1,112 @@
 {% if project is not none %}
+<div id="createReferencePopup" class="overlay">
+  <div class="popup">
+    <div class="header">
+      <div>
+        <h3>Create Reference</h3>
+      </div>
+      <div>
+        <a class="close" href="#">&times;</a>
+      </div>
+    </div>
+    <div class="content">
+      <form
+        action="{{ url_for('create_project_reference', project_resource_id=project['Project'].resource_id) }}"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <label
+          >Reference Name<sup class="red">*</sup>
+          <input
+            type="text"
+            name="reference_name"
+            minlength="3"
+            maxlength="100"
+            placeholder="My Reference Version"
+            required
+        /></label>
+        <br />
+        <br />
+        <label
+          >Language Name<sup class="red">*</sup>
+          <input
+            type="text"
+            name="lang_name"
+            minlength="2"
+            maxlength="70"
+            placeholder="English"
+            required
+        /></label>
+        <br />
+        <br />
+        <label
+          >Language Code<sup class="red">*</sup>
+          <input
+            type="text"
+            name="lang_code"
+            minlength="2"
+            maxlength="10"
+            placeholder="eng"
+            required
+          /><br /><small
+            >Please use
+            <a href="https://iso639-3.sil.org/code_tables/639/data"
+              >ISO 639-3</a
+            >
+            language codes.</small
+          ></label
+        >
+        <br />
+        <br />
+        <label
+          >Notes
+          <br />
+          <textarea
+            name="notes"
+            class="notes"
+            rows="5"
+            cols="30"
+            maxlength="10000"
+            placeholder="Optionally share any details about this project that may help us with the analysis. This includes details of the source text used (language and version), current stage in the translation process, geographical region, etc."
+          ></textarea>
+        </label>
+        <br />
+        <hr />
+        <label for="file-upload"
+          >Upload USFM files or Paratext Project (.zip)<sup class="red"
+            >*</sup
+          ></label
+        >
+        <p class="tip">
+          Please upload <b>ALL</b> available content (e.g. full New or Old
+          Testament or both) in the language (no matter the quality) even if you
+          are only interested in analyzing a part of the data. This is important
+          for the Greek Room tools to learn and provide you with higher quality
+          results.
+        </p>
+        <input type="file" id="file-upload" name="files" required multiple />
+        <br />
+        <br />
+        <input type="submit" value="Create" class="create" />
+        <img
+          src="static/home/assets/eclipse-loader.svg"
+          class="create"
+          style="display: none"
+        />
+      </form>
+      <p id="reference-form-notification" style="display: none">
+        <b></b>
+        <b>This page will refresh in a moment.</b>
+      </p>
+    </div>
+  </div>
+</div>
+
 <div class="flex">
   <div>
-    <h2>{{ project["Project"].name }}</h2>
+    <h2 data-resource-id="{{ project['Project'].resource_id }}">
+      {{ project["Project"].name }}
+    </h2>
   </div>
   {% if static_analysis_results_paths is none %}
   <div class="delete-icon">
@@ -17,7 +122,8 @@
 {% if project["Project"].lang_name is not none %} Language Name:
 <strong>{{ project["Project"].lang_name }}</strong> <br />{% endif %} Language
 Code: <strong>{{ project["Project"].lang_code }}</strong> <br />Created:
-<strong title="{{ project_create_datetime_ui }}"
+<strong
+  title="{{ project['Project'].create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}"
   >{{ (current_datetime - project["Project"].create_datetime)|timedeltaformat }}
   ago</strong
 >
@@ -50,6 +156,44 @@ project["Project"].project_metadata.notes|length > 0 %}
     %}
   </div>
 </details>
+
+<details>
+  <summary>
+    References{% if project["Project"].children %}:
+    <strong>{{ project["Project"].children|length }}</strong>{% endif %}
+    (<strong><a class="link" href="#createReferencePopup">&plus;</a></strong
+    >)
+  </summary>
+  <div name="reference-listing" class="project-detail">
+    {% if not project["Project"].children %}
+    <p>
+      No references found. Create one by clicking (<strong
+        ><a class="link" href="#createReferencePopup">&plus;</a></strong
+      >)
+    </p>
+    {% else %}
+    <ol>
+      {% for reference in project["Project"].children %}
+      <li
+        title="{{ reference.resource_id }} ({{ reference.name|truncate(27, True) }}). Uploaded on {{ reference.create_datetime.strftime(DATETIME_UTC_UI_FORMAT_STRING) }}.{% if reference.project_metadata.notes and reference.project_metadata.notes|length > 0 %} {{ reference.project_metadata.notes }}{% endif %}"
+      >
+        <strong> {{ reference.name|truncate(27, True) }} </strong> - {{
+        reference.lang_name }} ({{ reference.lang_code }}) {% if
+        static_analysis_results_paths is none %}
+        <span class="ref-delete-icon">
+          <img
+            src="static/home/assets/recycle-bin-icon.webp"
+            role="delete-project"
+            data-url="{{ url_for('delete_project_reference', project_resource_id=project['Project'].resource_id, resource_id=reference.resource_id) }}"
+        /></span>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+  </div>
+</details>
+
 <h4>Tools</h4>
 {% if static_analysis_results_paths is not none and
 static_analysis_results_paths.NOTES_DIR is not none %}

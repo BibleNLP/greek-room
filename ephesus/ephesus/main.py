@@ -28,6 +28,13 @@ _LOGGER = logging.getLogger(__name__)
 # Create DB instance
 Base.metadata.create_all(bind=engine)
 
+# load the Alembic configuration and generate the
+# version table, "stamping" it with the most recent rev
+# from alembic.config import Config
+# from alembic import command
+# alembic_cfg = Config("ephesus/database/alembic.ini")
+# command.stamp(alembic_cfg, "head", purge=True)
+
 # Create and configure app instance
 app = FastAPI()
 app.mount("/static", StaticFiles(packages=[("ephesus.home", "static")]), name="static")

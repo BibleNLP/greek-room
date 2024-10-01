@@ -110,12 +110,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const resourceId = linkTarget.dataset.resourceId;
 
       // Unselect any existing and highlight selected link
-      Array.from(document.getElementsByClassName("link underline")).forEach(
-        (el) => el.classList.remove("underline"),
+      Array.from(document.getElementsByClassName("link bold")).forEach((el) =>
+        el.classList.remove("bold"),
       );
 
-      // Underline selected resource link
-      linkTarget.classList.add("underline");
+      // Bold selected resource link
+      linkTarget.classList.add("bold");
 
       // Get project overview content to display on right pane
       getDataFromElementURL(linkTarget).then(
@@ -267,7 +267,52 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       return;
     }
+
+    // Event listener for create reference form submission
+    const createReferenceForm = event.target.closest(
+      "#createReferencePopup form",
+    );
+    const createReferenceFormSubmit = event.target.closest(
+      "#createReferencePopup form input[type='submit']",
+    );
+    if (createReferenceFormSubmit) {
+      event.preventDefault();
+      document.querySelector(
+        "#createReferencePopup input.create",
+      ).style.display = "none";
+      document.querySelector("#createReferencePopup img.create").style.display =
+        "";
+      // Get the selected project Resource ID
+      const resourceId = document.querySelector(
+        "#details-pane h2[data-resource-id]",
+      ).dataset.resourceId;
+      postForm(createReferenceForm).then(
+        (responseData) => {
+          handleCreateReferenceFormResult(responseData, resourceId);
+        },
+        (reason) => {
+          handleCreateReferenceFormResult(reason, resourceId);
+        },
+      );
+    }
   });
+
+  // Function to handle the results after 'createReference'
+  function handleCreateReferenceFormResult(responseData, resourceId) {
+    document.querySelector("img.create").style.display = "none";
+    // Show response
+    document.querySelector("#reference-form-notification > b").innerHTML =
+      responseData.detail;
+    document.querySelector("#reference-form-notification").style.display = "";
+    // Simulate project name click for partial refresh
+    setTimeout(() => {
+      document
+        .querySelector(
+          `div.content div.listing button.link[data-resource-id="${resourceId}"]`,
+        )
+        .click();
+    }, 4000);
+  }
 
   // Function to handle the results after CreateProject
   function handleCreateProjectFormResult(responseData) {
