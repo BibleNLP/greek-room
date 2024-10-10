@@ -117,6 +117,33 @@
     />
   </div>
   {% endif %}
+  <div class="project-menu">
+    {% if project["Project"].project_metadata.manualAnalysisRequestTime and
+    project["Project"].project_metadata.manualAnalysisRequestTime|length > 0 %}
+    <button
+      title="{{ project['Project'].project_metadata.manualAnalysisRequestTime }}"
+      disabled
+    >
+      Request sent {{ (current_datetime -
+      project["Project"].project_metadata.manualAnalysisRequestTime|todatetime)|timedeltaformat
+      }} ago
+    </button>
+    {% elif static_analysis_results_paths is none %}
+    <button
+      data-url="{{ url_for('request_manual_analysis', resource_id=project['Project'].resource_id) }}"
+      data-name="manual-analysis-request"
+    >
+      Request full analysis
+    </button>
+    <img
+      src="static/home/assets/eclipse-loader.svg"
+      role="loader"
+      class="loader-small hide"
+    />
+    {% else %}
+    <button disabled>Analysis completed</button>
+    {% endif %}
+  </div>
 </div>
 <hr />
 {% if project["Project"].lang_name is not none %} Language Name:
@@ -194,20 +221,47 @@ project["Project"].project_metadata.notes|length > 0 %}
   </div>
 </details>
 
-<h4>Tools</h4>
-{% if static_analysis_results_paths is not none and
-static_analysis_results_paths.NOTES_DIR is not none %}
-<a
-  href="{{ static_analysis_results_paths.NOTES_DIR }}"
-  target="_blank"
-  rel="noopener noreferrer"
-  class="link"
-  >Analysis summary notes↗</a
->
-{% endif %}
+<h3>
+  Results {% if static_analysis_results_paths is not none and
+  static_analysis_results_paths.DOWNLOAD_DIR is not none %}
+  <a
+    href="{{ static_analysis_results_paths.DOWNLOAD_DIR }}"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <img
+      src="static/home/assets/download-icon.svg"
+      class="wildebeest-icon-item"
+      title="Download all results"
+    />
+  </a>
+  {% endif %}
+</h3>
 <ul>
+  {% if static_analysis_results_paths is not none and
+  static_analysis_results_paths.SCORECARD_DIR is not none %}
   <li>
-    <strong>Wildebeest </strong>
+    <a
+      href="{{ static_analysis_results_paths.SCORECARD_DIR }}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="link"
+      >Scorecard↗</a
+    >
+  </li>
+  {% endif %} {% if static_analysis_results_paths is not none and
+  static_analysis_results_paths.USFM_DIR is not none %}
+  <li>
+    <a
+      href="{{ static_analysis_results_paths.USFM_DIR }}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="link"
+      >USFM↗</a
+    >
+  </li>
+  {% endif %}
+  <li>
     {% if static_analysis_results_paths is not none and
     static_analysis_results_paths.WILDEBEEST_DIR is not none %}
     <a
@@ -215,9 +269,10 @@ static_analysis_results_paths.NOTES_DIR is not none %}
       target="_blank"
       rel="noopener noreferrer"
       class="link"
-      >Results↗</a
+      >Wildebeest↗</a
     >
     {% else %}
+    <strong>Wildebeest</strong>
     <button
       class="link"
       data-url="{{ url_for('get_formatted_wildebeest_analysis', resource_id=project['Project'].resource_id) }}"
@@ -231,55 +286,48 @@ static_analysis_results_paths.NOTES_DIR is not none %}
       class="loader-small hide"
     />
   </li>
-  {% endif %}
+  {% endif %} {% if static_analysis_results_paths is not none and
+  static_analysis_results_paths.SPELL_DIR is not none %}
   <li>
-    <strong>Spellings</strong>
-    {% if static_analysis_results_paths is not none and
-    static_analysis_results_paths.SPELL_DIR is not none %}
     <a
       href="{{ static_analysis_results_paths.SPELL_DIR }}"
       target="_blank"
       rel="noopener noreferrer"
       class="link"
-      >Results↗</a
+      >Spellings↗</a
     >
-    {% elif project["Project"].project_metadata.manualAnalysisRequestTime and
-    project["Project"].project_metadata.manualAnalysisRequestTime|length > 0 %}
-    <span
-      title="{{ project['Project'].project_metadata.manualAnalysisRequestTime }}"
-      >Request sent {{ (current_datetime -
-      project["Project"].project_metadata.manualAnalysisRequestTime|todatetime)|timedeltaformat
-      }} ago</span
-    >
-    {% else %}
-    <button
-      class="link"
-      data-url="{{ url_for('request_manual_analysis', resource_id=project['Project'].resource_id) }}"
-      name="spell-analysis"
-    >
-      Request full offline analysis (notified by email)
-    </button>
-    <img
-      src="static/home/assets/eclipse-loader.svg"
-      role="loader"
-      class="loader-small hide"
-    />
-    {% endif %}
   </li>
-  {% if static_analysis_results_paths is not none and
+  {% endif %} {% if static_analysis_results_paths is not none and
   static_analysis_results_paths.ALIGN_VIZ_DIR is not none %}
   <li>
-    <strong>Alignment Viz</strong>
     <a
       href="{{ static_analysis_results_paths.ALIGN_VIZ_DIR }}"
       target="_blank"
       rel="noopener noreferrer"
       class="link"
-      >Results↗</a
+      >Alignment Visualization↗</a
+    >
+  </li>
+  {% endif %} {% if static_analysis_results_paths is not none and
+  static_analysis_results_paths.NOTES_DIR is not none %}
+  <li>
+    <a
+      href="{{ static_analysis_results_paths.NOTES_DIR }}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="link"
+      >Notes↗</a
     >
   </li>
   {% endif %}
 </ul>
-{% else %}
+{% if static_analysis_results_paths is none and
+project["Project"].project_metadata.manualAnalysisRequestTime is none%}
+<span
+  ><strong>Tip:</strong> To get all the Greek Room checks for this project,
+  click the 'Request full analysis' button on the top right. <br />You will be
+  notified to your registered email address when the results are ready.</span
+>
+{% endif %} {% else %}
 <p>Could not find project.</p>
 {% endif %}

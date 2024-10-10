@@ -12,6 +12,10 @@ body {
     font-family: system-ui;
     height: 100%;
 }
+button,
+button:hover {
+    cursor: pointer;
+}
 .header {
     display: flex;
     justify-content: space-between;
@@ -236,6 +240,10 @@ div[name="reference-listing"]:hover .ref-delete-icon {
     max-height: 20em;
     max-width: 70em;
     background: #fafad2;
+}
+.project-menu {
+    margin-left: auto;
+    align-self: center;
 }
 .notes-text {
     white-space: pre-wrap;
