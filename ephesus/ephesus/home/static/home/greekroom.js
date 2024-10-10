@@ -210,29 +210,29 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Handle Spell Check Analysis Click
-    const spellLinkTarget = event.target.closest(
-      'button[name="spell-analysis"]',
+    // Handle 'Request manual analysis' button click
+    const manualAnalysisButtonTarget = event.target.closest(
+      'button[data-name="manual-analysis-request"]',
     );
-    if (spellLinkTarget) {
+    if (manualAnalysisButtonTarget) {
       // Show loader
       detailsPane.classList.add("cursor-wait");
-      spellLinkTarget.classList.add("hide");
-      spellLinkTarget.nextElementSibling.classList.remove("hide");
+      manualAnalysisButtonTarget.setAttribute("disabled", "");
+      manualAnalysisButtonTarget.nextElementSibling.classList.remove("hide");
 
-      // Get HTML Wildebeest analysis content to display on right pane
-      getDataFromElementURL(spellLinkTarget).then(
+      // Call API for raising request
+      getDataFromElementURL(manualAnalysisButtonTarget).then(
         (content) => {
           detailsPane.classList.remove("cursor-wait");
-          spellLinkTarget.nextElementSibling.classList.add("hide");
-          spellLinkTarget.replaceWith(
-            "Successfully sent request. We will send you an email when the results are ready.",
-          );
+          manualAnalysisButtonTarget.nextElementSibling.classList.add("hide");
+          manualAnalysisButtonTarget.textContent =
+            "Full analysis request sent!";
         },
         (reason) => {
           detailsPane.classList.remove("cursor-wait");
-          detailsPane.innerHTML =
-            "There was an error while processing the request. Try again.";
+          manualAnalysisButtonTarget.nextElementSibling.classList.add("hide");
+          manualAnalysisButtonTarget.textContent =
+            "Error sending request. Try again.";
         },
       );
       return;
