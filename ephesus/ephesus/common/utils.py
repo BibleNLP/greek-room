@@ -4,6 +4,7 @@ Common utilities in service of the Ephesus application
 
 import os
 import re
+import string
 import shutil
 import logging
 import secrets
@@ -137,6 +138,14 @@ def secure_filename(filename: str) -> str:
     return filename
 
 
+def generate_alphanum_id(size: int = 8) -> str:
+    """
+    Create a random alpha-numeric resource ID of `size`.
+    """
+    alphabet: str = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for i in range(size))
+
+
 def has_filetype(dir: Path, pattern: str, min_count: int = 1) -> bool:
     """Return if `dir` has at least `min_count` file(s)
     within it that matches `pattern`"""
@@ -169,7 +178,7 @@ def get_book_from_usfm(file_fragment: str) -> BookCodes:
 
 
 # TODO: Add support for Scripture Burrito
-def parse_files(input_dir, output_dir, resource_id=secrets.token_urlsafe(6)):
+def parse_files(input_dir, output_dir, resource_id=generate_alphanum_id()):
     """
     Parse the uploaded file(s) in `input_dir` and save them in `output_dir`.
     Only allow:
@@ -429,22 +438,3 @@ def get_static_analysis_results_paths(resource_id: str, username: str, version: 
         return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / username / resource_id / version)
 
     return None
-
-def generate_resource_id() -> str:
-    """
-    Create a random alpha-numeric resource ID.
-    Make sure it does not contain `_` or `-`.
-    """
-    # Uses the base64 alphabet
-    resource_id: str = secrets.token_urlsafe(6)
-
-    # We don't want `_` and `-` in the ID.
-    # Try for a finite number of times.
-    for _ in range(20):
-        if '_' in resource_id or \
-           '_' in resource_id:
-            resource_id = secrets.token_urlsafe(6)
-        else:
-            break
-
-    return resource_id
