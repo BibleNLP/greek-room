@@ -1,7 +1,6 @@
 from typing import (
     List,
 )
-import secrets
 from functools import partial
 from datetime import datetime, timezone
 
@@ -57,9 +56,7 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     # Human-and-URL-friendly ID
-    resource_id: Mapped[str] = mapped_column(
-        String(50), default=secrets.token_urlsafe(6)
-    )
+    resource_id: Mapped[str] = mapped_column(String(50))
     name: Mapped[str] = mapped_column(String(1000))
     lang_code: Mapped[str] = mapped_column(String(10))
     lang_name: Mapped[str] = mapped_column(String(100))
