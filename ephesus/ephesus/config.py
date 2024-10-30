@@ -31,7 +31,6 @@ def get_ephesus_settings():
 class LogConfig(BaseSettings):
     """Logging configuration to be set for the server"""
 
-    LOGGER_NAME: str = "ephesus"
     LOG_FORMAT: str = "[%(asctime)s] %(levelname)s %(name)s:%(lineno)d -- %(message)s"
     LOG_LEVEL: str = "DEBUG"
 
@@ -53,5 +52,5 @@ class LogConfig(BaseSettings):
         },
     }
     loggers: dict = {
-        LOGGER_NAME: {"handlers": ["default"], "level": LOG_LEVEL},
+        "": {"handlers": ["default"], "level": LOG_LEVEL},
     }
