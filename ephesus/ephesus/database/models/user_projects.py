@@ -1,7 +1,6 @@
 from typing import (
     List,
 )
-import secrets
 from functools import partial
 from datetime import datetime, timezone
 
@@ -22,6 +21,9 @@ from ..setup import Base
 from ...constants import (
     StatusType,
     ProjectAccessType,
+)
+from ...common.utils import (
+    generate_alphanum_id,
 )
 from ..custom import (
     TZDateTime,
@@ -57,9 +59,8 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     # Human-and-URL-friendly ID
-    resource_id: Mapped[str] = mapped_column(
-        String(50), default=secrets.token_urlsafe(6)
-    )
+    resource_id: Mapped[str] = mapped_column(String(50),
+                                             default=generate_alphanum_id)
     name: Mapped[str] = mapped_column(String(1000))
     lang_code: Mapped[str] = mapped_column(String(10))
     lang_name: Mapped[str] = mapped_column(String(100))

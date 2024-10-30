@@ -55,7 +55,7 @@ from ..common.utils import (
     send_email,
     get_datetime,
     get_static_analysis_results_paths,
-    generate_resource_id,
+    generate_alphanum_id,
 )
 
 # Get app logger
@@ -121,7 +121,7 @@ def create_user_project(
 
     # Save file in a new randomly named dir
     # Create a new `resource_id` for the project
-    resource_id: str = generate_resource_id()
+    resource_id: str = generate_alphanum_id()
 
     # Check if `resource_id` is truly unique in the DB.
     # Over-engineered!
@@ -328,6 +328,52 @@ PS: Please consider automating the Greek Room analysis steps.
         )
 
 
+@api_router.post("/ticket", status_code=status.HTTP_201_CREATED)
+def send_help_ticket(
+    # This >10k to accommodate for browser inserted newline chars
+    message: Annotated[str, Form(max_length=11000)],
+    current_user_email: str = Depends(get_current_user_email),
+    current_username: str = Depends(get_current_username),
+):
+    """Send an email message from the user to the Greek Room email group """
+
+    try:
+        ticket_number: str = generate_alphanum_id(size=6)
+
+        # Create message body
+        body: str = f"""Subject: Help Request #{ticket_number}
+CC: {current_user_email}
+
+{message}
+
+---
+{current_username}
+{current_user_email}
+
+"""
+        # Send the email message
+        # only if in production
+        if ephesus_settings.ephesus_env.lower() == EphesusEnvType.DEVELOPMENT.name.lower():
+            _LOGGER.debug(body)
+        else:
+            send_email(from_addr=ephesus_settings.ephesus_support_email,
+                       to_addr=ephesus_settings.ephesus_support_email,
+                       body=body)
+
+
+    except OutputError as ote:
+        _LOGGER.exception(ote)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"There was an error processing your request. Please try again.",
+        )
+
+    return {
+        "detail": f"Successfully raised help ticket #{ticket_number}. Please check your email ({current_user_email}) for further conversation."
+    }
+
+
 @api_router.post("/projects/{project_resource_id}/reference", status_code=status.HTTP_201_CREATED)
 def create_project_reference(
     project_resource_id: str,
@@ -344,7 +390,7 @@ def create_project_reference(
 
     # Save file in a new randomly named dir
     # Create a new `resource_id` for the reference
-    resource_id: str = generate_resource_id()
+    resource_id: str = generate_alphanum_id()
 
     # Check if `resource_id` is truly unique in the DB.
     # Over-engineered!

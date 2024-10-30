@@ -108,7 +108,8 @@
       {{ project["Project"].name }}
     </h2>
   </div>
-  {% if static_analysis_results_paths is none %}
+  {% if static_analysis_results_paths is none and not
+  project["Project"].project_metadata.manualAnalysisRequestTime %}
   <div class="delete-icon">
     <img
       src="static/home/assets/recycle-bin-icon.webp"

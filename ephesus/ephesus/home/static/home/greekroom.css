@@ -30,10 +30,6 @@ button:hover {
     font-weight: bold;
     display: inline-block;
 }
-.logout {
-    text-decoration: none;
-    font-size: 1em;
-}
 .flexbox {
     display: flex;
     width: 100%;
@@ -157,7 +153,8 @@ a.project-header {
     font-size: 0.75em;
     margin-top: 0.3em;
 }
-.popup .create {
+.popup .create,
+.popup .help {
     float: right;
 }
 @media screen and (max-width: 700px) {
