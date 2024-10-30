@@ -23,7 +23,58 @@
       <div>
         <p class="username">{{ current_username }}</p>
         |
-        <a class="link logout" href="/oauth2/sign_out">Logout</a>
+        <a class="link" href="#helpPopup">Help</a>
+        |
+        <a class="link" href="/oauth2/sign_out">Logout</a>
+      </div>
+    </div>
+
+    <div id="helpPopup" class="overlay">
+      <div class="popup">
+        <div class="header">
+          <div>
+            <h3>Send Help Message</h3>
+          </div>
+          <div>
+            <a class="close" href="#">&times;</a>
+          </div>
+        </div>
+        <div class="content">
+          <form
+            action="{{ url_for('send_help_ticket') }}"
+            method="POST"
+            enctype="multipart/form-data"
+          >
+            <label
+              >Please let us know how we can help you. Share details of your
+              question or need and we will respond to your registered email
+              address as soon as possible.
+              <br />
+              <br />
+              <textarea
+                name="message"
+                class="notes"
+                rows="12"
+                cols="30"
+                maxlength="10000"
+                placeholder="We are happy to help answer all your queries regarding Greek Room- big or small!"
+                required
+              ></textarea>
+            </label>
+            <br />
+            <br />
+            <input type="submit" value="Send" class="help" />
+            <img
+              src="static/home/assets/eclipse-loader.svg"
+              class="help"
+              style="display: none"
+            />
+          </form>
+          <p id="help-form-notification" style="display: none">
+            <b></b>
+            <b>This page will refresh in a moment.</b>
+          </p>
+        </div>
       </div>
     </div>
 
@@ -128,7 +179,7 @@
               style="display: none"
             />
           </form>
-          <p id="form-notification" style="display: none">
+          <p id="create-form-notification" style="display: none">
             <b></b>
             <b>This page will refresh in a moment.</b>
           </p>

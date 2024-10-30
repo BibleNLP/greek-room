@@ -318,9 +318,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function handleCreateProjectFormResult(responseData) {
     document.querySelector("img.create").style.display = "none";
     // Show response
-    document.querySelector("#form-notification > b").innerHTML =
+    document.querySelector("#create-form-notification > b").innerHTML =
       responseData.detail;
-    document.querySelector("#form-notification").style.display = "";
+    document.querySelector("#create-form-notification").style.display = "";
     // Refresh page
     setTimeout(() => {
       location.replace(location.pathname);
@@ -342,6 +342,39 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (reason) => {
           handleCreateProjectFormResult(reason);
+        },
+      );
+    });
+
+  // Function to handle the results after help
+  function handleHelpFormResult(responseData) {
+    document.querySelector("img.help").style.display = "none";
+    // Show response
+    document.querySelector("#help-form-notification > b").innerHTML =
+      responseData.detail;
+    console.log(responseData);
+    document.querySelector("#help-form-notification").style.display = "";
+    // Refresh page
+    setTimeout(() => {
+      location.replace(location.pathname);
+    }, 5000);
+  }
+
+  // Event listener for Help form submission
+  document
+    .querySelector("#helpPopup form")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+      // Show loader
+      document.querySelector("input.help").style.display = "none";
+      document.querySelector("img.help").style.display = "";
+      // Post form
+      postForm(event.target).then(
+        (responseData) => {
+          handleHelpFormResult(responseData);
+        },
+        (reason) => {
+          handleHelpFormResult(reason);
         },
       );
     });
