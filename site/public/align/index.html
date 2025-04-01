@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html class="nojs" lang="en-us" dir="ltr">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Word Alignment Visualization – Greek Room</title>
+
+<meta name="created" content="0001-01-01T00:00:00+0000">
+<meta name="modified" content="0001-01-01T00:00:00+0000">
+
+
+<meta property="og:site_name" content="Greek Room">
+<meta property="og:title" content="Word Alignment Visualization">
+<meta property="og:url" content="http://localhost:1313/align/">
+<meta property="og:type" content="article">
+
+<meta name="generator" content="Hugo 0.145.0">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+
+
+<link rel="canonical" href="http://localhost:1313/align/">
+
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/print.css" media="print">
+
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "headline": "Word Alignment Visualization",
+    "datePublished": "0001-01-01T00:00:00Z",
+    "dateModified": "0001-01-01T00:00:00Z",
+    "url" : "http://localhost:1313/align/",
+    
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "http://localhost:1313/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Greek Room",
+      "url": "http://localhost:1313/"
+    }
+  }
+</script>
+
+<script src="/js/script-early.13eca1c44b48885517a4dc79e153a2da63e3825a7a37c271c88558877cb570b5.js"></script>
+
+<script defer src="/js/script.5ed52cdd956021fd7194109b25dbc5cbe93a1085461b9f29b1284df94c19481c.js"></script>
+
+
+
+
+</head>
+
+<body class="single-page">
+<div class="page layout__page">
+<header class="header layout__header">
+<a href="/" title="Home" rel="home" class="header__logo">
+<img src="/images/logo.png" alt="Home" class="header__logo-image">
+</a>
+<h1 class="header__site-name">
+<a href="/" title="Home" class="header__site-link" rel="home"><span>Greek Room</span></a>
+</h1>
+<div class="region header__region">
+</div>
+</header>
+
+<nav class="main-menu mx--xs layout__navigation" aria-label="Main menu">
+<ul class="flex-inline mx--0">
+</ul>
+</nav>
+<main class="main layout__main">
+<article class="single-view">
+<header>
+<h1 class="title">Word Alignment Visualization</h1>
+</header>
+
+<p>Word alignment supports applications such as spell-checking and learning word order and morphology. Even more directly, it indicates the strength of translation consistency. With its color-coded word alignment strengths, the Greek Room specifically helps to pinpoint words that are unusual translations, or missing or spurious words. Hovering with the mouse over a word in the source or target language will reveal additional information such as the glosses of a word.</p>
+<h2 id="examples-from-english-german-and-english-hindi">Examples from English-German and English-Hindi</h2>
+<ul>
+<li><a href="/align/data/eng-deu-sel.html" target="_blank">Word alignment visualization for English NRSV and German LU84NR06 (selection)</a></li>
+<li><a href="/align/data/eng-hin-sel.html" target="_blank">Word alignment visualization for English ESVUS16 and Hindi IRV (selection)</a></li>
+</ul>
+<h2 id="color-and-text-decoration-codes">Color and text-decoration codes</h2>
+<ul>
+<li>Red indicates an unreliable link. This might indicate a translation problem, but could also just reflect a rare word or an unusual translation.</li>
+<li>Copper rose indicates a link of mixed reliability.</li>
+<li>Green indicates a fairly reliable link.</li>
+<li>Orange indicates that Greek Room has determined a phrase to be spurious (with respect to the other translation).</li>
+<li>Blue indicates a link bolstered by phonetic string similarity (not used if the link is already highly reliable otherwise).</li>
+<li>Light blue indicates that a link was added (in mouse-over hover mode).</li>
+<li>Purple indicates that a link was deleted (in mouse-over hover mode).</li>
+<li>An underscore indicates that a word is not aligned.</li>
+<li>A green underscore indicates that a word is not aligned and that the word is often not aligned (&ldquo;no worries&rdquo;).</li>
+<li>A double-underscore indicates that a word alignment was updated.</li>
+<li>A dashed-underscore indicates that a word is aligned to multiple non-contiguous words on the other side.</li>
+<li>The ⟡ symbol to mark spell-checking information (use mouse-over).</li>
+</ul>
+<h2 id="abbreviations">Abbreviations</h2>
+<p>When you hover over a word, additional information becomes available. Below are abbreviations that occur in the pop-ups.</p>
+<ul>
+<li>gloss: a fairly literal translation of the word, without considering context</li>
+<li>NULL: this indicates that the word often does not correspond to a word in the other language</li>
+<li>c: count (not counting present word)</li>
+<li>p: probabilities (for both directions)</li>
+<li>jc: joint count (of word and its aligned word, not counting present link)</li>
+<li>fw: function word (e.g. <em>and</em> and <em>the</em>)</li>
+<li>sed: smart (phonetic) edit distance; the closer the sed is to 0, the closer the two words are phonetically</li>
+<li>s: score</li>
+<li>rom: romanization (conversion to Latin alphabet)</li>
+<li>[]: number in square brackets indicates word position starting at 0: [0] = first word, [1] = second word etc.</li>
+</ul>
+
+
+</article>
+</main>
+
+
+<footer class="footer layout__footer mt--l">
+<p><span>© Greek Room</span></p>
+
+
+</footer>
+
+</div>
+</body>
+</html>

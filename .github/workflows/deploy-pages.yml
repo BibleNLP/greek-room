@@ -18,5 +18,5 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages  # The branch the action should deploy to
-          folder: site      # The folder containing site files
+          folder: site/public      # The folder containing built site files
           clean: true       # Automatically remove deleted files from the deploy branch

@@ -149,7 +149,6 @@ utilities/scripts
 
 # Hugo files
 .hugo_build.lock
-public
 themes
 
 # Tempfiles
