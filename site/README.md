@@ -62,3 +62,5 @@ This should be enough to update the public website. Sometimes, `nginx` might nee
 ```sh
 sudo nginx -s reload
 ```
+
+Test input

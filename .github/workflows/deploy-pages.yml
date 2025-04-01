@@ -10,13 +10,26 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
 
-      - name: Deploy
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true  # Ensures theme submodules are cloned
+
+      - name: Install Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+
+      - name: Build Hugo site
+        run: |
+          cd site
+          hugo --minify  # Builds the site with the theme applied
+
+      - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages  # The branch the action should deploy to
-          folder: site/public      # The folder containing built site files
-          clean: true       # Automatically remove deleted files from the deploy branch
+          branch: gh-pages  # Deploy to this branch
+          folder: site/public  # Hugo output directory
+          clean: true  # Remove old files
