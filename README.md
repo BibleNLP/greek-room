@@ -20,4 +20,3 @@ or
 git clone https://github.com/BibleNLP/greek-room.git
 ```
 -->
-Test whether changes to files outside site triggers Github Action
