@@ -12,11 +12,11 @@ markup:
     renderer:
       unsafe: true
 
-# menu:
-#   main:
-#   - name: Home
-#     pageRef: /
-#     weight: 10
+menu:
+  main:
+  - name: Home
+    pageRef: /
+    weight: 10
 #   - name: Tools
 #     pageRef: /tools
 #     weight: 20

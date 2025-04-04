@@ -1,6 +1,7 @@
 ---
 title: Word Alignment Visualization
-
+menu: main
+weight: 10
 ---
 Word alignment supports applications such as spell-checking and learning word order and morphology. Even more directly, it indicates the strength of translation consistency. With its color-coded word alignment strengths, the Greek Room specifically helps to pinpoint words that are unusual translations, or missing or spurious words. Hovering with the mouse over a word in the source or target language will reveal additional information such as the glosses of a word.
 

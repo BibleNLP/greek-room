@@ -1,6 +1,7 @@
 ---
 title: Spell Checking
-
+menu: main
+weight: 10
 ---
 The Greek Room offers a spell checker based on phonetic string similarity and word alignment, rather than relying on the need of laboriously curated lists of words and morphological rules used in traditional spell checkers. It allows to identify spelling inconsistencies early on in Bible translation projects. In the word alignment visualization tool, the Greek Room uses the ⟡ symbol to mark spell-checking information.
 

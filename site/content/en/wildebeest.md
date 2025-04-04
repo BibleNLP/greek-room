@@ -1,6 +1,7 @@
 ---
 title: Wildebeest
-
+menu: main
+weight: 10
 ---
 This tool checks a text for a wide range of character level problems such as encoding errors, characters in the wrong script, characters in non-canonical forms and spurious control characters. The Wildebeest analysis script provides feedback on likely issues in a text. The Wildebeest normalization script corrects problems that can be fixed with very high confidence.
 
