@@ -1,4 +1,4 @@
-baseurl: "https://paulkurian-usc.github.io/greek-room/"
+baseurl: "https://biblenlp.github.io/greek-room/"
 title: "Greek Room"
 theme: "zen"
 languageCode: "en-US"       # Set your language code (only needed for none multilingual sites).
