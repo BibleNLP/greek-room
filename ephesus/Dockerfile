@@ -1,14 +1,28 @@
 # Instructions to build an image for Ephesus
 # Start with a Python base image
-FROM python:3.11
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Install requirements
+# Install the project into `/ephesus`
 WORKDIR /ephesus
-COPY ./requirements.txt /ephesus/requirements.txt
-RUN pip install --no-cache-dir -r /ephesus/requirements.txt
 
-# Copy over app and deps
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project --no-dev
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
 COPY ./ephesus /ephesus/ephesus
 COPY ./data /ephesus/data
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev
 
 CMD ["uvicorn", "ephesus.main:app", "--proxy-headers","--forwarded-allow-ips", "*", "--host", "0.0.0.0", "--port", "8000"]

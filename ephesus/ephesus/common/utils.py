@@ -320,8 +320,9 @@ def parse_files(input_dir, output_dir, resource_id=generate_alphanum_id()):
             verses: [str] = []
             vrefs: [str] = []
             for verse, _, vref in extract_scripture_corpus(corpus):
-                verses.append(verse)
-                vrefs.append(vref)
+                if not verse == None and not verse.strip() == "":
+                    verses.append(verse)
+                    vrefs.append(vref)
 
             # Check if there was nothing extracted. If so, bail.
             if not any(vrefs):
