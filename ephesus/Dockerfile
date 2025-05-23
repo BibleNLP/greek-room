@@ -22,6 +22,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Installing separately from its dependencies allows optimal layer caching
 COPY ./ephesus /ephesus/ephesus
 COPY ./data /ephesus/data
+COPY ./uv.lock ./uv.lock
+COPY ./pyproject.toml ./pyproject.toml
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
