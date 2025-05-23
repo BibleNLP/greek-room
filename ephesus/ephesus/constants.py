@@ -157,6 +157,12 @@ DATETIME_TZ_FORMAT_STRING = "%Y-%m-%d %H:%M:%S %z"
 # the the time output is in UTC.
 DATETIME_UTC_UI_FORMAT_STRING = "%B %d, %Y at %H:%M UTC"
 
+# The timezone-aware datetime format
+# string used for showing only date
+# and ignoring the time part.
+# Used in email, for example.
+DATETIME_UTC_DATEONLY_FORMAT_STRING = "%Y-%m-%d"
+
 # The template for downloaded file names
 WILDEBEEST_DOWNLOAD_FILENAME = "wildebeest-report-{name}.txt"
 

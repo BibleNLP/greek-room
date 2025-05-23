@@ -36,6 +36,7 @@ from ..constants import (
     PROJECT_VREF_FILE_NAME,
     DATETIME_TZ_FORMAT_STRING,
     DATETIME_UTC_UI_FORMAT_STRING,
+    DATETIME_UTC_DATEONLY_FORMAT_STRING,
     EphesusEnvType,
     ProjectAccessType,
     ProjectMetadata,
@@ -290,6 +291,7 @@ ID: {resource_id}/{LATEST_PROJECT_VERSION_NAME}
 Language Code: {project_mapping['Project'].lang_code}
 Language Name: {project_mapping['Project'].lang_name if project_mapping['Project'].lang_name else ''}
 Request Datetime: {datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_UI_FORMAT_STRING)}
+Project Information: {{"id": "{project_mapping['Project'].lang_code}-{resource_id}", "lc": "{project_mapping['Project'].lang_code}", "lang": "{project_mapping['Project'].lang_name if project_mapping['Project'].lang_name else ''}", "full": "{project_mapping['Project'].lang_name if project_mapping['Project'].lang_name else ''} {datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_DATEONLY_FORMAT_STRING)}", "short": "{project_mapping['Project'].lang_name if project_mapping['Project'].lang_name else ''} {''.join(datetime.now(tz=timezone.utc).strftime(DATETIME_UTC_DATEONLY_FORMAT_STRING).split('-')[:2])}"}}
 
 Sincerely,
 {current_username}
