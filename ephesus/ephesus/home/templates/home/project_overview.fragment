@@ -309,6 +309,20 @@ project["Project"].project_metadata.notes|length > 0 %}
   </li>
   <li>
     {% if static_analysis_results_paths is not none and
+    static_analysis_results_paths.OWL_DIR is not none %}
+    <a
+      href="{{ static_analysis_results_paths.OWL_DIR }}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="link"
+      >Owl↗</a
+    >
+    {% else %}
+    <span class="bold disabled">Owl</span>
+    {% endif %}
+  </li>
+  <li>
+    {% if static_analysis_results_paths is not none and
     static_analysis_results_paths.ALIGN_VIZ_DIR is not none %}
     <a
       href="{{ static_analysis_results_paths.ALIGN_VIZ_DIR }}"

@@ -108,6 +108,7 @@ class StaticAnalysisResults:
     """
     WILDEBEEST_DIR: Path = None
     SPELL_DIR: Path = None
+    OWL_DIR: Path = None
     ALIGN_VIZ_DIR: Path = None
     NOTES_DIR: Path = None
     USFM_DIR: Path = None
@@ -117,6 +118,7 @@ class StaticAnalysisResults:
     def __init__(self, base_path: Path) -> None:
         self.WILDEBEEST_DIR = base_path / "wildebeest" if (base_path / "wildebeest").exists() else None
         self.SPELL_DIR = base_path / "spell" if (base_path / "spell").exists() else None
+        self.OWL_DIR = base_path / "owl" if (base_path / "owl").exists() else None
         self.ALIGN_VIZ_DIR = base_path / "align" if (base_path / "align").exists() else None
         self.NOTES_DIR = base_path / "notes" if (base_path / "notes").exists() else None
         self.USFM_DIR = base_path / "usfm" if (base_path / "usfm").exists() else None
