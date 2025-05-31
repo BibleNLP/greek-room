@@ -11,6 +11,9 @@ class EphesusSettings(BaseSettings):
     ephesus_static_results_dir: Path
     ephesus_default_vref_file: Path
 
+    ephesus_host_user: str
+    ephesus_host_group: str
+
     ephesus_email_port: int
     ephesus_email_host: str
     ephesus_support_email: str

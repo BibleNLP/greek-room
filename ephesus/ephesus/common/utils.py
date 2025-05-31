@@ -4,6 +4,8 @@ Common utilities in service of the Ephesus application
 
 import os
 import re
+import pwd
+import grp
 import string
 import shutil
 import logging
@@ -439,3 +441,88 @@ def get_static_analysis_results_paths(resource_id: str, username: str, version: 
         return StaticAnalysisResults(ephesus_settings.ephesus_static_results_dir / username / resource_id / version)
 
     return None
+
+
+def copy_with_user_ownership(source_path: Path, dest_path: Path, username: str, target_perm_user: str, target_perm_group: str) -> Path:
+    """
+    Copy a root-owned file/directory to destination with specific user ownership
+
+    Args:
+        source_path: Source file or directory to copy
+        dest_path: Destination base directory
+        username: Username for creating subdirectory
+        target_perm_user: User for ownership
+        target_perm_group: Group for ownership
+
+    Returns:
+        Path to the final destination
+    """
+    mode = 0o755  # rwxr-xr-x
+
+    # Get target user info
+    user_info: pwd.struct_passwd = pwd.getpwnam(target_perm_user)
+    target_uid: int = user_info.pw_uid
+    target_gid: int = grp.getgrnam(target_perm_group).gr_gid
+
+    # Create temporary directory
+    temp_path: Path = Path(tempfile.mkdtemp())
+
+    try:
+        # Step 1: Ensure username directory exists in destination
+        if not (dest_path / username).exists():
+            _LOGGER.debug(f"Creating username directory: {(dest_path / username)}")
+            (temp_path / username).mkdir(parents=True, exist_ok=True)
+            os.chown((temp_path / username), target_uid, target_gid)
+            os.chmod((temp_path / username), mode)
+            shutil.copytree((temp_path / username), dest_path)
+
+        # Step 2: Copy source to temporary location
+        temp_source = temp_path / source_path.name
+        _LOGGER.debug(f"Copying {source_path} to temporary location {temp_source}")
+
+        if source_path.is_dir():
+            shutil.copytree(source_path, temp_source)
+        else:
+            shutil.copy2(source_path, temp_source)
+
+        _LOGGER.debug(f"Copied {source_path} to temporary location {temp_source}")
+
+        # Step 3: Change ownership recursively for the copied content
+        def chown_recursive(path: Path, uid: int, gid: int):
+            """Recursively change ownership"""
+            os.chown(path, uid, gid)
+            if path.is_dir():
+                for item in path.iterdir():
+                    chown_recursive(item, uid, gid)
+
+        chown_recursive(temp_source, target_uid, target_gid)
+        _LOGGER.debug(f"Changed ownership to {target_perm_user}:{target_perm_group}")
+
+        # Step 4: Set permissions recursively
+        def chmod_recursive(path: Path, mode: int):
+            """Recursively change permissions"""
+            path.chmod(mode)
+            if path.is_dir():
+                for item in path.iterdir():
+                    if item.is_dir():
+                        chmod_recursive(item, mode)
+                    else:
+                        item.chmod(mode)
+
+        chmod_recursive(temp_source, mode)
+
+        # Step 5: Move to final destination
+        final_dest = dest_path / username / source_path.name
+
+        shutil.move(str(temp_source), str(final_dest))
+        _LOGGER.debug(f"Moved to final destination: {final_dest}")
+
+        return final_dest
+
+    except Exception as e:
+        _LOGGER.error(f"Error in copy_with_user_ownership: {e}")
+        raise e
+    finally:
+        # Clean up temp directory
+        if temp_path.exists():
+            shutil.rmtree(temp_path)

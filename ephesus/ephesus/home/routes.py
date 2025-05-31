@@ -57,6 +57,7 @@ from ..common.utils import (
     get_datetime,
     get_static_analysis_results_paths,
     generate_alphanum_id,
+    copy_with_user_ownership,
 )
 
 # Get app logger
@@ -313,6 +314,9 @@ PS: Please consider automating the Greek Room analysis steps.
                 manualAnalysisRequestTime=datetime.now(tz=timezone.utc).strftime(
             DATETIME_TZ_FORMAT_STRING
         )))
+
+        # Copy over project files to static location
+        copy_with_user_ownership((ephesus_settings.ephesus_projects_dir / resource_id), ephesus_settings.ephesus_static_results_dir, current_username, ephesus_settings.ephesus_host_user, ephesus_settings.ephesus_host_group)
 
     except OutputError as ote:
         _LOGGER.exception(ote)
