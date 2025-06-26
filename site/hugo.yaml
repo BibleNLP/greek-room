@@ -1,4 +1,4 @@
-baseurl: "https://greekroom.org/"
+baseurl: "https://biblenlp.github.io/greek-room/"
 title: "Greek Room"
 theme: "zen"
 languageCode: "en-US"       # Set your language code (only needed for none multilingual sites).
@@ -12,11 +12,11 @@ markup:
     renderer:
       unsafe: true
 
-# menu:
-#   main:
-#   - name: Home
-#     pageRef: /
-#     weight: 10
+menu:
+  main:
+  - name: Home
+    pageRef: /
+    weight: 10
 #   - name: Tools
 #     pageRef: /tools
 #     weight: 20

@@ -1,0 +1,36 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'  # Only trigger when changes occur in the site directory
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true  # Ensures theme submodules are cloned
+
+      - name: Install Hugo (Extended)
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+          extended: true  # Ensure extended version is installed
+
+      - name: Build Hugo site
+        run: |
+          cd site
+          hugo --minify  
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages  # Deploy to this branch
+          folder: site/public  # Hugo output directory
+          clean: true  # Remove old files
