@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Greek Room</title><link>https://biblenlp.github.io/greek-room/</link><description>Recent content on Greek Room</description><generator>Hugo</generator><language>en-us</language><atom:link href="https://biblenlp.github.io/greek-room/index.xml" rel="self" type="application/rss+xml"/><item><title>Spell Checking</title><link>https://biblenlp.github.io/greek-room/spell/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://biblenlp.github.io/greek-room/spell/</guid><description>&lt;p>The Greek Room offers a spell checker based on phonetic string similarity and word alignment, rather than relying on the need of laboriously curated lists of words and morphological rules used in traditional spell checkers. It allows to identify spelling inconsistencies early on in Bible translation projects. In the word alignment visualization tool, the Greek Room uses the ⟡ symbol to mark spell-checking information.&lt;/p>
+&lt;h2 id="hindi-irv">Hindi IRV&lt;/h2>
+&lt;p>The &lt;a href="https://www.bible.com/bible/1980" target="_HinIRV">Hindi IRV&lt;/a> is a Bible translation that has undergone multiple rounds of checking over several years.
+Still, our spell checker has found a number of likely spelling inconsistencies for both names and non-names.&lt;/p>
+&lt;p>▶ &lt;a href="https://biblenlp.github.io/greek-room/spell/data/spell-summary_hi-IRVHin_en-ESVUS16.html" target="_blank">Spell checker in summary view for Hindi IRV (using ESV 2016 US as pivot)&lt;/a>&lt;/p>
+&lt;p>Example: चरवाहों (caravaahom) vs. चरावाहों (caraavaahom)&lt;/p>
+&lt;ul>
+&lt;li>IRV GEN 29:4 अतः याकूब ने &lt;strong>चरवाहों&lt;/strong> से पूछा, “हे मेरे भाइयों, तुम कहाँ के हो?” उन्होंने कहा, “हम हारान के हैं।”&lt;/li>
+&lt;li>IRV SNG 1:8 &amp;hellip; और &lt;strong>चरावाहों&lt;/strong> के तम्बुओं के पास, अपनी बकरियों के बच्चों को चरा।&lt;/li>
+&lt;li>NIV GEN 29:4 Jacob asked the &lt;strong>shepherds&lt;/strong>, ‘My brothers, where are you from?’ ‘We’re from Harran,’ they replied.&lt;/li>
+&lt;li>NIV SNG 1:8 &amp;hellip; and graze your young goats by the tents of the &lt;strong>shepherds&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;p>Example: यहोशापात	 (Yahoshaapaat) vs. यहोशाफात (Yahoshaaphaat)&lt;/p>
+&lt;ul>
+&lt;li>IRV 1KI 22:41 इस्राएल के राजा अहाब के राज्य के चौथे वर्ष में आसा का पुत्र &lt;strong>यहोशापात&lt;/strong> यहूदा पर राज्य करने लगा।&lt;/li>
+&lt;li>IRV MAT 1:8 आसा से &lt;strong>यहोशाफात&lt;/strong> उत्पन्न हुआ, और यहोशाफात से योराम उत्पन्न हुआ, और योराम से उज्जियाह उत्पन्न हुआ।&lt;/li>
+&lt;li>NIV 1KI 22:41 &lt;strong>Jehoshaphat&lt;/strong> son of Asa became king of Judah in the fourth year of Ahab king of Israel.&lt;/li>
+&lt;li>NIV MAT 1:8 Asa the father of &lt;strong>Jehoshaphat&lt;/strong>, Jehoshaphat the father of Jehoram, Jehoram the father of Uzziah,
+For reference, both English NIV and English ESVUS16 use &lt;strong>Jehoshaphat&lt;/strong> for both 1KI 22:41 and MAT 1:8.&lt;/li>
+&lt;/ul>
+&lt;h2 id="english-nrsv">English NRSV&lt;/h2>
+&lt;p>The English NRSV is a highly curated translation. While our checker did not find any common word typos, it did find a number of potential spelling inconsistencies for Biblical names.&lt;/p>
+&lt;p>▶ &lt;a href="https://biblenlp.github.io/greek-room/spell/data/spell-summary_en-NRSV_de-LU84NR06.html" target="_blank">Spell checker in summary view for English NRSV (using German LU84NR06 as pivot)&lt;/a>&lt;/p>
+&lt;p>Example: Addan vs. Addon&lt;/p>
+&lt;ul>
+&lt;li>NRSV EZR 2:59 The following were those who came up from Tel-melah, Tel-harsha, Cherub, &lt;strong>Addan&lt;/strong>, and Immer, though they could not prove their families or their descent, whether they belonged to Israel:&lt;/li>
+&lt;li>NRSV NEH 7:61 The following were those who came up from Tel-melah, Tel-harsha, Cherub, &lt;strong>Addon&lt;/strong>, and Immer, but they could not prove their ancestral houses or their descent, whether they belonged to Israel:&lt;/li>
+&lt;li>For reference, both English NIV and German LU84NR06 use &lt;strong>Addon&lt;/strong> in both EZR 2:59 and NEH 7:61.&lt;/li>
+&lt;/ul>
+&lt;p>Example: Immanuel vs. Emmanuel&lt;/p>
+&lt;ul>
+&lt;li>NRSV ISA 7:14 Therefore the Lord himself will give you a sign. Look, the young woman is with child and shall bear a son, and shall name him &lt;strong>Immanuel&lt;/strong>.&lt;/li>
+&lt;li>NRSV MAT 1:23 “Look, the virgin shall conceive and bear a son, and they shall name him &lt;strong>Emmanuel&lt;/strong>,” which means, “God is with us.”&lt;/li>
+&lt;li>For reference, both English NIV and German LU84NR06 use &lt;strong>Immanuel&lt;/strong> in both ISA 7:14 and MAT 1:23.&lt;/li>
+&lt;/ul>
+&lt;p>Example: Judas vs. Jude&lt;/p>
+&lt;ul>
+&lt;li>NRSV MAT 10:4 Simon the Cananaean, and &lt;strong>Judas&lt;/strong> Iscariot, the one who betrayed him.&lt;/li>
+&lt;li>NRSV JUD 1:1 &lt;strong>Jude&lt;/strong>, a servant of Jesus Christ and brother of James, To those who are called, who are beloved in God the Father and kept safe for Jesus Christ:&lt;/li>
+&lt;li>The New Testament refers to several people named &lt;em>Ἰούδας&lt;/em> (&lt;em>Judas&lt;/em>). Bible translations for most languages use the same name for the various Judas characters (as in the original Greek), but most English translations deliberately use a different name, &lt;strong>Jude&lt;/strong>, for the Book of Jude.&lt;/li>
+&lt;/ul>
+&lt;p>Example: Abiasaph vs. Ebiasaph&lt;/p>
+&lt;ul>
+&lt;li>NRSV EXO 6:24 The sons of Korah: Assir, Elkanah, and &lt;strong>Abiasaph&lt;/strong>; these are the families of the Korahites.&lt;/li>
+&lt;li>NRSV 1CH 6:22 son of Tahath, son of Assir, son of &lt;strong>Ebiasaph&lt;/strong>, son of Korah,&lt;/li>
+&lt;li>For reference, while German LU84NR06 and a few English translation use the same name for both EXO 6:24 and 1CH 6:22 (&lt;strong>Abiasaf&lt;/strong> (in German) or &lt;strong>Abiasaph&lt;/strong> (in English)), most English translations differentiate between &lt;strong>Abiasaph&lt;/strong> and &lt;strong>Ebiasaph&lt;/strong>.&lt;/li>
+&lt;/ul>
+&lt;p>The final decision on whether or not names in different Bible verses should be spelled the same lies with the human translator and consultant.&lt;/p>
+&lt;p>The spell checker also flags a number of (legitimate) morpholocial variations such as &lt;em>drink, drank, drunk&lt;/em> or &lt;em>woman, women&lt;/em>. This information can be useful for other aspects of Biblical natural language processing.&lt;/p>
+&lt;h2 id="other-translations">Other translations&lt;/h2>
+&lt;p>For the German LU84NR06 translation, the spell checker also flagged a few pairs of archaic/modern forms.&lt;/p>
+&lt;ul>
+&lt;li>höret (archaic), hört (modern) [&amp;ldquo;listen&amp;rdquo;, plural imperative form of &amp;ldquo;hören&amp;rdquo;]&lt;/li>
+&lt;li>ward (archaic), wurde (modern) [&amp;ldquo;became&amp;rdquo;, singular third person past tense form of &amp;ldquo;werden&amp;rdquo;]&lt;/li>
+&lt;/ul>
+&lt;p>We have also successfully applied the Greek Room&amp;rsquo;s spell checker on partial translations of the Bible in several Asian minority languages (not public).&lt;/p>
+&lt;h2 id="using-spell-checking">Using Spell Checking&lt;/h2>
+&lt;p>&lt;strong>For Bible translators:&lt;/strong> We currently offer spell checking support for Bible translation projects on servers running at USC. Please contact us at &lt;a href="mailto:support@greekroom.org">support@greekroom.org&lt;/a>&lt;/p>
+&lt;details>&lt;summary>Preferred format of spell checker input&lt;/summary>
+&lt;ul>
+ &lt;li>USFM files (as e.g. exported from Paratext)&lt;/li>
+ &lt;li>Preferably also the &lt;tt>settings.xml&lt;/tt> file for more accurate versification in the Greek Room results&lt;/li>
+ &lt;li>You can also supply the entire Paratext folder that contains the above (and possibly other stuff).&lt;/li>
+&lt;/ul>
+You may attach the input data to the email you send us, or you can provide us with a location from where we can download the data.&lt;br>
+Spell checking and Wildebeest results will typically be provided on a password-protected server.
+&lt;/details></description></item><item><title>Wildebeest</title><link>https://biblenlp.github.io/greek-room/wildebeest/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://biblenlp.github.io/greek-room/wildebeest/</guid><description>&lt;p>This tool checks a text for a wide range of character level problems such as encoding errors, characters in the wrong script, characters in non-canonical forms and spurious control characters. The Wildebeest analysis script provides feedback on likely issues in a text. The Wildebeest normalization script corrects problems that can be fixed with very high confidence.&lt;/p>
+&lt;h2 id="ebible-corpus">eBible Corpus&lt;/h2>
+&lt;p>We applied the Wildebeest tools to the 1009 translations in the &lt;a href="https://arxiv.org/abs/2304.09919">eBible corpus&lt;/a>. This was part of a project in collaboration with the Partnership for Applied Biblical Natural Language Processing (PAB-NLP) in 2022 and 2023. The Wildebeest normalization scripts made 3.3 million changes in 220 out of the 1009 eBible translations, with subsequent visualization and human review. The majority of changes are not or only barely visible to the human eye, but greatly facilitate further computational processing. See the results in the following links:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://greekroom.org/wildebeest/ebible/" target="_blank">Wildebeest analysis results as applied to the original eBible translations&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://greekroom.org/wildebeest/ebible-orig-plus-diff/" target="_blank">List of changes made to the eBible translations by the Wildebeest normalization scripts&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://greekroom.org/wildebeest/ebible-plus/" target="_blank">Wildebeest analysis results as applied to the updated eBible translations&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Some of the remaining issues flagged might be perfectly valid translations after all. (E.g. some English Bible translations deliberately contain Hebrew characters in the Psalms.) Other issues will need to be corrected by Bible translators with native speaker competence.&lt;/p>
+&lt;h2 id="using-wildebeest">Using &lt;em>Wildebeest&lt;/em>&lt;/h2>
+&lt;p>&lt;strong>Software installation:&lt;/strong> &lt;a target="_GITHUB" href="https://github.com/uhermjakob/wildebeest">Wildebeest on GitHub&lt;/a> (includes description, usage, installation &lt;code>pip install wildebeest-nlp&lt;/code>, code)&lt;br>
+&lt;strong>For Bible translators:&lt;/strong> see support info under &lt;strong>&lt;a href="https://biblenlp.github.io/greek-room/spell/" title="Spell Checking">Spell Checking&lt;/a>&lt;/strong>&lt;/p></description></item><item><title>Word Alignment Visualization</title><link>https://biblenlp.github.io/greek-room/align/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://biblenlp.github.io/greek-room/align/</guid><description>&lt;p>Word alignment supports applications such as spell-checking and learning word order and morphology. Even more directly, it indicates the strength of translation consistency. With its color-coded word alignment strengths, the Greek Room specifically helps to pinpoint words that are unusual translations, or missing or spurious words. Hovering with the mouse over a word in the source or target language will reveal additional information such as the glosses of a word.&lt;/p>
+&lt;h2 id="examples-from-english-german-and-english-hindi">Examples from English-German and English-Hindi&lt;/h2>
+&lt;ul>
+&lt;li>&lt;a href="https://biblenlp.github.io/greek-room/align/data/eng-deu-sel.html" target="_blank">Word alignment visualization for English NRSV and German LU84NR06 (selection)&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://biblenlp.github.io/greek-room/align/data/eng-hin-sel.html" target="_blank">Word alignment visualization for English ESVUS16 and Hindi IRV (selection)&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h2 id="color-and-text-decoration-codes">Color and text-decoration codes&lt;/h2>
+&lt;ul>
+&lt;li>Red indicates an unreliable link. This might indicate a translation problem, but could also just reflect a rare word or an unusual translation.&lt;/li>
+&lt;li>Copper rose indicates a link of mixed reliability.&lt;/li>
+&lt;li>Green indicates a fairly reliable link.&lt;/li>
+&lt;li>Orange indicates that Greek Room has determined a phrase to be spurious (with respect to the other translation).&lt;/li>
+&lt;li>Blue indicates a link bolstered by phonetic string similarity (not used if the link is already highly reliable otherwise).&lt;/li>
+&lt;li>Light blue indicates that a link was added (in mouse-over hover mode).&lt;/li>
+&lt;li>Purple indicates that a link was deleted (in mouse-over hover mode).&lt;/li>
+&lt;li>An underscore indicates that a word is not aligned.&lt;/li>
+&lt;li>A green underscore indicates that a word is not aligned and that the word is often not aligned (&amp;ldquo;no worries&amp;rdquo;).&lt;/li>
+&lt;li>A double-underscore indicates that a word alignment was updated.&lt;/li>
+&lt;li>A dashed-underscore indicates that a word is aligned to multiple non-contiguous words on the other side.&lt;/li>
+&lt;li>The ⟡ symbol to mark spell-checking information (use mouse-over).&lt;/li>
+&lt;/ul>
+&lt;h2 id="abbreviations">Abbreviations&lt;/h2>
+&lt;p>When you hover over a word, additional information becomes available. Below are abbreviations that occur in the pop-ups.&lt;/p>
+&lt;ul>
+&lt;li>gloss: a fairly literal translation of the word, without considering context&lt;/li>
+&lt;li>NULL: this indicates that the word often does not correspond to a word in the other language&lt;/li>
+&lt;li>c: count (not counting present word)&lt;/li>
+&lt;li>p: probabilities (for both directions)&lt;/li>
+&lt;li>jc: joint count (of word and its aligned word, not counting present link)&lt;/li>
+&lt;li>fw: function word (e.g. &lt;em>and&lt;/em> and &lt;em>the&lt;/em>)&lt;/li>
+&lt;li>sed: smart (phonetic) edit distance; the closer the sed is to 0, the closer the two words are phonetically&lt;/li>
+&lt;li>s: score&lt;/li>
+&lt;li>rom: romanization (conversion to Latin alphabet)&lt;/li>
+&lt;li>[]: number in square brackets indicates word position starting at 0: [0] = first word, [1] = second word etc.&lt;/li>
+&lt;/ul></description></item></channel></rss>
