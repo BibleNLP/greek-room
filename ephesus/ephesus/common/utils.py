@@ -255,6 +255,7 @@ def parse_files(input_dir, output_dir, resource_id=generate_alphanum_id()):
                 for usfm_file_item in Path(extract_dir).glob(pattern)
             ]:
                 lines: list[str] = []
+                # _LOGGER.debug("file name %s", usfm_file)
                 with usfm_file.open() as usfm_file_handle:
                     for line in usfm_file_handle:
                         if len(lines) > 2:
@@ -320,9 +321,14 @@ def parse_files(input_dir, output_dir, resource_id=generate_alphanum_id()):
             verses: [str] = []
             vrefs: [str] = []
             for verse, _, vref in extract_scripture_corpus(corpus):
+                verses.append(verse)
+
+                # Handle issue where the extraction always returns
+                # a vref value even if verse does not exist
                 if not verse == None and not verse.strip() == "":
-                    verses.append(verse)
                     vrefs.append(vref)
+                else:
+                    vrefs.append("")
 
             # Check if there was nothing extracted. If so, bail.
             if not any(vrefs):
