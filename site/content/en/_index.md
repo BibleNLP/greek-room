@@ -1,4 +1,4 @@
-> **To try *Greek Room*, register at <a target="_GR" href="https://app.greekroom.org">app.greekroom.org</a> now!**
+> **To try the *Greek Room* application, register at <a target="_GR" href="https://app.greekroom.org">app.greekroom.org</a> now!**
 
 The *Greek Room* is a project to improve the quality and efficiency of Bible translation with software tools that help translators and quality control consultants with spell-checking, terminology consistency, translation drafting and other tasks.
 
