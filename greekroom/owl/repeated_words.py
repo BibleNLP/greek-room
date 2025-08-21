@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # Sample calls
 # cd /Users/ulf2/projects/NLP/GreekRoom3/greekroom
-# cd /Users/ulf2/projects/NLP/GreekRoom3/greekroom
 # owl/repeated_words.py -j owl/data/samples_inputs/ceb_01.json -o tmp/repeated_words3.json
 # owl/repeated_words.py -i /Users/ulf2/projects/NLP/fast_align/data/ceb-GGvlo4L7.txt
 #  -r /Users/ulf2/projects/NLP/fast_align/data/vref.txt --lang_code ceb --lang_name Cebuano
@@ -49,24 +48,40 @@ def read_legitimate_duplicate_data(filename: Path, d: dict, lang_code_restrictio
     with open(filename) as f_in:
         line_number = 0
         n_entries = 0
+        n_deletes = 0
         lang_codes = set()
         for line in f_in:
             line_number += 1
             if regex.match(r"\s*\{.*\}", line):
                 load_d = json.loads(line)
+                delete_entry = load_d.get('delete')
                 lang_code = load_d.get('lang-code')
                 if lang_code and lang_code_restriction and (lang_code != lang_code_restriction):
                     continue
                 text = load_d.get('text')
                 text2 = regex.sub(r'([-,]+\s*|\s+)', ' ', text)
                 if text:
-                    n_entries += 1
-                    if lang_code:
-                        lang_codes.add(lang_code)
-                    d[(lang_code, 'legitimate-duplicate', text2)] = load_d
-                    if d.get((lang_code, 'legitimate-duplicates')) is None:
-                        d[(lang_code, 'legitimate-duplicates')] = []
-                    d[(lang_code, 'legitimate-duplicates')].append(text2)
+                    if delete_entry:
+                        if d.get((lang_code, 'legitimate-duplicate', text2)):
+                            if verbose:
+                                sys.stderr.write(f"Removing legitimate-duplicate entry '{text}' for {lang_code}\n")
+                            del d[(lang_code, 'legitimate-duplicate', text2)]
+                            n_deletes += 1
+                        elif verbose:
+                            sys.stderr.write(f"Cannot remove legitimate-duplicate entry '{text}' for {lang_code}\n")
+                        if text2 in d.get((lang_code, 'legitimate-duplicates'), []):
+                            d[(lang_code, 'legitimate-duplicates')].remove(text2)
+                    else:
+                        n_entries += 1
+                        if lang_code:
+                            lang_codes.add(lang_code)
+                        if verbose and d.get((lang_code, 'legitimate-duplicate', text2)):
+                            sys.stderr.write(f"Overwriting legitimate-duplicate entry '{text}' for {lang_code}\n")
+                        d[(lang_code, 'legitimate-duplicate', text2)] = load_d
+                        if d.get((lang_code, 'legitimate-duplicates')) is None:
+                            d[(lang_code, 'legitimate-duplicates')] = []
+                        if text2 not in d.get((lang_code, 'legitimate-duplicates'), []):
+                            d[(lang_code, 'legitimate-duplicates')].append(text2)
             elif regex.match(r'(#.*|\s*)$', line):
                 # comment or empty line
                 pass
@@ -77,6 +92,9 @@ def read_legitimate_duplicate_data(filename: Path, d: dict, lang_code_restrictio
         if verbose:
             sys.stderr.write(f"Loaded {n_entries} legitimate-duplicate entr{'y' if n_entries == 1 else 'ies'}"
                              f" in {n_lang} language{'' if n_lang == 1 else 's'} from {filename}\n")
+            if n_deletes:
+                sys.stderr.write(f"Deleted {n_deletes} legitimate-duplicate entr{'y' if n_deletes == 1 else 'ies'}"
+                                 f" based on {filename}\n")
 
 
 def markup_duplicate_words(s: str, duplicate_words: str, color: str) -> str:
@@ -133,6 +151,9 @@ def check_for_repeated_words(param_d: dict, data_filename_dict: Dict[str, List[s
             check_for_repeated_words_in_line(snt, snt_id, lang_code, repeated_word_list, misc_data_dict)
     result = {"tool": "GreekRoom", "checks": [{"check": "RepeatedWords", "feedback": repeated_word_list}]}
     error = {}
+    if verbose:
+        sys.stderr.write(f"DFD: {data_filename_dict.get('repeated-words')}\n")
+        sys.stderr.write(f"MDD: {misc_data_dict}\n")
     return result, error, misc_data_dict
 
 
