@@ -41,7 +41,7 @@ Sample calls
 wb_util.py -h
 wb_util.py -s """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n""" -j test.json
 cat test.json
-```
+</code>
 </details>
 
 <details>
