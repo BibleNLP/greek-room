@@ -17,10 +17,8 @@ git clone https://github.com/BibleNLP/greek-room.git
 -->
 
 
-## owl (a battery of smaller Bible Translation checks)
-
-<details>
-
+## owl 
+A battery of smaller Bible Translation checks
 
 <details>
 <summary> <b>wb_util.py</b>
@@ -46,7 +44,9 @@ cat test.json
 ```
 </details>
 
-Note: When working on a clone (as opposed to a pip-install), please make sure that your $PYTHONPATH includes the directory in which this README file resides.
+<details>
+<summary> <b>gr_utilities.wb_util</b>
+A Python function to analyze file properties such as script direction, quotations.</summary>
 ```python 
 import json
 from gr_utilities import wb_util
@@ -73,6 +73,4 @@ with open(html_output, "w") as f_html:
 </details>
 
 ## gr_utilities
-
-#### wb_util.py
 
