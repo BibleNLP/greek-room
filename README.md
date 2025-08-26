@@ -42,6 +42,10 @@ options:
   --lang_code LANG_CODE
   --lang_name LANG_NAME
 ```
+Notes:
+* Typically, either an INPUT_FILENAME or an INPUT_STRING is provided (but not both).
+* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
+
 Sample calls
 ```
 wb_util.py -h
@@ -53,7 +57,7 @@ cat test.json
 </details>
 
 <details>
-<summary> <b>gr_utilities.wb_util</b>
+<summary> <b>gr_utilities.wb_util.script_punct</b>
 A Python function to analyze file properties such as script direction, quotations.</summary>
 
 ```python 
@@ -85,4 +89,94 @@ with open(html_output, "w") as f_html:
 </details>
 
 ## gr_utilities
+_gr_utilities_ is a set of Greek Room utilities..
+
+<details>
+<summary> <b>repeated_words.py</b>
+A CLI Python script to check a file for repeated words, e.g. "the the".</summary>
+
+```
+usage: repeated_words.py [-h] 
+                         [-j JSON] 
+                         [-i IN_FILENAME] 
+                         [-r REF_FILENAME] 
+                         [-o OUT_FILENAME] 
+                         [--html HTML] 
+                         [--project_name PROJECT_NAME] 
+                         [--lang_code LANGUAGE-CODE] 
+                         [--lang_name LANG_NAME] 
+                         [--message_id MESSAGE_ID]
+                         [-d DATA_FILENAMES] 
+                         [--verbose]
+
+options:
+  -h, --help            show this help message and exit
+  -j JSON, --json JSON  input (alternative 1)
+  -i IN_FILENAME, --in_filename IN_FILENAME
+                        text file (alternative 2)
+  -r REF_FILENAME, --ref_filename REF_FILENAME
+                        ref file (alt. 2)
+  -o OUT_FILENAME, --out_filename OUT_FILENAME
+                        output JSON filename
+  --html HTML           output HTML filename
+  --project_name PROJECT_NAME
+                        full name of Bible translation project
+  --lang_code LANGUAGE-CODE
+                        ISO 639-3, e.g. 'fas' for Persian
+  --lang_name LANG_NAME
+  --message_id MESSAGE_ID
+  -d DATA_FILENAMES, --data_filenames DATA_FILENAMES
+  --verbose
+```
+Notes:
+* Typically, either a JSON INPUT_FILENAME or a JSON INPUT_STRING is provided (but not both).
+* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
+
+
+Sample calls
+```
+repeated_words.py -h
+repeated_words.py -j """
+{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English", 
+             "project-id": "eng-sample", 
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}
+""" -o test.json
+cat test.json
+```
+</details>
+
+<details>
+<summary> <b>owl.repeated_words.check_mcp</b>
+A Python function to check a file for repeated words, e.g. "the the".</summary>
+
+```python 
+from owl import repeated_words
+from gr_utilities import general_util
+
+task_s = """
+{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English",
+             "project-id": "eng-sample",
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}
+
+"""
+corpus = general_util.Corpus()
+data_filename_dict = repeated_words.load_data_filename()
+mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
+print(json.dumps(mcp_d))
+print(misc_data_dict)
+print(check_corpus_list)
+```
+</details>
 
