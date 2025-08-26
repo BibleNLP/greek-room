@@ -32,7 +32,7 @@ setup(
     platforms=['any'],
     author='Ulf Hermjakob',
     author_email='ulfhermjakob@gmail.com',
-    packages=find_namespace_packages(exclude=['aux', 'old']),
+    packages=find_namespace_packages(exclude=['aux', 'old', 'tmp']),
     keywords=['machine translation', 'datasets', 'NLP', 'natural language processing,'
                                                         'computational linguistics'],
     entry_points={
