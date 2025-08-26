@@ -136,8 +136,7 @@ Notes:
 Sample calls
 ```
 repeated_words.py -h
-repeated_words.py -j """
-{"jsonrpc": "2.0",
+repeated_words.py -j '{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
  "params": [{"lang-code": "eng", "lang-name": "English", 
@@ -145,8 +144,7 @@ repeated_words.py -j """
              "project-name": "English Bible",
              "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}
-""" -o test.json
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}' -o test.json
 cat test.json
 ```
 </details>
