@@ -1,10 +1,12 @@
 #!/usr/bin/env python
-# wb_util.py -i f.untok -o owl/props.html -j owl/props.json --lang_code eng --lang_name English
+# wb_file_props.py -i f.untok -o owl/props.html -j owl/props.json --lang_code eng --lang_name English
 
 import argparse
 from collections import defaultdict
 import datetime
-from gr_utilities import general_util, html_util
+# from gr_utilities import general_util, html_util
+import gr_utilities.general_util as general_util
+import gr_utilities.html_util as html_util
 import json
 import os
 import regex
