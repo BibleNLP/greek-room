@@ -127,8 +127,8 @@ def check_for_repeated_words_in_line(line: str, snt_id: str, lang_code: str,
                                            "severity": severity})
 
 
-def new_corpus() -> general_util.Corpus:
-    return general_util.Corpus()
+def new_corpus(corpus_id: str | None = None) -> general_util.Corpus:
+    return general_util.Corpus(corpus_id)
 
 
 def check_for_repeated_words(param_d: dict, data_filename_dict: Dict[str, List[str]],
@@ -280,8 +280,9 @@ def load_data_filename(explicit_date_filenames: List[str] | None = None) -> dict
 
 def update_corpus_if_empty(corpus: general_util.Corpus, check_corpus_list: List[dict]) -> general_util.Corpus:
     sys.stderr.write(f"check_corpus_list: {check_corpus_list}\n")
+    corpus_id = corpus.corpus_id if corpus else None
     if (corpus is None) or (not corpus.snt_id2snt.keys()) and check_corpus_list:
-        corpus = new_corpus()
+        corpus = new_corpus(corpus_id)
         corpus.load_corpus_from_in_dict(check_corpus_list)
     return corpus
 
@@ -319,7 +320,9 @@ def main():
             sys.stderr.write(f"Suspicious -j arg: {args.json}\n")
             task_s = args.json
     elif args.in_filename and os.path.exists(args.in_filename):
-        corpus = new_corpus()
+        if not message_id:
+            message_id = f"{lang_code}-{''.join(random.choices(string.ascii_letters + string.digits, k=8))}"
+        corpus = new_corpus(message_id)
         n_entries, error_message = corpus.load_corpus_with_vref(args.in_filename, args.ref_filename)
         if error_message:
             sys.stderr.write(f"{error_message}\n")
@@ -328,8 +331,6 @@ def main():
                    'lang-name': lang_name,
                    'project-name': project_name,
                    'selectors': [{'tool': 'GreekRoom', 'checks': ['RepeatedWords']}]}
-        if not message_id:
-            message_id = f"{lang_code}-{''.join(random.choices(string.ascii_letters + string.digits, k=8))}"
         task_d = {'jsonrpc': '2.0',
                   'id': message_id,
                   'method': 'BibleTranslationCheck',
