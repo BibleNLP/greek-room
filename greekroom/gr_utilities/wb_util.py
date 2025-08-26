@@ -4,8 +4,9 @@
 import argparse
 from collections import defaultdict
 import datetime
-import html_util
+from gr_utilities import general_util, html_util
 import json
+import os
 import regex
 import sys
 from typing import TextIO
@@ -235,7 +236,8 @@ class PunctStyle:
             f_html.write("      </ul>\n")
 
 
-def script_punct(input_filename: str, input_string: str, lang_code: str | None = None, lang_name: str | None = None)\
+def script_punct(input_filename: str | None = None, input_string: str | None = None,
+                 lang_code: str | None = None, lang_name: str | None = None)\
         -> dict:
     script_direction = ScriptDirection(lang_code, lang_name)
     punct_style = PunctStyle()
@@ -297,15 +299,36 @@ def main():
     parser.add_argument('--lang_name', type=str, default=None)
 
     args = parser.parse_args()
+
+    # read lang_code, lang_name from file info.json if not already given
     lang_code = args.lang_code
     lang_name = args.lang_name
+    if not lang_code and not lang_name:
+        if info_d := general_util.read_corpus_json_info("info.json"):
+            lang_code = info_d.get("lc")
+            lang_name = info_d.get("lang")
+    json_out_filename = args.json_out_filename
+    html_out_filename = args.html_out_filename
+
+    # set defaults for json_out_filename and html_out_filename if neither are given
+    if not json_out_filename and not html_out_filename:
+        owl_folder = "owl"
+        if not os.path.isdir(owl_folder):
+            os.mkdir(owl_folder, mode=0o775)
+        json_out_filename = f"{owl_folder}/props.json"
+        html_out_filename = f"{owl_folder}/props.html"
+
     d = script_punct(args.input_filename, args.input_string, lang_code, lang_name)
-    if args.json_out_filename:
-        with open(args.json_out_filename, "w") as f_json:
+    if json_out_filename:
+        with open(json_out_filename, "w") as f_json:
             f_json.write(f"{json.dumps(d)}\n")
-    if args.html_out_filename:
-        with open(args.html_out_filename, "w") as f_html:
+        if not args.json_out_filename:
+            sys.stderr.write(f"Wrote JSON output to {json_out_filename}\n")
+    if html_out_filename:
+        with open(html_out_filename, "w") as f_html:
             print_to_html(d, f_html)
+        if not args.html_out_filename:
+            sys.stderr.write(f"Wrote HTML output to {html_out_filename}\n")
 
 
 if __name__ == "__main__":
