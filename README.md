@@ -25,9 +25,13 @@ _owl_ is a battery of smaller Bible Translation checks.
 A CLI Python script to analyze file properties such as script direction, quotations.</summary>
 
 ```
-usage: wb_util.py [-h] [-i INPUT_FILENAME] [-s INPUT_STRING] 
-                  [-j JSON_OUT_FILENAME] [-o HTML_OUT_FILENAME] 
-                  [--lang_code LANG_CODE] [--lang_name LANG_NAME]
+usage: wb_util.py [-h] 
+                  [-i INPUT_FILENAME] 
+                  [-s INPUT_STRING] 
+                  [-j JSON_OUT_FILENAME] 
+                  [-o HTML_OUT_FILENAME] 
+                  [--lang_code LANG_CODE] 
+                  [--lang_name LANG_NAME]
 
 options:
   -h, --help            show this help message and exit
@@ -41,7 +45,8 @@ options:
 Sample calls
 ```
 wb_util.py -h
-wb_util.py -s """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n""" -j test.json
+wb_util.py -s """She asked: “Whatʼs a ‘PyPi’?”
+He replied: “I don't know.”""" -j test.json
 cat test.json
 ```
 </details>
