@@ -157,7 +157,7 @@ A Python function to check a file for repeated words, e.g. "the the".</summary>
 from owl import repeated_words
 from gr_utilities import general_util
 
-task_s = '{"jsonrpc": "2.0",
+task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
  "params": [{"lang-code": "eng", "lang-name": "English",
@@ -165,7 +165,7 @@ task_s = '{"jsonrpc": "2.0",
              "project-name": "English Bible",
              "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
 
 corpus = general_util.Corpus()
 data_filename_dict = repeated_words.load_data_filename()
