@@ -127,6 +127,10 @@ def check_for_repeated_words_in_line(line: str, snt_id: str, lang_code: str,
                                            "severity": severity})
 
 
+def new_corpus() -> general_util.Corpus:
+    return general_util.Corpus()
+
+
 def check_for_repeated_words(param_d: dict, data_filename_dict: Dict[str, List[str]],
                              corpus: general_util.Corpus | None = None, verbose: bool = False) \
         -> Tuple[dict, dict, dict]:
@@ -196,9 +200,12 @@ def get_feedback(output_d: dict, tool: str, check: str) -> List[dict] | None:
     return None
 
 
-def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Corpus, lang_code: str,
-                  args: argparse.Namespace) -> None:
-    html_out_filename = args.html
+def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Corpus, html_out_filename: str,
+                  lang_code: str, lang_name: str | None = None, project_id: str | None = None) -> None:
+    if lang_name is None:
+        lang_name = lang_code
+    if project_id is None:
+        project_id = lang_name
     repeated_word_dict = defaultdict(list)
     n_repeated_words = 0
     for feedback_d in feedback:
@@ -218,7 +225,7 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
     with open(html_out_filename, 'w') as f_html:
         date = f"{datetime.datetime.now():%B %-d, %Y at %-H:%M}"
         title = f"🦉 &nbsp; Greek Room Repeated Word Check"
-        if project_id := args.project_name or args.lang_name or lang_code or args.in_filename:
+        if project_id:
             title += f" for <nobr>{project_id}</nobr>"
         meta_title = 'Dupl'
         if lang_code:
@@ -230,7 +237,10 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
         f_html.write("<ul>\n")
         for duplicate in sorted(repeated_word_dict.keys(), key=lambda x: (-len(repeated_word_dict[x]), x)):
             if legit_dupl_dict := misc_data_dict.get((lang_code, 'legitimate-duplicate', duplicate)):
-                eng_gloss = legit_dupl_dict['gloss'].get('eng')
+                try:
+                    eng_gloss = legit_dupl_dict['gloss'].get('eng')
+                except KeyError:
+                    eng_gloss = None
                 non_latin_characters = regex.findall(r'(?V1)[\pL--\p{Latin}]', duplicate)
                 rom = legit_dupl_dict.get('rom')
                 title = duplicate + 50 * ' '
@@ -238,7 +248,7 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
                     title += f"&#xA;Romanization: {rom}"
                 if eng_gloss:
                     title += f"&#xA;English gloss: {eng_gloss}"
-                title += f"&#xA;Listed as legitimate for {args.lang_name}"
+                title += f"&#xA;Listed as legitimate for {lang_name}"
                 title = html_util.html_title_guard(title)
                 duplicate2 = (f"<span patitle='{title}' style='color:green;border-bottom:1px dotted;'>"
                               f"{duplicate}</span>")
@@ -268,9 +278,17 @@ def load_data_filename(explicit_date_filenames: List[str] | None = None) -> dict
     return data_filename_dict
 
 
+def update_corpus_if_empty(corpus: general_util.Corpus, check_corpus_list: List[dict]) -> general_util.Corpus:
+    sys.stderr.write(f"check_corpus_list: {check_corpus_list}\n")
+    if (corpus is None) or (not corpus.snt_id2snt.keys()) and check_corpus_list:
+        corpus = new_corpus()
+        corpus.load_corpus_from_in_dict(check_corpus_list)
+    return corpus
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-j', '--json', type=str, help='input (alternative 1)')
+    parser.add_argument('-j', '--json', type=str, help='input text or filename (alternative 1)')
     parser.add_argument('-i', '--in_filename', type=str, help='text file (alternative 2)')
     parser.add_argument('-r', '--ref_filename', type=Path, default='vref.txt', help='ref file (alt. 2)')
     parser.add_argument('-o', '--out_filename', type=str, default=None, help='output JSON filename')
@@ -292,9 +310,16 @@ def main():
     task_s = None
     data_filename_dict = load_data_filename(args.data_filenames)
     if args.json and isinstance(args.json, str):
-        task_s = args.json
+        if os.path.exists(args.json):
+            with open(args.json) as f_in:
+                task_s = f_in.read()
+        elif regex.match(r'\s*\{', args.json):
+            task_s = args.json
+        else:
+            sys.stderr.write(f"Suspicious -j arg: {args.json}\n")
+            task_s = args.json
     elif args.in_filename and os.path.exists(args.in_filename):
-        corpus = general_util.Corpus()
+        corpus = new_corpus()
         n_entries, error_message = corpus.load_corpus_with_vref(args.in_filename, args.ref_filename)
         if error_message:
             sys.stderr.write(f"{error_message}\n")
@@ -324,11 +349,10 @@ def main():
         except IOError:
             sys.stderr.write(f"Cannot write JSON output to {json_out_filename}\n")
     if html_out_filename:
-        if corpus is None and check_corpus_list:
-            corpus = general_util.Corpus()
-            corpus.load_corpus_from_in_dict(check_corpus_list)
+        corpus = update_corpus_if_empty(corpus, check_corpus_list)
         lang_code = mcp_d.get("lang-code") or args.lang_code
-        write_to_html(feedback, misc_data_dict, corpus, lang_code, args)
+        write_to_html(feedback, misc_data_dict, corpus, html_out_filename, lang_code, lang_name,
+                      project_name or args.in_filename)
 
 
 if __name__ == "__main__":
