@@ -1,3 +1,3 @@
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 __description__ = '''This directory provides general Greek Room utilities.'''
-last_mod_date = 'August 25, 2025'
+last_mod_date = 'August 26, 2025'
