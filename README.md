@@ -61,7 +61,8 @@ import json
 from gr_utilities import wb_util
 
 ## Apply script to string
-text = """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n"""
+text = """She asked: “Whatʼs a ‘PyPi’?”
+He replied: “I don't know.”"""
 result_dict = wb_util.script_punct(None, text, "eng", "English")
 print(result_dict)
 
