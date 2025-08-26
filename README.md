@@ -21,17 +21,17 @@ git clone https://github.com/BibleNLP/greek-room.git
 _gr_utilities_ is a set of Greek Room utilities.
 
 <details>
-<summary> <b>wb_util.py</b>
+<summary> <b>wb_file_props.py</b>
 A CLI Python script to analyze file properties such as script direction, quotations.</summary>
 
 ```
-usage: wb_util.py [-h] 
-                  [-i INPUT_FILENAME] 
-                  [-s INPUT_STRING] 
-                  [-j JSON_OUT_FILENAME] 
-                  [-o HTML_OUT_FILENAME] 
-                  [--lang_code LANG_CODE] 
-                  [--lang_name LANG_NAME]
+usage: wb_file_props.py [-h]
+           [-i INPUT_FILENAME]
+           [-s INPUT_STRING]
+           [-j JSON_OUT_FILENAME]
+           [-o HTML_OUT_FILENAME]
+           [--lang_code LANG_CODE]
+           [--lang_name LANG_NAME]
 
 options:
   -h, --help            show this help message and exit
@@ -48,8 +48,8 @@ Notes:
 
 Sample calls
 ```
-wb_util.py -h
-wb_util.py -s """She asked: “Whatʼs a ‘PyPi’?”
+wb_file_props.py -h
+wb_file_props.py -s """She asked: “Whatʼs a ‘PyPi’?”
 He replied: “I don't know.”""" -j test.json
 cat test.json
 
@@ -57,17 +57,17 @@ cat test.json
 </details>
 
 <details>
-<summary> <b>gr_utilities.wb_util.script_punct</b>
+<summary> <b>gr_utilities.wb_file_props.script_punct</b>
 A Python function to analyze file properties such as script direction, quotations.</summary>
 
 ```python 
 import json
-from gr_utilities import wb_util
+from gr_utilities import wb_file_props
 
 ## Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”
 He replied: “I don't know.”"""
-result_dict = wb_util.script_punct(None, text, "eng", "English")
+result_dict = wb_file_props.script_punct(None, text, "eng", "English")
 print(result_dict)
 
 ## Apply script to file content
@@ -77,13 +77,13 @@ with open(filename, "w") as f_out:
     f_out.write(text)
 
 # Apply script
-result_dict2 = wb_util.script_punct(filename)
+result_dict2 = wb_file_props.script_punct(filename)
 # Print result as JSON string
 print(json.dumps(result_dict2))
 # Write result to HTML file
 html_output = "test.html"
 with open(html_output, "w") as f_html:
-    wb_util.print_to_html(result_dict2, f_html)
+    wb_file_props.print_to_html(result_dict2, f_html)
 
 ```
 </details>

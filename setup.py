@@ -38,7 +38,7 @@ setup(
     entry_points={
         'console_scripts': [
             'repeated_words.py=greekroom.owl.repeated_words:main',
-            'wb_file_props.py=greekroom.gr_utilities.wb_util:main',
+            'wb_file_props.py=greekroom.gr_utilities.wb_file_props:main',
         ],
     },
     install_requires=[
