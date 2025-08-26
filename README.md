@@ -17,8 +17,8 @@ git clone https://github.com/BibleNLP/greek-room.git
 -->
 
 
-## owl 
-_owl_ is a battery of smaller Bible Translation checks.
+## gr_utilities
+_gr_utilities_ is a set of Greek Room utilities.
 
 <details>
 <summary> <b>wb_util.py</b>
@@ -88,8 +88,8 @@ with open(html_output, "w") as f_html:
 ```
 </details>
 
-## gr_utilities
-_gr_utilities_ is a set of Greek Room utilities..
+## owl 
+_owl_ is a battery of smaller Bible Translation checks.
 
 <details>
 <summary> <b>repeated_words.py</b>
