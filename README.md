@@ -55,6 +55,7 @@ cat test.json
 <details>
 <summary> <b>gr_utilities.wb_util</b>
 A Python function to analyze file properties such as script direction, quotations.</summary>
+
 ```python 
 import json
 from gr_utilities import wb_util
