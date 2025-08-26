@@ -156,7 +156,6 @@ A Python function to check a file for repeated words, e.g. "the the".</summary>
 ```python 
 import json
 from owl import repeated_words
-from gr_utilities import general_util
 
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
@@ -168,7 +167,7 @@ task_s = '''{"jsonrpc": "2.0",
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
 
-corpus = general_util.Corpus()
+corpus = repeated_words.new_corpus()
 data_filename_dict = repeated_words.load_data_filename()
 mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
 print(json.dumps(mcp_d))
