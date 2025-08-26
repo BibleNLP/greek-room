@@ -154,6 +154,7 @@ cat test.json
 A Python function to check a file for repeated words, e.g. "the the".</summary>
 
 ```python 
+import json
 from owl import repeated_words
 from gr_utilities import general_util
 
