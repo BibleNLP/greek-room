@@ -167,8 +167,9 @@ task_s = '''{"jsonrpc": "2.0",
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
 
-corpus = repeated_words.new_corpus()
+# load_data_filename() loads data of legitimate duplicates such as "truly truly"; function only called once.
 data_filename_dict = repeated_words.load_data_filename()
+corpus = repeated_words.new_corpus("eng-sample-01")
 mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
 print(json.dumps(mcp_d))
 print(misc_data_dict)
@@ -179,6 +180,15 @@ feedback = repeated_words.get_feedback(mcp_d, 'GreekRoom', 'RepeatedWords')
 corpus = repeated_words.update_corpus_if_empty(corpus, check_corpus_list)
 repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng", "English", "English Bible")
 # result will be in test.html
+
+```
+
+Samples from file <i>legitimate_duplicates.jsonl</i>:
+
+```
+{"lang-code": "eng", "text": "truly, truly"}
+{"lang-code": "eng", "text": "her her", "snt-ids": ["HOS 2:17", "EST 2:9", "JDT 10:4"], "context-examples": ["give her her vineyards", "gave her her things for purification"]}
+{"lang-code": "grc", "text": "ἀμὴν ἀμὴν", "rom": "amen amen", "gloss": {"eng": "truly truly [I say to you]"}}
 
 ```
 
