@@ -4,15 +4,16 @@
 import argparse
 from collections import defaultdict
 import datetime
-# from gr_utilities import general_util, html_util
-import gr_utilities.general_util as general_util
-import gr_utilities.html_util as html_util
 import json
 import os
 import regex
 import sys
 from typing import TextIO
 import unicodedata as ud
+sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)))))
+# from gr_utilities import general_util, html_util
+# import gr_utilities.general_util as general_util
+from gr_utilities import general_util, html_util
 
 
 # script_direction = ScriptDirection(lang_code, lang_name)

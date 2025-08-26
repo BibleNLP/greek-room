@@ -19,8 +19,9 @@ import string
 import sys
 from typing import Dict, List, Tuple
 # from gr_utilities import general_util, html_util
-import gr_utilities.general_util as general_util
-import gr_utilities.html_util as html_util
+# import gr_utilities.general_util as general_util
+sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'gr_utilities')))
+from gr_utilities import general_util, html_util
 
 
 def legit_dupl_data_filenames() -> List[str]:
