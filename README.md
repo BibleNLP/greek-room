@@ -166,6 +166,7 @@ task_s = '{"jsonrpc": "2.0",
              "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'
+
 corpus = general_util.Corpus()
 data_filename_dict = repeated_words.load_data_filename()
 mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
