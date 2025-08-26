@@ -182,15 +182,26 @@ repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng
 # result will be in test.html
 
 ```
+</details>
 
-Samples from file <i>legitimate_duplicates.jsonl</i>:
+<details>
+<summary> <b>legitimate_duplicates.jsonl</b> 
+A data file describing legitimate repeated words.</summary>
+
+Samples:
 
 ```
 {"lang-code": "eng", "text": "truly, truly"}
 {"lang-code": "eng", "text": "her her", "snt-ids": ["HOS 2:17", "EST 2:9", "JDT 10:4"], "context-examples": ["give her her vineyards", "gave her her things for purification"]}
 {"lang-code": "grc", "text": "ἀμὴν ἀμὴν", "rom": "amen amen", "gloss": {"eng": "truly truly [I say to you]"}}
 
+{"lang-code": "hin", "text": "जब जब", "rom": "jab jab", "gloss": {"eng": "whenever"}}
+{"lang-code": "hin", "text": "कुछ कुछ", "rom": "kuch kuch", "gloss": {"eng": "something, somewhat, some of, part of"}}
+{"lang-code": "eng", "text": "they they", "delete": true}
 ```
+Notes: 
+* Searches for files <i>owl/data/legitimate_duplicates.jsonl</i> in directories "greekroom", "$XDG_DATA_HOME", "/usr/share", "$HOME/.local/share"
+* <i>delete</i> entries overwrite prior entries
 
 </details>
 
