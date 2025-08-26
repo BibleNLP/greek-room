@@ -1,3 +1,3 @@
-__version__ = '0.0.2'
+__version__ = '0.0.3'
 __description__ = '''The Greek Room will be a suite of tools supporting Biblical natural language processing.'''
-last_mod_date = 'August 20, 2025'
+last_mod_date = 'August 25, 2025'
