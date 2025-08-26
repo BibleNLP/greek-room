@@ -59,11 +59,13 @@ A Python function to analyze file properties such as script direction, quotation
 ```python 
 import json
 from gr_utilities import wb_util
-# Apply script to string
+
+## Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n"""
 result_dict = wb_util.script_punct(None, text, "eng", "English")
 print(result_dict)
-# Apply script to file content
+
+## Apply script to file content
 # Write text to file
 filename = "test.txt"
 with open(filename, "w") as f_out:
