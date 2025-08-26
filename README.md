@@ -173,6 +173,10 @@ mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data
 print(json.dumps(mcp_d))
 print(misc_data_dict)
 print(check_corpus_list)
+
+# print to HTML file
+feedback = get_feedback(mcp_d, 'GreekRoom', 'RepeatedWords')
+repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng", "English", "English Bible")
 ```
 </details>
 
