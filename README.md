@@ -18,14 +18,16 @@ git clone https://github.com/BibleNLP/greek-room.git
 
 
 ## owl 
-A battery of smaller Bible Translation checks
+_owl_ is a battery of smaller Bible Translation checks.
 
 <details>
 <summary> <b>wb_util.py</b>
 A CLI Python script to analyze file properties such as script direction, quotations.</summary>
 
-<code>
-usage: wb_util.py [-h] [-i INPUT_FILENAME] [-s INPUT_STRING] [-j JSON_OUT_FILENAME] [-o HTML_OUT_FILENAME] [--lang_code LANG_CODE] [--lang_name LANG_NAME]
+```
+usage: wb_util.py [-h] [-i INPUT_FILENAME] [-s INPUT_STRING] 
+                  [-j JSON_OUT_FILENAME] [-o HTML_OUT_FILENAME] 
+                  [--lang_code LANG_CODE] [--lang_name LANG_NAME]
 
 options:
   -h, --help            show this help message and exit
@@ -35,13 +37,13 @@ options:
   -o HTML_OUT_FILENAME, --html_out_filename HTML_OUT_FILENAME
   --lang_code LANG_CODE
   --lang_name LANG_NAME
-</code>
+```
 Sample calls
-<code>
+```
 wb_util.py -h
 wb_util.py -s """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n""" -j test.json
 cat test.json
-</code>
+```
 </details>
 
 <details>
@@ -69,7 +71,7 @@ print(json.dumps(result_dict2))
 html_output = "test.html"
 with open(html_output, "w") as f_html:
     wb_util.print_to_html(result_dict2, f_html)
-</code>
+```
 </details>
 
 ## gr_utilities
