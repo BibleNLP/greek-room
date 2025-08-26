@@ -36,12 +36,12 @@ def standard_data_dirs() -> List[str]:
     if xdg_data_home := os.getenv("XDG_DATA_HOME", None):
         if os.path.isdir(xdg_data_home):
             result.append(xdg_data_home)
+    if os.path.isdir("/usr/share"):
+        result.append("/usr/share")
     if home := os.getenv("HOME", None):
         local_share = os.path.join(home, ".local", "share")
         if os.path.isdir(local_share):
             result.append(local_share)
-    if os.path.isdir("/usr/share"):
-        result.append("/usr/share")
     return result
 
 
