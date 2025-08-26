@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 from __future__ import annotations
-from typing import List, Optional, Tuple
+import json
 from pathlib import Path
 import os
 import regex
+import sys
+from typing import List, Optional, Tuple
 
 
 def slot_value_in_double_colon_del_list(line: str, slot: str, default: Optional = None) -> str:
@@ -57,6 +59,32 @@ def findall3(match_regex: str, text: str) -> Tuple[List[str], List[int], List[st
         position += len(core)
     inter_matches.append(rest)
     return matches, start_positions, inter_matches
+
+
+def read_corpus_json_info(info_filename: str = "info.json") -> dict | None:
+    """read in content such as '{"id": "tam-A2aO4fh5", "lc": "tam", "lang": "Tamil", "short": "Tamil IRV 202505",
+                                 "full": "Tamil Indian Revised Version (IRV) 2025-05-05"}'"""
+    if os.path.isfile(info_filename):
+        try:
+            f_info = open(info_filename)
+        except IOError:
+            sys.stderr.write(f"Cannot open file {info_filename}\n")
+            return None
+        try:
+            s = f_info.read()
+        except IOError:
+            sys.stderr.write(f"Cannot read file {info_filename}\n")
+            f_info.close()
+            return None
+        f_info.close()
+        try:
+            return json.loads(s)  # keys: id, lc, lang, short, full
+        except ValueError as error:
+            sys.stderr.write(f"JSON format error in file {info_filename}: {error}\n")
+            return None
+    else:
+        # sys.stderr.write(f"Could not find file {info_filename}\n")
+        return None
 
 
 class Corpus:
