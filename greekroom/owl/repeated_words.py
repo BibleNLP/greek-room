@@ -18,9 +18,7 @@ import regex
 import string
 import sys
 from typing import Dict, List, Tuple
-
-from gr_utilities import general_util
-from gr_utilities import html_util
+from gr_utilities import general_util, html_util
 
 
 def legit_dupl_data_filenames() -> List[str]:
@@ -157,10 +155,11 @@ def check_for_repeated_words(param_d: dict, data_filename_dict: Dict[str, List[s
     return result, error, misc_data_dict
 
 
-def check_mcp(mcp_request: str, data_filename_dict: dict, corpus: general_util.Corpus, verbose: bool) \
+def check_mcp(mcp_request: str, data_filename_dict: dict, corpus: general_util.Corpus, verbose: bool = False) \
         -> Tuple[dict, dict, List[dict]]:
     """Input object to result object and error object"""
     request_timestamp = datetime.datetime.now().replace(microsecond=0).isoformat()
+    # sys.stderr.write(f"MCP: {mcp_request}\n")
     load_d = json.loads(mcp_request)
     load_d["request-timestamp"] = request_timestamp
     if verbose:
@@ -259,6 +258,16 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
         sys.stderr.write(f"Wrote HTML to {full_html_output_filename}\n")
 
 
+def load_data_filename(explicit_date_filenames: List[str] | None = None) -> dict:
+    data_filename_dict = defaultdict(list)
+    repeated_words_data_filenames = data_filename_dict["repeated-words"]
+    data_filenames = explicit_date_filenames or legit_dupl_data_filenames()
+    for data_filename in data_filenames:
+        if data_filename not in repeated_words_data_filenames:
+            repeated_words_data_filenames.append(data_filename)
+    return data_filename_dict
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-j', '--json', type=str, help='input (alternative 1)')
@@ -281,20 +290,10 @@ def main():
     json_out_filename = args.out_filename
     corpus = None
     task_s = None
-    data_filename_dict = defaultdict(list)
-    repeated_words_data_filenames = data_filename_dict["repeated-words"]
-    data_filenames = args.data_filenames or legit_dupl_data_filenames()
-    for data_filename in data_filenames:
-        if data_filename not in repeated_words_data_filenames:
-            repeated_words_data_filenames.append(data_filename)
-    if args.json and os.path.exists(args.json):
-        try:
-            with open(args.json) as f_in:
-                task_s = f_in.read()
-        except IOError:
-            sys.stderr.write(f"Could not read JSON input file {args.json}")
-            return
-    if (not task_s) and args.in_filename and os.path.exists(args.in_filename):
+    data_filename_dict = load_data_filename(args.data_filenames)
+    if args.json and isinstance(args.json, str):
+        task_s = args.json
+    elif args.in_filename and os.path.exists(args.in_filename):
         corpus = general_util.Corpus()
         n_entries, error_message = corpus.load_corpus_with_vref(args.in_filename, args.ref_filename)
         if error_message:
