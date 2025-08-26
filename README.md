@@ -167,7 +167,7 @@ task_s = '''{"jsonrpc": "2.0",
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
 
-# load_data_filename() loads data of legitimate duplicates such as "truly truly"; function only called once.
+# load_data_filename() loads <i>legitimate_duplicates.jsonl</i> (see below); call this function only once, even for multiple checks.
 data_filename_dict = repeated_words.load_data_filename()
 corpus = repeated_words.new_corpus("eng-sample-01")
 mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
@@ -186,7 +186,7 @@ repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng
 
 <details>
 <summary> <b>legitimate_duplicates.jsonl</b> 
-A data file describing legitimate repeated words.</summary>
+Data files describing legitimate repeated words.</summary>
 
 Samples:
 
@@ -201,7 +201,8 @@ Samples:
 ```
 Notes: 
 * Searches for files <i>owl/data/legitimate_duplicates.jsonl</i> in directories "greekroom", "$XDG_DATA_HOME", "/usr/share", "$HOME/.local/share"
-* <i>delete</i> entries overwrite prior entries
+* later entries overwrite prior entries
+* <i>"delete": true</i> entries delete prior entries
 
 </details>
 
