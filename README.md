@@ -71,6 +71,7 @@ print(result_dict)
 filename = "test.txt"
 with open(filename, "w") as f_out:
     f_out.write(text)
+
 # Apply script
 result_dict2 = wb_util.script_punct(filename)
 # Print result as JSON string
@@ -79,6 +80,7 @@ print(json.dumps(result_dict2))
 html_output = "test.html"
 with open(html_output, "w") as f_html:
     wb_util.print_to_html(result_dict2, f_html)
+
 ```
 </details>
 
