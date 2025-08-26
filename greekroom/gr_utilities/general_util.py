@@ -96,6 +96,12 @@ class Corpus:
         if corpus_id:
             Corpus.corpora[corpus_id] = self
 
+    def __repr__(self):
+        result = f"Corpus {self.corpus_id or ''}"
+        for snt_id in sorted(self.snt_id2snt.keys()):
+            result += f"\n   {snt_id} {self.snt_id2snt.get(snt_id)}"
+        return result
+
     @staticmethod
     def find_corpus(corpus_name: str) -> Corpus | None:
         return Corpus.corpora.get(corpus_name)
