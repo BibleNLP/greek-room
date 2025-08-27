@@ -18,7 +18,10 @@ import regex
 import string
 import sys
 from typing import Dict, List, Tuple
-from gr_utilities import general_util, html_util
+try:
+    from gr_utilities import general_util, html_util
+except ImportError:
+    from greekroom.gr_utilities import general_util, html_util
 # import gr_utilities.general_util as general_util
 # sys.path.append(os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'gr_utilities')))
 # from greekroom.gr_utilities import general_util, html_util
