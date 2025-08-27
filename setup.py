@@ -32,13 +32,14 @@ setup(
     platforms=['any'],
     author='Ulf Hermjakob',
     author_email='ulfhermjakob@gmail.com',
-    packages=find_namespace_packages(include=['greekroom', 'greekroom.gr_utilities', 'greekroom.owl'], exclude=['aux', 'old', 'tmp']),
+    packages=find_namespace_packages(exclude=['aux', 'old', 'tmp']),
     keywords=['machine translation', 'datasets', 'NLP', 'natural language processing,'
                                                         'computational linguistics'],
     entry_points={
         'console_scripts': [
             'repeated_words.py=greekroom.owl.repeated_words:main',
             'wb_file_props.py=greekroom.gr_utilities.wb_file_props:main',
+            'test_wb_file_props.py=greekroom.gr_utilities.test.test_wb_file_props:main',
         ],
     },
     install_requires=[
