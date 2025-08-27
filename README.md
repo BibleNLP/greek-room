@@ -62,7 +62,10 @@ A Python function to analyze file properties such as script direction, quotation
 
 ```python 
 import json
-from gr_utilities import wb_file_props
+try:
+    from gr_utilities import wb_file_props
+except ImportError:
+    from greekroom.gr_utilities import wb_file_props
 
 ## Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”
@@ -155,7 +158,10 @@ A Python function to check a file for repeated words, e.g. "the the".</summary>
 
 ```python 
 import json
-from owl import repeated_words
+try:
+   from owl import repeated_words
+except ImportError:
+    from greekroom.owl import repeated_words
 
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
