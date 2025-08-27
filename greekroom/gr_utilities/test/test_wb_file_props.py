@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import json
-from gr_utilities import wb_file_props
+try:
+    from gr_utilities import wb_file_props
+except ImportError:
+    from greekroom.gr_utilities import wb_file_props
 
 # Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”\nHe replied: “I don't know.”\n"""
