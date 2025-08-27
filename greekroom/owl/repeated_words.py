@@ -24,10 +24,12 @@ except ImportError:
     from greekroom.gr_utilities import general_util, html_util
 
 
-def legit_dupl_data_filenames() -> List[str]:
+def legit_dupl_data_filenames(verbose: bool = False) -> List[str]:
     """find data files that list legitimate repeated words, both system and user defined"""
     result = []
     if owl_dir := os.path.dirname(os.path.realpath(__file__)):
+        if verbose:
+            sys.stderr.write(f"owl dir: {owl_dir}\n")
         if owl_data_dir := os.path.join(owl_dir, "data"):
             if os.path.isdir(owl_data_dir):
                 if data_filename := os.path.join(owl_data_dir, "legitimate_duplicates.jsonl"):
@@ -271,10 +273,10 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
         sys.stderr.write(f"Wrote HTML to {full_html_output_filename}\n")
 
 
-def load_data_filename(explicit_date_filenames: List[str] | None = None) -> dict:
+def load_data_filename(explicit_date_filenames: List[str] | None = None, verbose: bool = False) -> dict:
     data_filename_dict = defaultdict(list)
     repeated_words_data_filenames = data_filename_dict["repeated-words"]
-    data_filenames = explicit_date_filenames or legit_dupl_data_filenames()
+    data_filenames = explicit_date_filenames or legit_dupl_data_filenames(verbose)
     for data_filename in data_filenames:
         if data_filename not in repeated_words_data_filenames:
             repeated_words_data_filenames.append(data_filename)
@@ -312,7 +314,7 @@ def main():
     json_out_filename = args.out_filename
     corpus = None
     task_s = None
-    data_filename_dict = load_data_filename(args.data_filenames)
+    data_filename_dict = load_data_filename(args.data_filenames, verbose)
     if args.json and isinstance(args.json, str):
         if os.path.exists(args.json):
             with open(args.json) as f_in:
