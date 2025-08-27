@@ -33,6 +33,7 @@ setup(
     author='Ulf Hermjakob',
     author_email='ulfhermjakob@gmail.com',
     packages=find_namespace_packages(exclude=['aux', 'old', 'tmp']),
+    package_data={'greekroom': ['greekroom/*/data/*']}
     keywords=['machine translation', 'datasets', 'NLP', 'natural language processing,'
                                                         'computational linguistics'],
     entry_points={
