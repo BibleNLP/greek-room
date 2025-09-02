@@ -1,0 +1,56 @@
+[project]
+name = "greekroom"
+version = "0.0.15"
+description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
+readme = "README.md"
+authors = [
+    { name = "Ulf Hermjakob", email = "ulfhermjakob@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "regex>=2025.7.34",
+    "unicodeblock>=0.3.1",
+    "uroman>=1.3.1.1",
+    "wheel>=0.45.1",
+]
+keywords = [
+    "machine translation",
+    "datasets",
+    "NLP",
+    "natural language processing",
+    "computational linguistics"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Utilities",
+    "Topic :: Text Processing",
+    "Topic :: Text Processing :: General",
+    "Topic :: Text Processing :: Filters",
+    "Topic :: Text Processing :: Linguistic",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Homepage = "https://greekroom.org"
+Download = "https://github.com/BibleNLP/greek-room"
+
+[project.scripts]
+"gr_repeated_words.py" = "greekroom.owl.repeated_words:main"
+"gr_wb_file_props.py" = "greekroom.gr_utilities.wb_file_props:main"
+"gr_test_wb_file_props.py" = "greekroom.gr_utilities.test.test_wb_file_props:main"
+
+[tool.setuptools]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+exclude = ["aux", "old", "tmp"]
+
+[tool.setuptools.package-data]
+greekroom = ["data/*", "*/data/*"]
+
+[build-system]
+requires = ["uv_build>=0.8.11,<0.9.0"]
+build-backend = "uv_build"
