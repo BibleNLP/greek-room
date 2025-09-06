@@ -1,6 +1,6 @@
 [project]
 name = "greekroom"
-version = "0.0.15"
+version = "0.0.16"
 description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
 readme = "README.md"
 authors = [
@@ -54,3 +54,7 @@ greekroom = ["data/*", "*/data/*"]
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
 build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "greekroom"
+module-root = ""
