@@ -18,6 +18,7 @@ def html_title_guard(s: str) -> str:
     s = s.replace(' ', '&nbsp;')
     s = s.replace('-', '\u2011')
     s = s.replace('&#xA;', ' ')
+    s = s.replace("'", '&apos;')
     return s
 
 
