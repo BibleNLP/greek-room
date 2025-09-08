@@ -12,8 +12,12 @@ from typing import List, Optional, Tuple
 def slot_value_in_double_colon_del_list(line: str, slot: str, default: Optional = None) -> str:
     """For a given slot, e.g. 'cost', get its value from a line such as '::s1 of course ::s2 ::cost 0.3' -> 0.3
     The value can be an empty string, as for ::s2 in the example above."""
-    m = regex.match(fr'(?:.*\s)?::{slot}(|\s+\S.*?)(?:\s+::\S.*|\s*)$', line)
-    return m.group(1).strip() if m else default
+    if m := regex.match(fr'(?:.*\s)?::{slot}(|\s+\S.*?)(?:\s+::\S.*|\s*)$', line):
+        result = m.group(1).strip()
+        result = result.strip('"')
+        return result
+    else:
+        return default
 
 
 # cwd_path = Path(os.getcwd())
@@ -59,7 +63,6 @@ def findall3(match_regex: str, text: str) -> Tuple[List[str], List[int], List[st
         position += len(core)
     inter_matches.append(rest)
     return matches, start_positions, inter_matches
-
 
 def read_corpus_json_info(info_filename: str = "info.json") -> dict | None:
     """read in content such as '{"id": "tam-A2aO4fh5", "lc": "tam", "lang": "Tamil", "short": "Tamil IRV 202505",
@@ -115,7 +118,7 @@ class Corpus:
         try:
             f_in = open(corpus_filename)
         except IOError:
-            return 0, "Could not read corpus {corpus_filename}"
+            return 0, f"Could not read corpus {corpus_filename}"
         try:
             f_vref = open(vref_filename)
         except IOError:
