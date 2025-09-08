@@ -1,0 +1,17 @@
+# English
+{"lang-code": "eng", "text": "truly, truly"}
+{"lang-code": "eng", "text": "verily, verily"}
+{"lang-code": "eng", "text": "her her", "snt-ids": ["HOS 2:17", "EST 2:9", "JDT 10:4"], "context-examples": ["give her her vineyards", "gave her her things for purification"]}
+
+# Ancient Greek
+{"lang-code": "grc", "text": "ἀμὴν ἀμὴν", "rom": "amen amen", "gloss": {"eng": "truly truly [I say to you]"}}
+
+# Hindi
+{"lang-code": "hin", "text": "जब जब", "rom": "jab jab", "gloss": {"eng": "whenever"}}
+{"lang-code": "hin", "text": "बार बार", "rom": "baar baar", "gloss": {"eng": "frequently"}}
+{"lang-code": "hin", "text": "धीरे धीरे", "rom": "dhiire dhiire", "gloss": {"eng": "slowly, gradually"}}
+{"lang-code": "hin", "text": "कुछ कुछ", "rom": "kuch kuch", "gloss": {"eng": "something, somewhat, some of, part of"}}
+{"lang-code": "hin", "text": "किसी किसी", "rom": "kisii kisii", "gloss": {"eng": "some, certain, only a few [partial inclusion]"}}
+{"lang-code": "hin", "text": "ले ले", "rom": "le le", "gloss": {"eng": "take it"}}
+{"lang-code": "hin", "text": "दे दे", "rom": "de de", "gloss": {"eng": "give it [to me]"}}
+{"lang-code": "hin", "text": "छः छः", "rom": "chah cha", "gloss": {"eng": "six [by] six, six each"}}

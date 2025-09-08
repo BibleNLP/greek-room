@@ -1,0 +1,7 @@
+{"jsonrpc": "2.0",
+ "id": "ceb-GGvlo4L7-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "ceb", "lang-name": "Cebuano", "project-id": "ceb-GGvlo4L7", "project-name": "Cebuano Contemporary Bible (Biblica) 2025-07-10",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "2KI 4:38", "text": "Sa pagbalik ni Eliseo sa Gilgal, adunay kagutom didto. Usa ka adlaw, samtang nakig-istorya ang grupo sa mga propeta kaniya, miingon siya sa iyang sulugoon, “Itak-ang ang dako nga kolon ug pagluto ug sabaw alang niining mga propeta.”"},
+                              {"snt-id": "1KI 10:19", "text": "Adunay unom ka Ang-ang ang trono, ug lingin ang likod niini. Adunay patonganan sa bukton ang isigka-kilid sa trono ug tapad niini adunay estatuwa sa liyon nga nagtindog."}]}]}
