@@ -64,6 +64,7 @@ def findall3(match_regex: str, text: str) -> Tuple[List[str], List[int], List[st
     inter_matches.append(rest)
     return matches, start_positions, inter_matches
 
+
 def read_corpus_json_info(info_filename: str = "info.json") -> dict | None:
     """read in content such as '{"id": "tam-A2aO4fh5", "lc": "tam", "lang": "Tamil", "short": "Tamil IRV 202505",
                                  "full": "Tamil Indian Revised Version (IRV) 2025-05-05"}'"""
