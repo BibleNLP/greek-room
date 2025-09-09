@@ -18,10 +18,7 @@ import regex
 import string
 import sys
 from typing import Dict, List, Tuple
-try:
-    from gr_utilities import general_util, html_util
-except ImportError:
-    from greekroom.gr_utilities import general_util, html_util
+from greekroom.gr_utilities import general_util, html_util
 
 
 def legit_dupl_data_filenames(verbose: bool = False) -> List[str]:
