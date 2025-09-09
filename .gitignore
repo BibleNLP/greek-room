@@ -26,6 +26,9 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+..tmp
+setup.py~v01
+setup.py~v02
 MANIFEST
 
 # PyInstaller
@@ -51,6 +54,8 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+tmp
+test.json
 
 # Translations
 *.mo
