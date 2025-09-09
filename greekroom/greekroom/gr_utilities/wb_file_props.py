@@ -10,10 +10,7 @@ import regex
 import sys
 from typing import TextIO
 import unicodedata as ud
-try:
-    from gr_utilities import general_util, html_util
-except ImportError:
-    from greekroom.gr_utilities import general_util, html_util
+from greekroom.gr_utilities import general_util, html_util
 
 
 # script_direction = ScriptDirection(lang_code, lang_name)
