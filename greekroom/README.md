@@ -16,6 +16,9 @@ git clone https://github.com/BibleNLP/greek-room.git
 ```
 -->
 
+When using the GitHub version, we recommend that your PYTHONPATH includes the outer *greekroom* directory, i.e. the one that includes this README.md;
+additionally you might want to include in PATH the Greek Room's executable directories such as greekroom/greekroom/gr_utilities:greekroom/greekroom/owl .
+
 
 ## gr_utilities
 _gr_utilities_ is a set of Greek Room utilities.
@@ -62,10 +65,7 @@ A Python function to analyze file properties such as script direction, quotation
 
 ```python
 import json
-try:
-    from gr_utilities import wb_file_props
-except ImportError:
-    from greekroom.gr_utilities import wb_file_props
+from greekroom.gr_utilities import wb_file_props
 
 ## Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”
@@ -158,10 +158,7 @@ A Python function to check a file for repeated words, e.g. "the the".</summary>
 
 ```python
 import json
-try:
-   from owl import repeated_words
-except ImportError:
-    from greekroom.owl import repeated_words
+from greekroom.owl import repeated_words
 
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
