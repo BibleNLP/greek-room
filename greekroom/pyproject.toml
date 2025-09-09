@@ -1,6 +1,6 @@
 [project]
 name = "greekroom"
-version = "0.0.17"
+version = "0.0.18"
 description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
 readme = "README.md"
 authors = [
@@ -49,7 +49,7 @@ zip-safe = false
 exclude = ["aux", "old", "tmp"]
 
 [tool.setuptools.package-data]
-greekroom = ["data/*", "*/data/*"]
+greekroom = ["data/*", "owl/data/*"]
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
