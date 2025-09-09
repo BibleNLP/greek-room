@@ -1,6 +1,6 @@
 [project]
 name = "greekroom"
-version = "0.0.16"
+version = "0.0.17"
 description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
 readme = "README.md"
 authors = [
