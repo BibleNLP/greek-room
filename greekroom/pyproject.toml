@@ -46,10 +46,10 @@ include-package-data = true
 zip-safe = false
 
 [tool.setuptools.packages.find]
-exclude = ["aux", "old", "tmp"]
+exclude = ["aux", "old", "tmp", "ualign"]
 
 [tool.setuptools.package-data]
-greekroom = ["data/*", "owl/data/*"]
+greekroom = ["data/*", "*/data/*"]
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
