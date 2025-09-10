@@ -41,16 +41,6 @@ Download = "https://github.com/BibleNLP/greek-room"
 "gr_wb_file_props.py" = "greekroom.gr_utilities.wb_file_props:main"
 "gr_test_wb_file_props.py" = "greekroom.gr_utilities.test.test_wb_file_props:main"
 
-[tool.setuptools]
-include-package-data = true
-zip-safe = false
-
-[tool.setuptools.packages.find]
-exclude = ["aux", "old", "tmp", "ualign"]
-
-[tool.setuptools.package-data]
-greekroom = ["data/*", "*/data/*"]
-
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
 build-backend = "uv_build"
@@ -58,3 +48,5 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "greekroom"
 module-root = ""
+source-exclude = ["greekroom/ualign"]
+
