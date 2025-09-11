@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Sample calls
 # cd /Users/ulf2/projects/NLP/GreekRoom3/greekroom
 # owl/repeated_words.py -j owl/data/samples_inputs/ceb_01.json -o tmp/repeated_words3.json

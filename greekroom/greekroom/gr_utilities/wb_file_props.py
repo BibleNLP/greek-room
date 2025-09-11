@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # wb_file_props.py -i f.untok -o owl/props.html -j owl/props.json --lang_code eng --lang_name English
 
 import argparse
