@@ -24,11 +24,11 @@ additionally you might want to include in PATH the Greek Room's executable direc
 _gr_utilities_ is a set of Greek Room utilities.
 
 <details>
-<summary> <b>wb_file_props.py</b>
+<summary> <b>wb-file-props</b>
 A CLI Python script to analyze file properties such as script direction, quotations.</summary>
 
 ```
-usage: wb_file_props.py [-h]
+usage: wb-file-props [-h]
            [-i INPUT_FILENAME]
            [-s INPUT_STRING]
            [-j JSON_OUT_FILENAME]
@@ -51,8 +51,8 @@ Notes:
 
 Sample calls
 ```
-wb_file_props.py -h
-wb_file_props.py -s """She asked: “Whatʼs a ‘PyPi’?”
+wb-file-props -h
+wb-file-props -s """She asked: “Whatʼs a ‘PyPi’?”
 He replied: “I don't know.”""" -j test.json
 cat test.json
 
@@ -95,22 +95,22 @@ with open(html_output, "w") as f_html:
 _owl_ is a battery of smaller Bible Translation checks.
 
 <details>
-<summary> <b>repeated_words.py</b>
+<summary> <b>repeated-words</b>
 A CLI Python script to check a file for repeated words, e.g. "the the".</summary>
 
 ```
-usage: repeated_words.py [-h]
-                         [-j JSON]
-                         [-i IN_FILENAME]
-                         [-r REF_FILENAME]
-                         [-o OUT_FILENAME]
-                         [--html HTML]
-                         [--project_name PROJECT_NAME]
-                         [--lang_code LANGUAGE-CODE]
-                         [--lang_name LANG_NAME]
-                         [--message_id MESSAGE_ID]
-                         [-d DATA_FILENAMES]
-                         [--verbose]
+usage: repeated-words [-h]
+                      [-j JSON]
+                      [-i IN_FILENAME]
+                      [-r REF_FILENAME]
+                      [-o OUT_FILENAME]
+                      [--html HTML]
+                      [--project_name PROJECT_NAME]
+                      [--lang_code LANGUAGE-CODE]
+                      [--lang_name LANG_NAME]
+                      [--message_id MESSAGE_ID]
+                      [-d DATA_FILENAMES]
+                      [--verbose]
 
 options:
   -h, --help            show this help message and exit
@@ -138,8 +138,8 @@ Notes:
 
 Sample calls
 ```
-repeated_words.py -h
-repeated_words.py -j '{"jsonrpc": "2.0",
+repeated-words -h
+repeated-words -j '{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
  "params": [{"lang-code": "eng", "lang-name": "English",

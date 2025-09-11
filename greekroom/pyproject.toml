@@ -1,6 +1,6 @@
 [project]
 name = "greekroom"
-version = "0.0.18"
+version = "0.0.19"
 description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
 readme = "README.md"
 authors = [
@@ -37,9 +37,9 @@ Homepage = "https://greekroom.org"
 Download = "https://github.com/BibleNLP/greek-room"
 
 [project.scripts]
-"gr_repeated_words.py" = "greekroom.owl.repeated_words:main"
-"gr_wb_file_props.py" = "greekroom.gr_utilities.wb_file_props:main"
-"gr_test_wb_file_props.py" = "greekroom.gr_utilities.test.test_wb_file_props:main"
+gr-repeated-words = "greekroom.owl.repeated_words:main"
+gr-wb-file-props = "greekroom.gr_utilities.wb_file_props:main"
+gr-test-wb-file-props = "greekroom.gr_utilities.test.test_wb_file_props:main"
 
 [build-system]
 requires = ["uv_build>=0.8.11,<0.9.0"]
