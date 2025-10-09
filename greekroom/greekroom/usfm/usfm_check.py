@@ -19,6 +19,7 @@ from pathlib import Path
 import regex
 import sys
 from typing import List, Tuple
+from greekroom.gr_utilities import general_util
 from ualign_utilities import BibleUtilities, DocumentConfiguration, ScriptDirection, BibleRefSpan, DataManager
 import unicodedata as ud
 
@@ -670,7 +671,7 @@ class CorpusModel:
         sc = self.sc
         ref_words = {}
         if sc and sc.doc_config and sc.doc_config.ref_words:
-           ref_words = sc.doc_config.ref_words.get(sc.lang_code, [])
+            ref_words = sc.doc_config.ref_words.get(sc.lang_code, {})
         chapter_keywords = ref_words.get('_CHAPTER_', [])
         chapter_keywords_lc = [x.lower() for x in chapter_keywords]
         verse_keywords = ref_words.get('_VERSE_', [])
@@ -682,6 +683,7 @@ class CorpusModel:
         known_chapter_keywords = []
         known_verse_keywords = []
         known_none_keywords = []
+        general_util.mkdirs_in_path(filename)
         # sys.stderr.write(f"BOOK NORM: {sc.ref_stats.book_name_normalization}\n")
         with (open(filename, 'w') as f):
             d = self.stats()
@@ -3392,6 +3394,7 @@ class UsfmCheck:
             self.current_book: str | None = None
             if self.repair_dir:
                 repair_filename = self.repair_dir / file_basename
+                general_util.mkdirs_in_path(repair_filename)
                 self.repair_fh = open(repair_filename, 'w')
             fls = FileLineStruct(filename, sc=self)
             merge_markers = ('=======', '<<<<<<<', '>>>>>>>', '|||||||')
@@ -3657,6 +3660,7 @@ class UsfmCheck:
         timestamp = datetime.datetime.now().replace(microsecond=0).isoformat()
         repair_log_filename_with_timestamp = self.repair_dir / f"repair-log-{timestamp}.html"
         repair_log_filename = self.repair_dir / f"repair-log.html"
+        general_util.mkdirs_in_path(repair_log_filename_with_timestamp)
         with open(repair_log_filename_with_timestamp, 'w') as f_log:
             info_filename = None
             info_file_dir_candidates = []
@@ -3816,9 +3820,9 @@ def main() -> None:
         doc_config = None
         if default_config_filenames:
             sys.stderr.write(f'No configuration filename provided, '
-                             f'neither as argument or default ({default_config_filenames})')
+                             f'neither as argument or default ({default_config_filenames})\n')
         else:
-            sys.stderr.write('No configuration filename provided')
+            sys.stderr.write('No configuration filename provided\n')
     misc_data_dict = {}
     if args.misc_data_filename and os.path.exists(args.misc_data_filename):
         DataManager.read_file(args.misc_data_filename, misc_data_dict, selectors=['owl'])
@@ -3838,6 +3842,7 @@ def main() -> None:
         os.mkdir(usfm_folder, mode=0o775)
     if args.html:
         full_html_output_filename = cwd / args.html
+        general_util.mkdirs_in_path(args.html)
         f_html_out = open(args.html, 'w')
         if f_full and lang_code:
             f_html_out.write(html_head(f'Selected USFM (Paratext format) Checks for  {f_full}', date,
@@ -3892,6 +3897,7 @@ def main() -> None:
                          f"/{usfm_check.n_additional_lines_in_split_usfm_chapters_and_verses}\n")
     usfm_check.final_check()
     if args.out:
+        general_util.mkdirs_in_path(args.out)
         f_txt = open(args.out, 'w')
     else:
         f_txt = sys.stdout
@@ -3908,6 +3914,7 @@ def main() -> None:
     if args.out:
         f_txt.close()
     if args.scorecard:
+        general_util.mkdirs_in_path(args.scorecard)
         with open(args.scorecard, 'w') as f_scorecard:
             d = {}
             for top_error_cat in ("Severe errors", "Errors", "Auto-repairable errors", "Warnings"):
@@ -3933,6 +3940,7 @@ def main() -> None:
         usfm_check.repair_report_to_html()
     if args.extract and args.extract not in ('None', ):
         try:
+            general_util.mkdirs_in_path(args.extract)
             with open(args.extract, 'w') as f_extract:
                 for key in usfm_check.bible_text_extract_dict:
                     bte = usfm_check.bible_text_extract_dict.get(key)
