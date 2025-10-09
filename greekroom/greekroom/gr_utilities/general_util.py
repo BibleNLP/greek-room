@@ -34,6 +34,18 @@ def find_file(filename: str | Path, dirs: List[str | Path]) -> Path | None:
     return None
 
 
+def mkdirs_in_path(filename: str | Path):
+    if isinstance(filename, Path):
+        filename = str(filename)
+    if not filename.startswith('/'):
+        path_elements = filename.split('/')
+        for path_len in range(1, len(path_elements)):
+            partial_path = '/'.join(path_elements[0:path_len])
+            if (not os.path.isdir(partial_path)) and (not os.path.isfile(partial_path)):
+                sys.stderr.write(f"Making directory {partial_path}\n")  # maybe just temporary?
+                os.mkdir(partial_path, mode=0o775)
+
+
 def standard_data_dirs() -> List[str]:
     result = []
     # https://wiki.archlinux.org/title/XDG_Base_Directory
