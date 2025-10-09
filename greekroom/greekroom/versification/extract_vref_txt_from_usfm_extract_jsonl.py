@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This tool extracts from a USFM extraction-file a versified corpus (rendered as two parallel files).
 # Usage: extract_vref_txt_from_usfm_extract_jsonl.py -i extract.jsonl -o f_usfm.txt -v f_usfm_vref.txt

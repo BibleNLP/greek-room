@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This development auxiliary tool compares two different reversified corpora,
 # allowing for a reference corpus (-r), corpus titles (-l); output in HTML format (-o)
