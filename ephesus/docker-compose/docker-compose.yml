@@ -11,6 +11,7 @@ volumes:
 services:
   postgres:
     image: postgres:15
+    restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     env_file:
@@ -22,6 +23,7 @@ services:
 
   redis:
     image: redis:7
+    restart: always
     volumes:
       - redis-data:/data
       - ./redis-users.acl:/etc/redis/users.acl
@@ -31,6 +33,7 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:23.0
+    restart: always
     env_file:
       - ./keycloak.env
     ports:
@@ -41,6 +44,7 @@ services:
 
   oauth2proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.5.1
+    restart: always
     env_file:
       - ./oauth2proxy.env
     volumes:
@@ -49,16 +53,13 @@ services:
       - 4180:4180
     depends_on:
       - keycloak
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 30s
 
   ephesus:
-    # image: ephesus:2023.12.19.1
     build: /usr/local/src/greek-room/ephesus
+    restart: always
     volumes:
       - ephesus-data:/data
+      - /shared-data/ephesus-data/analysis-requests:/analysis-requests
     env_file:
       - ./ephesus.env
     ports:
@@ -66,10 +67,6 @@ services:
     depends_on:
       - oauth2proxy
       - redis
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 30s
     develop:
       watch:
         - action: sync+restart
@@ -77,6 +74,16 @@ services:
           target: /ephesus
         - action: rebuild
           path: /usr/local/src/greek-room/ephesus/requirements.txt
+
+  ephesus-db-migrations:
+    build: /usr/local/src/greek-room/ephesus
+    volumes:
+      - ephesus-data:/data
+    env_file:
+      - ./ephesus.env
+    depends_on:
+      - ephesus
+    command: alembic -c ephesus/database/alembic.ini upgrade head
 
   backup:
     image: offen/docker-volume-backup:v2.34.0
