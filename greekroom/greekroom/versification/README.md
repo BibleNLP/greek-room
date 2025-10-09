@@ -47,6 +47,8 @@ extract_vref_txt_from_usfm_extract_jsonl.py -h
 
 ### versification.py
 
+This script identifies ("sniffs") the best-fitting versification schema for the input files and then reversifies the corpus to the 'org' schema.
+
 #### Typical usage
 ```
 versification.py -i INPUT_CORPUS_FILENAME  -j INPUT_VERSE_ID_FILENAME  -o OUTPUT_CORPUS_FILENAME  -t ORG_VERSE_ID_FILENAME
@@ -69,6 +71,8 @@ versification.py -h
 
 
 ### versification_diff_html.py
+
+This script visualizes the differences between two versions of a versified Bible corpus.
 
 #### Typical usage
 ```
