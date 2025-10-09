@@ -51,4 +51,4 @@ Abbreviations: bk = book; c = chapter, v = verse, o = other, l = line(s),
 txt = text, d = descriptive title, cl = chapter label
 </details>
 
-Note: The usfm_check.py output file *extract.jsonl* serves as input to script *versification/extract_vref_txt_from_usfm_extract_jsonl.py*
+Note: The usfm_check.py output file *extract.jsonl* serves as input to script [versification/extract_vref_txt_from_usfm_extract_jsonl.py](https://github.com/BibleNLP/greek-room/blob/main/greekroom/greekroom/versification/README.md)
