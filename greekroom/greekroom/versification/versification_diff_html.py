@@ -14,6 +14,7 @@ import regex
 import sys
 from typing import List
 import uroman as ur
+from greekroom.gr_utilities import general_util
 
 
 uroman = ur.Uroman()
@@ -297,6 +298,7 @@ def main():
             if line_number != n_vref_lines:
                 sys.stderr.write(f"Verse number mismatch: {n_vref_lines} ({args.vref_filename}) "
                                  f"!= {line_number} ({input_filename})\n")
+    general_util.mkdirs_in_path(args.output_filename)
     with open(args.output_filename, 'w') as f_html:
         date = f"{datetime.datetime.now():%B %-d, %Y at %-H:%M}"
         title = f"Greek Room Versification Diff"
