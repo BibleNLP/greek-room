@@ -1,22 +1,23 @@
-## Greek Room's Versification
+## Greek Room's Versification Tools
 
 This directory hosts a number of versification scripts.
 <details>
 <summary>Background</summary>
+
 There are multiple schemas to identify Bible verses.
-For example, *The Lord is my shepherd, I shall not want.* is quoted as **PSA 23:1** in many Western Bibles,
-but as **PSA 23:2** in the 'original' schema (which uses PSA 23:1 for the descriptive title *A psalm of David.*).
+For example, *"The Lord is my shepherd, I shall not want."* is identified as **PSA 23:1** in many Bibles,
+but as **PSA 23:2** in the *original* schema (which uses PSA 23:1 for the descriptive title *"A psalm of David."*).
 
 These are the most common schemas:
-* Original ('org')
-* English ('eng')
-* Russian Protestant ('rsc')
+* Original Hebrew/Greek ('org')
+* English, mainly Protestant ('eng')
+* Russian Synodal Canonical, mainly Russian Protestant ('rsc')
 * Russian Orthodox ('rso')
-* Vulgate ('vul')
-* Septuagint ('lxx')
+* Vulgate, mainly Catholic ('vul')
+* Septuagint, mainly Orthodox ('lxx')
 
-In order to compare and align Bible verses across different translation, many tools normalize the versification to "Original" ('org'),
-including, for example, the (eBible Corpus)[https://github.com/BibleNLP/ebible]. This process is called **reversification**.
+In order to compare and align Bible verses across different translation, many tools normalize the versification to *original* ('org'),
+including, for example, the [eBible Corpus](https://github.com/BibleNLP/ebible). This process is called **reversification**.
 
 These versification tools support such reversification. They also provide back-versification.
 </details>
@@ -39,12 +40,14 @@ extract_vref_txt_from_usfm_extract_jsonl.py -h
 <details>
 <summary>Argument notes</summary>
 
-* *extract.jsonl* (input) is the file produced by script (usfm_check.py)[https://github.com/BibleNLP/greek-room/edit/main/greekroom/greekroom/usfm/README.md]
+* *extract.jsonl* (input) is the file produced by script [usfm_check.py](https://github.com/BibleNLP/greek-room/edit/main/greekroom/greekroom/usfm/README.md).
 * *f_usfm.txt* (output) is the Bible corpus in plain text, one verse per line.
 * *f_usfm_vref.txt* (output) is a companion file of verse IDs, matching *f_usfm.txt* line by line.
 </details>
 
 ### versification.py
+
+This script identifies ("sniffs") the best-fitting versification schema for the input files and then reversifies the corpus to the 'org' schema.
 
 #### Typical usage
 ```
@@ -60,14 +63,16 @@ versification.py -h
 <details>
 <summary>Argument notes</summary>
 
-* *f_usfm.txt* (input) is the Bible corpus file produced by script *extract_vref_txt_from_usfm_extract_jsonl.py*
-* *f_usfm_vref.txt* (input) is the verse ID file produced by script *extract_vref_txt_from_usfm_extract_jsonl.py*
-* *vref.txt* (input) is the target verse ID order that the output file *f_usfm_reversified.txt* should be in (file available at (data/vref.txt)[data/vref.txt])
+* *f_usfm.txt* (input) is the Bible corpus file produced by script *extract_vref_txt_from_usfm_extract_jsonl.py* (or by some other script)
+* *f_usfm_vref.txt* (input) is the verse ID file produced by script *extract_vref_txt_from_usfm_extract_jsonl.py* (or by some other script)
+* *vref.txt* (input) is the target verse ID order that the output file *f_usfm_reversified.txt* should be in (standard *vref.txt* file available at [data/vref.txt](data/vref.txt))
 * *f_usfm_reversified.txt* (output) is the reversified Bible corpus (typically following the 'org' schema) matching *vref.txt* line by line.
 </details>
 
 
 ### versification_diff_html.py
+
+This script visualizes the differences between two versions of a versified Bible corpus.
 
 #### Typical usage
 ```
@@ -90,4 +95,3 @@ versification_diff_html.py -h
 * *vref.txt* (input) is a file with the verse IDs, same number of lines as the corpus files.
 * *vers_diff.html* (output) is the visualized difference between the 2 versification versions.
 </details>
-
