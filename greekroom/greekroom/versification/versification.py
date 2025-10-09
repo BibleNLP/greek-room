@@ -13,6 +13,7 @@ from pathlib import Path
 import regex
 import sys
 from typing import List, TextIO, Tuple
+from greekroom.gr_utilities import general_util
 
 
 class BibleStructure:
@@ -389,9 +390,10 @@ class Versification:
             f_log.write(f"  Found {n} {s}: {'; '.join(splits)}\n")
 
     @staticmethod
-    def load_versifications(bible: BibleStructure, f_log: TextIO):
+    def load_versifications(bible: BibleStructure, f_log: TextIO, standard_mapping_dir: str | None = None):
         versification_dir = os.path.dirname(os.path.realpath(__file__))
-        standard_mapping_dir = Path(versification_dir) / 'data' / 'standard_mappings'
+        if standard_mapping_dir is None:
+            standard_mapping_dir = Path(versification_dir) / 'data' / 'standard_mappings'
         for schema in bible.standard_versification_schemas.keys():
             filename = f"{standard_mapping_dir}/{schema}.json"
             f_log.write(f"Loading versification from {filename} ...\n")
@@ -589,6 +591,7 @@ class VersifiedCorpus:
     def write_corpus(self, corpus_filename: str, vref_filename: str, bible: BibleStructure, _f_log: TextIO):
         n_verses_writen = 0
         mapped_verse_ids = set()
+        general_util.mkdirs_in_path(corpus_filename)
         with open(corpus_filename, "w") as f_out, open(vref_filename) as f_vref:
             for line in f_vref:
                 verse_id = line.strip()
@@ -708,6 +711,7 @@ def main():
     parser.add_argument('-d', '--data_log_filename', default='vers/versification_data_log.txt')
     parser.add_argument('-l', '--corpus_log_filename', default='vers/corpus_versification_log.txt')
     parser.add_argument('-b', '--back_versification_filename', default='vers/back_versification.json')
+    parser.add_argument('-m', '--standard_mapping_dir')
     parser.add_argument('--back_versification_diff', nargs=2)
     args = parser.parse_args()
     f_corpus_log = sys.stderr  # default
@@ -717,17 +721,19 @@ def main():
         return
     if args.corpus_log_filename:
         try:
+            general_util.mkdirs_in_path(args.corpus_log_filename)
             f_corpus_log = open(args.corpus_log_filename, 'w')
         except IOError:
             sys.stderr.write(f"Cannot write to {args.corpus_log_filename}")
     f_data_log = sys.stderr  # default
     if args.data_log_filename:
         try:
+            general_util.mkdirs_in_path(args.data_log_filename)
             f_data_log = open(args.data_log_filename, 'w')
         except IOError:
             sys.stderr.write(f"Cannot write to {args.data_log_filename}")
     bible = BibleStructure()
-    Versification.load_versifications(bible, f_data_log)
+    Versification.load_versifications(bible, f_data_log, args.standard_mapping_dir)
     if args.input_corpus_filename and args.input_verse_id_filename:
         input_corpus = VersifiedCorpus(args.input_schema)
         input_corpus.load_corpus(args.input_corpus_filename, args.input_verse_id_filename, f_corpus_log)
@@ -757,6 +763,7 @@ def main():
                 reversified_corpus.report_errors(args.output_verse_id_filename, sys.stderr)
                 if args.back_versification_filename:  # and reversified_corpus.back_versification:
                     try:
+                        general_util.mkdirs_in_path(args.back_versification_filename)
                         with open(args.back_versification_filename, "w") as f_br:
                             f_br.write(json.dumps(reversified_corpus.back_versification) + '\n')
                             sys.stderr.write(f"Wrote {len(reversified_corpus.back_versification):,d} back "
