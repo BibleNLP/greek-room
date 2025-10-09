@@ -1,0 +1,56 @@
+::explanation FQ-NOT-IN-V
+A footnote quotation, e.g. <tt>\f …<b>\fq Son of Man</b>\ft …\f*</tt>, refers to a text segment <i>Son of Man</i> inside the verse text.<br>
+This section lists cases where a footnote quotation such as <i>Son of Man</i> does <b>not</b> occur in the verse text.<br>
+Possible reasons:
+<ul>
+   <li> The footnote quotation or the verse text are not spelled correctly.
+   <li> The footnote quotation should be a footnote <u>keyword</u> (\fk …) instead.
+   <li> The footnote quotation should be marked as italic (\it …\it*) or similar instead.
+   <li> The footnote quotation covers the wrong part of the footnote.
+   <li> The footnote quotation contains extra punctuation etc.
+</ul>
+
+Color codes:
+<ul>
+   <li> <span style="color:red;font-style:italic;">Red</span> marks the text of the footnote quotation.
+   <li> <span style="color:green;">Green</span> marks text at the beginning of the footnote that also occurs in the verse.
+   <li> <span style="color:purple;">Purple</span> marks text at the end of the footnote that also occurs in the verse.
+   <li> <span style="color:blue;">Blue</span> marks text of maximal length text anywhere in the footnote that also occurs in the verse.
+</ul>
+
+::explanation FQ-STAR
+The latest USFM standards recommend <b>not</b> to use <span style="color:red;">\fq*</span> to mark the end of a footnote quotation.<br>
+Instead, the end of a footnote quotation should be marked by another footnote section (e.g. \ft, \fk) or the end of the entire footnote \f*.
+<ul>
+  <li> Deprecated annotation style: &nbsp; &nbsp;&nbsp; <tt>\f …\ft …\fq Son of Man\fq* …\f*</tt> &nbsp; &nbsp; (but still valid) <br>
+  <li> Recommended annotation style: <tt>\f …\ft …\fq Son of Man\ft …\f*</tt>
+  <li> Recommended annotation style: <tt>\f …\ft …\fq Son of Man\f*</tt>
+</ul>
+(The same applies to <span style="color:blue;">\fqa*</span>.)
+
+::explanation FQA-STAR
+The latest USFM standards recommend <b>not</b> to use <span style="color:red;">\fqa*</span> to mark the end of a footnote quotation.<br>
+Instead, the end of a footnote quotation should be marked by another footnote section (e.g. \ft, \fk) or the end of the entire footnote \f*.
+<ul>
+  <li> Deprecated annotation style: &nbsp; &nbsp;&nbsp; <tt>\f …\ft …\fqa Son of Man\fqa* …\f*</tt> &nbsp; &nbsp; (but still valid) <br>
+  <li> Recommended annotation style: <tt>\f …\ft …\fqa Son of Man\ft …\f*</tt>
+  <li> Recommended annotation style: <tt>\f …\ft …\fqa Son of Man\f*</tt>
+</ul>
+(The same applies to <span style="color:blue;">\fq*</span>.)
+
+::explanation FT-STAR
+USFM standards recommend <b>not</b> to use <span style="color:red;">\ft*</span> to mark the end of a footnote text.<br>
+Instead, the end of a footnote text should be marked by another footnote section (e.g. \fq, \fk) or the end of the entire footnote \f*.
+<ul>
+  <li> Deprecated annotation style: &nbsp; &nbsp;&nbsp; <tt>\f …\ft Some helpful information\ft*\f*</tt> <br>
+  <li> Recommended annotation style: <tt>\f …\ft Some helpful information\f*</tt>
+  <li> Recommended annotation style: <tt>\f …\ft Some helpful information about \fq justification\f*</tt>
+</ul>
+
+::explanation XT-STAR
+<ul>
+  <li> Discouraged annotation style: &nbsp; &nbsp;&nbsp; <tt>\x - \xo 2:23 \xt Mrk 1:24; Luk 2:39; Jhn 1:45\xt*\x*</tt> &nbsp; &nbsp;&nbsp; Do not use \xt* inside a full cross-references list \x …\x*
+  <li> Recommended annotation style: &nbsp; &nbsp;&nbsp; <tt>\x - \xo 2:23 \xt Mrk 1:24; Luk 2:39; Jhn 1:45\x*</tt> &nbsp; &nbsp;&nbsp; \xt is automatically closed by \x*
+  <li> Recommended annotation style: <tt>\f …\ft Footnote referring to \xt Jhn 3:16\xt*\f*</tt> &nbsp; &nbsp;&nbsp; But close \xt with \xt* in other contexts, e.g. inside a footnote.
+</ul>
+
