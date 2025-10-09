@@ -24,11 +24,12 @@ These versification tools support such reversification. They also provide back-v
 
 ### extract_vref_txt_from_usfm_extract_jsonl.py
 
-This script extracts from *extract.jsonl* (1) a plain text corpus file and (2) a matching verse ID file.
+This auxiliary script extracts from *extract.jsonl* (1) a plain text corpus file and (2) a matching verse ID file.
 
 #### Typical usage
 ```
-extract_vref_txt_from_usfm_extract_jsonl.py  -i INPUT_FILENAME  -o OUTPUT_FILENAME  -v VREF_FILENAME
+extract_vref_txt_from_usfm_extract_jsonl.py  -i INPUT_FILENAME  -o OUTPUT_FILENAME \
+                                             -v VREF_FILENAME
 ```
 
 **Examples**
@@ -47,16 +48,25 @@ extract_vref_txt_from_usfm_extract_jsonl.py -h
 
 ### versification.py
 
-This script identifies ("sniffs") the best-fitting versification schema for the input files and then reversifies the corpus to the 'org' schema.
+This main reversification script:
+1. Checks the standard versification schema files for any internal **inconsistencies** such as duplicate target verse IDs, verse IDs outside the scope as defined in the chapter length section. Results are written to the file specified by the -d option.
+2. Identifies ("sniffs") and reports the **best-fitting** versification schema for the input, **reporting** how well the corpus fits with repect to each versification schema.
+3. **Reversifies** the corpus from the schema identified in (2) to the 'org' schema.
+4. **Reports problems** during reversification, such as verses being dropped due to duplicate target verse IDs or a source verse ID not being mapped to a valid target ID as specified by -t ORG_VERSE_ID_FILENAME
+5. Provides a **back-versification** dictionary to the file specified by the -b option. 
 
 #### Typical usage
 ```
-versification.py -i INPUT_CORPUS_FILENAME  -j INPUT_VERSE_ID_FILENAME  -o OUTPUT_CORPUS_FILENAME  -t ORG_VERSE_ID_FILENAME
+versification.py -i INPUT_CORPUS_FILENAME  -j INPUT_VERSE_ID_FILENAME \
+                 -t ORG_VERSE_ID_FILENAME -o OUTPUT_CORPUS_FILENAME \
+                 -b BACK_VERSIFICATION_FILENAME  -d DATA_LOG_FILENAME
 ```
 
 **Examples**
 ```
-versification.py -i f_usfm.txt -j f_usfm_vref.txt -t vref.txt -o f_usfm_reversified.txt
+versification.py -i f_usfm.txt -j f_usfm_vref.txt -t vref.txt \
+                 -o f_usfm_reversified.txt -b back_versification.json \
+                 -d data_log.txt
 versification.py -h
 ```
 
@@ -67,6 +77,8 @@ versification.py -h
 * *f_usfm_vref.txt* (input) is the verse ID file produced by script *extract_vref_txt_from_usfm_extract_jsonl.py* (or by some other script)
 * *vref.txt* (input) is the target verse ID order that the output file *f_usfm_reversified.txt* should be in (standard *vref.txt* file available at [data/vref.txt](data/vref.txt))
 * *f_usfm_reversified.txt* (output) is the reversified Bible corpus (typically following the 'org' schema) matching *vref.txt* line by line.
+* *back_versification.json* (optional output) contains a back versification dictionary that supports other tool to convert verse ID from the 'org' schema back to what the user submitted.
+* *data_log.txt* reports any inconsistencies in the standard schema versification mapping files.
 </details>
 
 
@@ -76,7 +88,8 @@ This script visualizes the differences between two versions of a versified Bible
 
 #### Typical usage
 ```
-versification_diff_html.py INPUT_FILENAMES  -r REFERENCE_FILENAME  -l FILE_LEGENDS  -v VREF_FILENAME  -o OUTPUT_FILENAME
+versification_diff_html.py INPUT_FILENAMES  -r REFERENCE_FILENAME  -l FILE_LEGENDS \
+                           -v VREF_FILENAME  -o OUTPUT_FILENAME
 ```
 
 **Examples**
