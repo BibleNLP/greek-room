@@ -1,0 +1,45 @@
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/org.json ...
+  Warning: Invalid mapping sources: S3Y 1:68
+  Found 1 merge: HAB 3:19-20 -> HAB 3:19
+  Loaded 95 books; 1,584 chapters; 43,953 verses; 1 mappings
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/eng.json ...
+  Warning: Dropped verses: TOB 7:18; WIS 17:21; SIR 20:32; BAR 6:73; LJE 1:73; S3Y 1:68; 1ES 1:56-58; 1ES 2:27-30; 1ES 5:72-73; 1ES 6:34; 1ES 8:93-96; DAG 1:1-21; DAG 2:1-49; DAG 3:1-97; DAG 4:1-37; DAG 5:1-31; DAG 6:1-28; DAG 7:1-28; DAG 8:1-27; DAG 9:1-27; DAG 10:1-21; DAG 11:1-45; DAG 12:1-13; DAG 13:64; LAO 1:1-20
+  Warning: Duplicate target verses: ESG 5:2
+  Warning: Invalid mapping sources: ESG 8:40-41; ESG 10:14
+  Warning: Invalid mapping targets: LJE 1:73
+  Found 6 merges: NEH 7:68-69 -> NEH 7:68; PSA 13:5-6 -> PSA 13:6; ISA 64:1-2 -> ISA 64:1; HAB 3:19-20 -> HAB 3:19; ACT 19:40-41 -> ACT 19:40; 2CO 13:12-13 -> 2CO 13:12
+  Found 4 splits: PSA 51:0 -> PSA 51:1-2; PSA 52:0 -> PSA 52:1-2; PSA 54:0 -> PSA 54:1-2; PSA 60:0 -> PSA 60:1-2
+  Loaded 92 books; 1,480 chapters; 40,447 verses; 2,252 mappings
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/rsc.json ...
+  Warning: Invalid mapping sources: 9SA 20:43
+  Warning: Invalid mapping targets: 9SA 21:1
+  Found 5 merges: 1SA 20:42-43 -> 1SA 21:1; NEH 7:68-69 -> NEH 7:68; PSA 89:0-1 -> PSA 90:0; ISA 64:1-2 -> ISA 64:1; HAB 3:19-20 -> HAB 3:19
+  Found 5 splits: LEV 14:55 -> LEV 14:55-56; PSA 86:2 -> PSA 87:1-2; PSA 89:6 -> PSA 90:5-6; SNG 1:1 -> SNG 1:1-2; 2CO 11:32 -> 2CO 11:32-33
+  Loaded 66 books; 1,189 chapters; 31,163 verses; 3,463 mappings
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/rso.json ...
+  ** Error: in schema "rso", ranges have different lengths: PSA 89:2-6 -> PSA 90:1-6
+  Warning: Dropped verses: JOS 24:34-36; PRO 4:28-29; DAN 3:34-90; DAN 5:31; WIS 5:24; WIS 6:26-27; WIS 9:19; WIS 11:27; WIS 12:28; SIR 4:32-35; SIR 5:16-18; SIR 7:37-39; SIR 8:20-22; SIR 9:19-23; SIR 10:32-34; SIR 13:27-32; SIR 16:31; SIR 21:29-31; SIR 22:28-31; SIR 23:28-37; SIR 24:35-37; SIR 25:27-29; SIR 27:31-33; SIR 28:27-30; SIR 29:29-31; SIR 30:26-27; SIR 31:32-37; SIR 32:25; SIR 36:28-29; SIR 37:32-34; SIR 38:35-39; SIR 39:36-42; SIR 40:31-32; SIR 41:28-29; SIR 42:26; SIR 43:34-36; SIR 44:24-27; SIR 45:27-31; SIR 46:21-23; SIR 47:26-31; SIR 48:26-28; SIR 49:17-18; SIR 50:30-31; SIR 51:31-38; 2MA 2:33; 1ES 1:56-58; 1ES 2:27-31; 1ES 6:34
+  Warning: Duplicate source verses: PSA 9:22; PSA 86:2; PSA 113:9; PSA 114:8; 2ES 10:59-60
+  Warning: Duplicate target verses: MAN 1:5; MAN 1:10; MAN 1:15; NEH 7:67; PSA 87:1; ISA 3:20; ISA 63:19; ESG 5:2; 2ES 10:59
+  Warning: Invalid mapping sources: 2ES 7:106-140; ESG 1:23-39; ESG 3:16-22; ESG 4:18-47; ESG 5:15-28; ESG 8:18-41; ESG 10:4-14
+  Found 2 merges: PSA 86:0-1 -> PSA 87:1; HAB 3:19-20 -> HAB 3:19
+  Loaded 79 books; 1,373 chapters; 37,280 verses; 4,249 mappings
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/vul.json ...
+  ** Error: in schema "vul", bad source range 52-23
+  ** Error: in schema "vul", ranges have different lengths: DAG 3:52-23 -> S3Y 1:30-31
+  Warning: Dropped verses: TOB 1:23-25; TOB 2:15-23; TOB 3:18-25; TOB 4:22-23; TOB 5:24-28; TOB 6:20-22; TOB 7:18-20; TOB 8:22-24; TOB 9:7-12; TOB 11:20-21; TOB 13:19-23; TOB 14:16-17; JDT 3:11-15; JDT 4:16-17; JDT 5:25-29; JDT 9:15-19; JDT 13:21-31; JDT 15:15; JDT 16:26-31; SIR 1:31-40; SIR 2:19-23; SIR 3:32-34; SIR 4:32-36; SIR 5:16-18; SIR 7:37-40; SIR 8:20-22; SIR 9:19-25; SIR 10:32-34; SIR 11:35-36; SIR 12:19; SIR 13:27-32; SIR 15:21-22; SIR 16:31; SIR 20:32-33; SIR 21:29-31; SIR 22:28-33; SIR 23:28-38; SIR 24:35-47; SIR 25:27-36; SIR 27:31-33; SIR 28:27-30; SIR 29:29-35; SIR 30:26-27; SIR 31:32-42; SIR 32:25-28; SIR 34:27-31; SIR 35:25-26; SIR 36:28; SIR 37:32-34; SIR 38:35-39; SIR 39:36-41; SIR 40:31-32; SIR 41:28; SIR 42:26; SIR 43:34-37; SIR 44:24-27; SIR 45:27-31; SIR 46:21-23; SIR 47:26-31; SIR 48:26-28; SIR 49:17-19; SIR 50:30-31; SIR 51:31-38; SIR 52:1-13; 1ES 2:31; 1ES 8:97; 1ES 9:56; 2ES 10:60; 6EZ 1:1-63; 6EZ 2:1-78; DAG 3:1-23; DAG 3:53; DAG 3:90; DAG 5:31; DAG 11:1-45; DAG 13:64; LAO 1:1-20
+  Warning: Duplicate source verses: PSA 9:22; PSA 12:1; PSA 113:9; SNG 1:1; ISA 9:20-21; 1MA 1:31
+  Warning: Duplicate target verses: SUS 1:63; NUM 20:28; JOS 4:23; JOS 5:14; JDG 5:31; NEH 7:67; JOB 16:4; PSA 2:12; PSA 4:9; PSA 11:1; PSA 13:3; ISA 8:23; ISA 63:19; BEL 1:1; HOS 2:25; AMO 6:10; JHN 6:51; WIS 2:24; WIS 5:13; WIS 6:21; WIS 9:18; WIS 11:5; 1MA 1:4; 1MA 1:30; 1MA 1:35; 1MA 1:45; 1MA 12:53; 1MA 13:52; 2MA 2:18; 2MA 12:45; 2MA 15:36; 1ES 1:14-16; 1ES 1:49; 1ES 2:1-2; 1ES 2:4; 1ES 2:8; 1ES 2:11; 1ES 2:16-17; 1ES 3:14; 1ES 4:11; 1ES 5:41; 1ES 5:53; 1ES 5:57; 1ES 5:57; 1ES 6:8; 1ES 8:43; 1ES 8:56; 1ES 8:62-63; 1ES 8:84; 1ES 8:90; S3Y 1:1-29; S3Y 1:33; S3Y 1:32; S3Y 1:34-35; S3Y 1:37; S3Y 1:36; S3Y 1:38-67; DAN 3:24-33; DAN 6:1-28; SUS 1:63
+  Warning: Invalid mapping sources: JON 1:17
+  Warning: Invalid mapping targets: S3Y 1:68; DAN 5:31
+  ** Warning: Found 2 implausibly large merges: DAG 13:1-63 -> SUS 1:63; DAG 14:1-42 -> BEL 1:42
+  Found 1 merge: HAB 3:19-20 -> HAB 3:19
+  Loaded 86 books; 1,402 chapters; 38,898 verses; 4,887 mappings
+Loading versification from /Users/ulf/projects/NLP/GreekRoom3/greekroom/greekroom/versification/data/standard_mappings/lxx.json ...
+  Warning: Dropped verses: EZR 14:18-23; EZR 17:73; EZR 19:38; DAG 3:24-90
+  Warning: Duplicate source verses: DAG 4:1-2; PSA 9:22; PSA 113:9; DAG 5:1-30; DAG 6:1-28
+  Warning: Duplicate target verses: JER 49:34
+  Warning: Invalid mapping sources: DAG 5:31; EZR 13:38; 2ES 10:60
+  Warning: Invalid mapping targets: PS2 1:0; DAN 5:31
+  Found 1 merge: HAB 3:19-20 -> HAB 3:19
+  Loaded 89 books; 1,486 chapters; 40,142 verses; 4,889 mappings
