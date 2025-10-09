@@ -1,0 +1,221 @@
+{"tag": "DISABLED_zli1", "exp": "some sort of inline list item", "closing-p": false, "locations": ["ceb-FzonwvHw"]}
+{"tag": "add", "exp": "translator's addition", "closing-p": true, "entity-category-markup": true}
+{"tag": "b", "exp": "blank line", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "bd", "exp": "bold", "closing-p": true, "visual-style": true}
+{"tag": "bdit", "exp": "bold italic", "closing-p": true, "visual-style": true}
+{"tag": "bk", "exp": "book", "closing-p": true, "entity-category-markup": true}
+{"tag": "c", "exp": "chapter", "closing-p": false, "format": ["int"], "one-liner": true, "closed-by": ["c", "id"]}
+{"tag": "ca", "exp": "alt. chapter", "closing-p": true, "format": ["int"], "one-liner": true}
+{"tag": "cat", "exp": "category", "closing-p": true, "entity-category-markup": true}
+{"tag": "cd", "exp": "chapter description", "closing-p": false, "one-liner": true}
+{"tag": "cl", "exp": "chapter label", "closing-p": false, "one-liner": true}
+{"tag": "cls", "exp": "paragraph closing an epistle", "closing-p": false, "immediately-self-closing": true, "one-liner": true}
+{"tag": "cp", "exp": "published chapter character", "closing-p": false, "one-liner": true}
+{"tag": "d", "exp": "descriptive title", "closing-p": false, "one-liner": true}
+{"tag": "dc", "exp": "deuterocanonical/LXX additions", "closing-p": true}
+{"tag": "ef", "exp": "extended footnote", "closing-p": true, "exclusive-children": ["fdc", "fk", "fl", "fm", "fq", "fqa", "fr", "ft", "fv", "fw"]}
+{"tag": "em", "exp": "emphasis", "closing-p": true, "visual-style": true}
+{"tag": "esb", "exp": "sidebar content section", "closing-p": false, "one-liner": true, "closing-tag": "esbe"}
+{"tag": "esbe", "exp": "end of sidebar content section", "closing-p": false, "one-liner": true, "opening-tag": "esb"}
+{"tag": "ex", "exp": "extended cross reference", "closing-p": true, "exclusive-children": ["xo", "xk", "xq", "xt", "xta", "xop"]}
+{"tag": "f", "exp": "footnote", "closing-p": true, "exclusive-children": ["fdc", "fk", "fl", "fm", "fq", "fqa", "fr", "ft", "fv", "fw"], "closed-by": ["f", "end-of-line"]}
+{"tag": "fdc", "exp": "footnote deuterocanonical content", "exp-short": "fn deuterocanon. content", "deprecated": true, "closing-p": true}
+{"tag": "fe", "exp": "footnote endnote", "closing-p": true, "exclusive-children": ["fdc", "fk", "fl", "fm", "fq", "fqa", "fr", "ft", "fv", "fw"]}
+{"tag": "fig", "exp": "figure", "closing-p": true, "can-have-attributes": true, "comment": "mandatory: caption (anchor), src, size, ref"}
+{"tag": "fk", "exp": "footnote keyword", "closing-p": false, "can-have-entity-category-markup-children": true, "entity-category-markup": true}
+{"tag": "fl", "exp": "footnote label", "closing-p": false}
+{"tag": "fm", "exp": "footnote reference mark", "closing-p": true}
+{"tag": "fp", "exp": "footnote paragraph", "closing-p": false}
+{"tag": "fq", "exp": "footnote quotation", "quotation-markup": true, "closing-p": false, "closing-deprecated": true}
+{"tag": "fqa", "exp": "alt. footnote quotation", "quotation-markup": true, "closing-p": false, "closing-deprecated": true}
+{"tag": "fr", "exp": "footnote reference", "closing-p": false}
+{"tag": "ft", "exp": "footnote text", "closing-p": false, "can-have-entity-category-markup-children": true, "comment": "more of a footnote text fragment (non-quote, non-ref)", "closing-deprecated": true}
+{"tag": "fv", "exp": "footnote verse number", "closing-p": true}
+{"tag": "fw", "exp": "footnote witness", "closing-p": false}
+{"tag": "h1", "exp": "header text 1", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "h2", "exp": "header text 2", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "h3", "exp": "header text 3", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "ib", "exp": "introduction blank line", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "id", "exp": "file/book identification", "closing-p": false, "format": ["tok", "str"], "one-liner": true, "closed-by": ["id"], "intro-p": true}
+{"tag": "ide", "exp": "file encryption", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ie", "exp": "introduction end", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "iex", "exp": "introduction explanation", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ili1", "exp": "introduction list item 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ili2", "exp": "introduction list item 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ili3", "exp": "introduction list item 3", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "im", "exp": "introduction margin", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "imi", "exp": "indented introduction margin paragraph", "exp-short": "indented intro margin para", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "imq", "exp": "introduction (margin) paragraph quoted text", "exp-short": "intro para quoted text", "closing-p": true, "one-liner": true, "intro-p": true}
+{"tag": "imt1", "exp": "introduction major title 1", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "imt2", "exp": "introduction major title 2", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "imt3", "exp": "introduction major title 3", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "imte1", "exp": "introduction major title end 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "imte2", "exp": "introduction major title end 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "imte2", "exp": "introduction major title end 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "io1", "exp": "introduction outline 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "io2", "exp": "introduction outline 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "io3", "exp": "introduction outline 3", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ipi", "exp": "indented introduction paragraph", "exp-short": "indented introduction para", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "iq1", "exp": "introduction poetry 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "iq2", "exp": "introduction poetry 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "iq3", "exp": "introduction poetry 3", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "iqt", "exp": "introduction quoted text", "closing-p": true, "quotation-markup": true, "intro-p": true}
+{"tag": "ior", "exp": "introduction outline reference range", "exp-short": "intro outline ref. range", "closing-p": true, "intro-p": true}
+{"tag": "iot", "exp": "introduction outline title", "closing-p": false, "one-liner": true, "heading-p": true, "heading-p": true, "intro-p": true}
+{"tag": "ip", "exp": "introduction paragraph", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ipq", "exp": "introduction paragraph quoted text", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "ipr", "exp": "introduction right-aligned paragraph", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "is1", "exp": "introduction section heading 1", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "is2", "exp": "introduction section heading 2", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "is3", "exp": "introduction section heading 3", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
+{"tag": "it", "exp": "italic", "closing-p": true, "visual-style": true}
+{"tag": "jmp", "exp": "link text (URI)", "closing-p": true, "can-have-attributes": true, "entity-category-markup": true}
+{"tag": "k", "exp": "keyword", "closing-p": true, "entity-category-markup": true}
+{"tag": "lf", "exp": "list footer", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "lh", "exp": "list header", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "li1", "exp": "list item 1", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "li2", "exp": "list item 2", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "li3", "exp": "list item 3", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "li4", "exp": "list item 4", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "li5", "exp": "list item 5", "closing-p": false, "one-liner": true, "table-content": true}
+{"tag": "lik", "exp": "list item 'key' content", "closing-p": true}
+{"tag": "lim1", "exp": "embedded list item 1", "closing-p": false, "one-liner": true}
+{"tag": "lim2", "exp": "embedded list item 2", "closing-p": false, "one-liner": true}
+{"tag": "lim3", "exp": "embedded list item 3", "closing-p": false, "one-liner": true}
+{"tag": "litl", "exp": "list item total", "closing-p": true}
+{"tag": "liv1", "exp": "list item 'value' content 1", "closing-p": true}
+{"tag": "liv2", "exp": "list item 'value' content 2", "closing-p": true}
+{"tag": "liv3", "exp": "list item 'value' content 3", "closing-p": true}
+{"tag": "m", "exp": "continuation (margin) paragraph", "exp-short": "continuation (margin) para", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "mi", "exp": "indented paragraph, first line not indented", "exp-short": "indented para, l.1 unindented", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "mr", "exp": "major range", "closing-p": false, "one-liner": true}
+{"tag": "ms1", "exp": "major section heading 1", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "ms2", "exp": "major section heading 2", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "ms3", "exp": "major section heading 3", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "ms4", "exp": "major section heading 4", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "ms5", "exp": "major section heading 5", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mt1", "exp": "major title 1", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mt2", "exp": "major title 2", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mt3", "exp": "major title 3", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mt4", "exp": "major title 4", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mt5", "exp": "major title 5", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mte1", "exp": "major title at ending 1", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mte2", "exp": "major title at ending 2", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "mte3", "exp": "major title at ending 3", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "nb", "exp": "no break", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "nd", "exp": "name of god", "closing-p": true, "entity-category-markup": true}
+{"tag": "ndx", "exp": "subject index entry", "closing-p": true, "entity-category-markup": true}
+{"tag": "no", "exp": "normal text", "closing-p": true, "visual-style": true}
+{"tag": "ord", "exp": "ordinal number ending", "closing-p": true, "entity-category-markup": true}
+{"tag": "p", "exp": "paragraph", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pb", "exp": "page break", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pc", "exp": "centered paragraph", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "periph", "exp": "peripheral division title", "closing-p": false, "one-liner": true, "can-have-attributes": true}
+{"tag": "ph1", "exp": "indented paragraph with hanging indent 1", "exp-short": "hanging indented paragraph 1", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "deprecated": true, "paragraph-format": true}
+{"tag": "ph2", "exp": "indented paragraph with hanging indent 2", "exp-short": "hanging indented paragraph 2", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "deprecated": true, "paragraph-format": true}
+{"tag": "ph3", "exp": "indented paragraph with hanging indent 3", "exp-short": "hanging indented paragraph 3", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "deprecated": true, "paragraph-format": true}
+{"tag": "pi1", "exp": "indented paragraph 1", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pi2", "exp": "indented paragraph 2", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pi3", "exp": "indented paragraph 3", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pm", "exp": "embedded text paragraph", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pmc", "exp": "embedded text closing paragraph", "exp-short": "embedded text closing para", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pmo", "exp": "embedded text opening paragraph", "exp-short": "embedded text opening para", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pmr", "exp": "embedded text refrain paragraph", "exp-short": "embedded text refrain para", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pn", "exp": "proper name", "closing-p": true, "entity-category-markup": true}
+{"tag": "png", "exp": "geographic proper name", "closing-p": true, "entity-category-markup": true}
+{"tag": "po", "exp": "paragraph opening an epistle", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pr", "exp": "right-aligned paragraph", "closing-p": false, "immediately-self-closing": true, "one-liner": true, "paragraph-format": true}
+{"tag": "pro", "exp": "pronunciation", "closing-p": true, "deprecated": true}
+{"tag": "q1", "exp": "poetry 1", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "q2", "exp": "poetry 2", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "q3", "exp": "poetry 3", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "q4", "exp": "poetry 4", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "q5", "exp": "poetry 5", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "qa", "exp": "acrostic heading", "exp-long": "acrostic heading  (the first letters of each verse in poetry, which spell out a word, message, or the alphabet, e.g. the Hebrew alphabet in Psalm 119)", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "qac", "exp": "acrostic letter", "exp-long": "acrostic letter  (the first letter of a verse in poetry, which together with other acrostic letters spell out a word, message, or the alphabet, e.g. the Hebrew alphabet in Psalm 119)", "closing-p": true}
+{"tag": "qc", "exp": "centered poetic line", "closing-p": false, "one-liner": true}
+{"tag": "qd", "exp": "Hebrew director's note", "exp-long": "Hebrew director's musical performance note (at the end of the poetic section)", "closing-p": false, "one-liner": true}
+{"tag": "qm1", "exp": "embedded poetry 1", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "qm2", "exp": "embedded poetry 2", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "qm3", "exp": "embedded poetry 3", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
+{"tag": "qr", "exp": "right-aligned poetry", "closing-p": false, "one-liner": true}
+{"tag": "qs", "exp": "poetry 'selah'", "closing-p": true, "entity-category-markup": true}
+{"tag": "qt", "exp": "quoted text", "closing-p": true, "quotation-markup": true}
+{"tag": "r", "exp": "parallel passage reference", "closing-p": false, "one-liner": true}
+{"tag": "rb", "exp": "ruby gloss", "closing-p": true, "can-have-attributes": true, "default-attribute": "gloss", "comment": "ex: hiragana for kanji word|gloss-for-char1:gloss-for-char2", "word-p": true}
+{"tag": "rq", "exp": "inline quotation reference", "closing-p": true}
+{"tag": "rem", "exp": "remark (not for publication)", "closing-p": false, "one-liner": true}
+{"tag": "s1", "exp": "section heading 1", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "s2", "exp": "section heading 2", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "s3", "exp": "section heading 3", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "s4", "exp": "section heading 4", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "s5", "exp": "section heading 5", "closing-p": false, "one-liner": true, "heading-p": true}
+{"tag": "sc", "exp": "small cap", "closing-p": true, "visual-style": true}
+{"tag": "sd1", "exp": "semantic division 1", "closing-p": false, "immediately-self-closing": true}
+{"tag": "sd2", "exp": "semantic division 2", "closing-p": false, "immediately-self-closing": true}
+{"tag": "sd3", "exp": "semantic division 3", "closing-p": false, "immediately-self-closing": true}
+{"tag": "sig", "exp": "signature of author", "closing-p": true, "entity-category-markup": true}
+{"tag": "sls", "exp": "secondary language source", "exp-long": "secondary language source  (e.g. source text is in Aramaic as opposed to Hebrew)", "closing-p": true, "entity-category-markup": true}
+{"tag": "sp", "exp": "speaker identification", "closing-p": false, "one-liner": true}
+{"tag": "sr", "exp": "section reference range", "closing-p": false, "one-liner": true}
+{"tag": "sts", "exp": "status code", "closing-p": false, "one-liner": true}
+{"tag": "sup", "exp": "superscript", "closing-p": true, "visual-style": true}
+{"tag": "tc1", "exp": "table cell 1", "closing-p": false, "table-content": true}
+{"tag": "tc2", "exp": "table cell 2", "closing-p": false, "table-content": true}
+{"tag": "tc3", "exp": "table cell 3", "closing-p": false, "table-content": true}
+{"tag": "tc4", "exp": "table cell 4", "closing-p": false, "table-content": true}
+{"tag": "tc5", "exp": "table cell 5", "closing-p": false, "table-content": true}
+{"tag": "tc6", "exp": "table cell 6", "closing-p": false, "table-content": true}
+{"tag": "tc7", "exp": "table cell 7", "closing-p": false, "table-content": true}
+{"tag": "tc8", "exp": "table cell 8", "closing-p": false, "table-content": true}
+{"tag": "tcc1", "exp": "center-aligned table cell 1", "closing-p": false, "table-content": true}
+{"tag": "tcc2", "exp": "center-aligned table cell 2", "closing-p": false, "table-content": true}
+{"tag": "tcc3", "exp": "center-aligned table cell 3", "closing-p": false, "table-content": true}
+{"tag": "tcc4", "exp": "center-aligned table cell 4", "closing-p": false, "table-content": true}
+{"tag": "tcc5", "exp": "center-aligned table cell 5", "closing-p": false, "table-content": true}
+{"tag": "tcr1", "exp": "right-aligned table cell 1", "closing-p": false, "table-content": true}
+{"tag": "tcr2", "exp": "right-aligned table cell 2", "closing-p": false, "table-content": true}
+{"tag": "tcr3", "exp": "right-aligned table cell 3", "closing-p": false, "table-content": true}
+{"tag": "tcr4", "exp": "right-aligned table cell 4", "closing-p": false, "table-content": true}
+{"tag": "tcr5", "exp": "right-aligned table cell 5", "closing-p": false, "table-content": true}
+{"tag": "th1", "exp": "table column heading 1", "closing-p": false, "table-content": true}
+{"tag": "th2", "exp": "table column heading 2", "closing-p": false, "table-content": true}
+{"tag": "th3", "exp": "table column heading 3", "closing-p": false, "table-content": true}
+{"tag": "th4", "exp": "table column heading 4", "closing-p": false, "table-content": true}
+{"tag": "th5", "exp": "table column heading 5", "closing-p": false, "table-content": true}
+{"tag": "th6", "exp": "table column heading 6", "closing-p": false, "table-content": true}
+{"tag": "th7", "exp": "table column heading 7", "closing-p": false, "table-content": true}
+{"tag": "th8", "exp": "table column heading 8", "closing-p": false, "table-content": true}
+{"tag": "thc1", "exp": "c-aligned table col. heading 1", "exp-long": "center-aligned table column heading 1", "closing-p": false, "undocumented": true, "table-content": true}
+{"tag": "thc2", "exp": "c-aligned table col. heading 2", "exp-long": "center-aligned table column heading 2", "closing-p": false, "undocumented": true, "table-content": true}
+{"tag": "thc3", "exp": "c-aligned table col. heading 3", "exp-long": "center-aligned table column heading 3", "closing-p": false, "undocumented": true, "table-content": true}
+{"tag": "thc4", "exp": "c-aligned table col. heading 4", "exp-long": "center-aligned table column heading 4", "closing-p": false, "undocumented": true, "table-content": true}
+{"tag": "thc5", "exp": "c-aligned table col. heading 5", "exp-long": "center-aligned table column heading 5", "closing-p": false, "undocumented": true, "table-content": true}
+{"tag": "thr1", "exp": "r-aligned table col. heading 1", "exp-long": "right-aligned table column heading 1", "closing-p": false, "table-content": true}
+{"tag": "thr2", "exp": "r-aligned table col. heading 2", "exp-long": "right-aligned table column heading 2", "closing-p": false, "table-content": true}
+{"tag": "thr3", "exp": "r-aligned table col. heading 3", "exp-long": "right-aligned table column heading 3", "closing-p": false, "table-content": true}
+{"tag": "thr4", "exp": "r-aligned table col. heading 4", "exp-long": "right-aligned table column heading 4", "closing-p": false, "table-content": true}
+{"tag": "thr5", "exp": "r-aligned table col. heading 5", "exp-long": "right-aligned table column heading 5", "closing-p": false, "table-content": true}
+{"tag": "tl", "exp": "transliterated foreign word", "closing-p": true, "entity-category-markup": true}
+{"tag": "toc1", "exp": "table of content 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "toc2", "exp": "table of content 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "toc3", "exp": "table of content 3", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "toca1", "exp": "alt. table of content 1", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "toca2", "exp": "alt. table of content 2", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "toca3", "exp": "alt. table of content 3", "closing-p": false, "one-liner": true, "intro-p": true}
+{"tag": "tr", "exp": "table row start", "closing-p": false, "one-liner": true, "exclusive-children": ["tc1", "tc2", "tc3", "tc4", "tc5", "tcc1", "tcc2", "tcc3", "tcc4", "tcc5", "tcr1", "tcr2", "tcr3", "tcr4", "tcr5", "th1", "th2", "th3", "th4", "th5", "thc1", "thc2", "thc3", "thc4", "thc5", "thr1", "thr2", "thr3", "thr4", "thr5"], "table-content": true, "closed-by": ["tr"]}
+{"tag": "usfm", "exp": "USFM version number", "closing-p": false, "one-liner": true}
+{"tag": "v", "exp": "verse", "closing-p": false, "format": ["int|int-range", "str"], "one-liner": true, "closed-by": ["v", "c", "id"], "children": ["w", "f", "p", "pc", "pi1", "pi2", "pi3", "m", "mi", "q1", "q2", "q3", "va"], "can-have-entity-category-markup-children": true}
+{"tag": "va", "exp": "alt. verse number", "closing-p": true}
+{"tag": "vp", "exp": "published verse character", "closing-p": true}
+{"tag": "w", "exp": "wordlist entry", "closing-p": true, "can-have-attributes": true, "default-attribute": "lemma", "comment": "word|attr1='value1',attr2='value2'", "word-p": true}
+{"tag": "wa", "exp": "Aramaic wordlist entry", "closing-p": true, "can-have-attributes": true, "default-attribute": "lemma", "comment": "word|attr1='value1',attr2='value2'", "word-p": true}
+{"tag": "wg", "exp": "Greek wordlist entry", "closing-p": true, "can-have-attributes": true, "default-attribute": "lemma", "comment": "word|attr1='value1',attr2='value2'", "word-p": true}
+{"tag": "wh", "exp": "Hebrew wordlist entry", "closing-p": true, "can-have-attributes": true, "default-attribute": "lemma", "comment": "word|attr1='value1',attr2='value2'", "word-p": true}
+{"tag": "wj", "exp": "words of Jesus", "closing-p": true, "quotation-markup": true}
+{"tag": "x", "exp": "cross reference", "closing-p": true, "exclusive-children": ["xo", "xk", "xq", "xt", "xta", "xop"], "closed-by": ["x", "end-of-line"]}
+{"tag": "xk", "exp": "cross reference keyword", "closing-p": false, "entity-category-markup": true}
+{"tag": "xo", "exp": "cross reference origin text", "closing-p": false}
+{"tag": "xop", "exp": "published cross reference origin text", "exp-short": "publ. xref origin text", "closing-p": true}
+{"tag": "xq", "exp": "cross reference quotation", "closing-p": false}
+{"tag": "xt", "exp": "cross reference text", "closing-p": true, "dont-close-inside": ["x"], "can-have-attributes": true, "DISABLED_redirections": [{"proper-parent": "x", "improper-parent": "f", "equivalent-child-at-improper-parent": "fr"}]}
