@@ -67,17 +67,17 @@ versification.py -h
 </details>
 
 
-### versification_diff.py
+### versification_diff_html.py
 
 #### Typical usage
 ```
-versification_diff.py INPUT_FILENAMES  -r REFERENCE_FILENAME  -l FILE_LEGENDS  -v VREF_FILENAME  -o OUTPUT_FILENAME
+versification_diff_html.py INPUT_FILENAMES  -r REFERENCE_FILENAME  -l FILE_LEGENDS  -v VREF_FILENAME  -o OUTPUT_FILENAME
 ```
 
 **Examples**
 ```
-versification_diff.py corpus-version1.txt corpus-version2.txt -r reference-corpus.txt -l version1 version2 reference -v vref.txt -o vers_diff.html
-versification_diff.py -h
+versification_diff_html.py corpus-version1.txt corpus-version2.txt -r reference-corpus.txt -l version1 version2 reference -v vref.txt -o vers_diff.html
+versification_diff_html.py -h
 ```
 
 <details>
