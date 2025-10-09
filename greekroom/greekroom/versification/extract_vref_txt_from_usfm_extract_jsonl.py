@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import regex
 import sys
+from greekroom.gr_utilities import general_util
 
 
 def normalize_string(s: str, change_count_dict: dict, change_example_dict: dict, verse_id: str | None,
@@ -62,6 +63,8 @@ def main():
     n_descriptive_titles = 0
     change_count_dict = defaultdict(int)
     change_example_dict = defaultdict(list)
+    general_util.mkdirs_in_path(args.output_filename)
+    general_util.mkdirs_in_path(args.vref_filename)
     with (open(args.input_filename) as f_in,
           open(args.output_filename, 'w') as f_out,
           open(args.vref_filename, 'w') as f_vref):
