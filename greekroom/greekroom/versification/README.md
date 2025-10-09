@@ -1,4 +1,4 @@
-## Greek Room's Versification
+## Greek Room's Versification Tools
 
 This directory hosts a number of versification scripts.
 <details>
@@ -22,6 +22,7 @@ including, for example, the [eBible Corpus](https://github.com/BibleNLP/ebible).
 These versification tools support such reversification. They also provide back-versification.
 </details>
 
+<a name="extract_vref_txt_from_usfm_extract_jsonl">
 ### extract_vref_txt_from_usfm_extract_jsonl.py
 
 This script extracts from *extract.jsonl* (1) a plain text corpus file and (2) a matching verse ID file.
@@ -40,7 +41,7 @@ extract_vref_txt_from_usfm_extract_jsonl.py -h
 <details>
 <summary>Argument notes</summary>
 
-* *extract.jsonl* (input) is the file produced by script [usfm_check.py](https://github.com/BibleNLP/greek-room/edit/main/greekroom/greekroom/usfm/README.md).
+* *extract.jsonl* (input) is the file produced by script [usfm_check.py](https://github.com/BibleNLP/greek-room/edit/main/greekroom/greekroom/usfm/README.md#usfm_check).
 * *f_usfm.txt* (output) is the Bible corpus in plain text, one verse per line.
 * *f_usfm_vref.txt* (output) is a companion file of verse IDs, matching *f_usfm.txt* line by line.
 </details>
