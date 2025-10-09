@@ -668,12 +668,14 @@ class CorpusModel:
 
     def report_stats(self, filename: str | Path | None):
         sc = self.sc
-        ref_words = sc.doc_config.ref_words.get(sc.lang_code, []) if sc else None
-        chapter_keywords = ref_words.get('_CHAPTER_', []) if ref_words else []
+        ref_words = {}
+        if sc and sc.doc_config and sc.doc_config.ref_words:
+           ref_words = sc.doc_config.ref_words.get(sc.lang_code, [])
+        chapter_keywords = ref_words.get('_CHAPTER_', [])
         chapter_keywords_lc = [x.lower() for x in chapter_keywords]
-        verse_keywords = ref_words.get('_VERSE_', []) if ref_words else []
+        verse_keywords = ref_words.get('_VERSE_', [])
         verse_keywords_lc = [x.lower() for x in verse_keywords]
-        none_keywords = ref_words.get('_NONE_', []) if ref_words else []
+        none_keywords = ref_words.get('_NONE_', [])
         none_keywords_lc = [x.lower() for x in none_keywords]
         known_book_ids = []
         known_numbered_book_ids = set()   # e.g. chronicles, corinthians
@@ -850,7 +852,9 @@ class BibleTextExtracts:
         sc = so.sc
         misc_data_dict = sc.misc_data_dict
         lang_code = sc.lang_code
-        lang_name = sc.doc_config.langcode_to_langname(lang_code) or lang_code
+        lang_name = lang_code  # default
+        if sc.doc_config:
+            lang_name = sc.doc_config.langcode_to_langname(lang_code) or lang_code
         if self.verse_text and (txt := self.verse_text['txt']):
             words = regex.findall(r"\pL\pM*(?:(?:'|\u200C|\u200D)?\pL\pM*)*", txt.lower())
             for i in range(len(words) - 1):
@@ -2118,10 +2122,12 @@ class ReferenceStats:
 
     def check_se(self, se: UsfmElement, so: UsfmObject) -> None:
         sc = so.sc
-        ref_words = sc.doc_config.ref_words.get(sc.lang_code, [])
-        chapter_keywords = ref_words.get('_CHAPTER_', []) if ref_words else []
+        ref_words = {}  # default
+        if sc.doc_config and sc.doc_config.ref_words:
+            ref_words = sc.doc_config.ref_words.get(sc.lang_code, {})
+        chapter_keywords = ref_words.get('_CHAPTER_', [])
         chapter_keywords_lc = [x.lower() for x in chapter_keywords]
-        verse_keywords = ref_words.get('_VERSE_', []) if ref_words else []
+        verse_keywords = ref_words.get('_VERSE_', [])
         verse_keywords_lc = [x.lower() for x in verse_keywords]
         for sub_element in se.sub_elements:
             if isinstance(sub_element, UsfmElement):
@@ -3807,11 +3813,12 @@ def main() -> None:
         # sys.stderr.write(f"Config: {str(config_filename)}\n")
         doc_config = DocumentConfiguration(Path(config_filename))
     else:
+        doc_config = None
         if default_config_filenames:
-            raise ValueError(f'No configuration filename provided, '
+            sys.stderr.write(f'No configuration filename provided, '
                              f'neither as argument or default ({default_config_filenames})')
         else:
-            raise ValueError('No configuration filename provided')
+            sys.stderr.write('No configuration filename provided')
     misc_data_dict = {}
     if args.misc_data_filename and os.path.exists(args.misc_data_filename):
         DataManager.read_file(args.misc_data_filename, misc_data_dict, selectors=['owl'])
