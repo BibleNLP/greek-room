@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """USFM checks"""
-# todo: fq can be both self-closing as well as paired, similarly fqa, fk
-# todo: \+bk mixed with \bk*  CODED
-# todo: repair: add old-fashioned \bk to \+bk
+
 
 
 from __future__ import annotations
@@ -918,7 +916,7 @@ class BibleTextExtracts:
         so = se.so
         sc = so.sc
         _location = f"{self.book_id} {self.chapter_number}:{self.verse_number}"
-        # verbose = (location == "GEN 1:2")
+        # verbose = (location == "PRO 18:1")
         # if verbose: sys.stderr.write(f"ADD-SE 1 {location} {se}\n")
         if sc.tag_props.get(('paragraph-format', se.tag)):
             return ""
@@ -1005,6 +1003,12 @@ class BibleTextExtracts:
             elif sc.tag_props.get(('quotation-markup', se.tag)):
                 return result
             elif sc.tag_props.get(('table-content', se.tag)):
+                return result
+            # Following block added Oct. 9, 2025
+            elif (regex.match(r'(?:q\d?)$', se.tag)
+                  and result
+                  and se.parent
+                  and ((se.parent.tag in ('v', 'd', 'mr')) or sc.tag_props.get(('heading-p', se.parent.tag)))):
                 return result
             elif regex.match(r'(?:v|q\d?|qm\d?|qc|qr)$', se.tag):
                 if result:
