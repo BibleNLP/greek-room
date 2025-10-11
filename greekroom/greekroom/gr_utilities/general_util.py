@@ -20,6 +20,10 @@ def slot_value_in_double_colon_del_list(line: str, slot: str, default: Optional 
         return default
 
 
+def valid_offset(lst: list, offset: int) -> bool:
+    return isinstance(lst, list) and isinstance(offset, int) and (0 <= offset < len(lst))
+
+
 # cwd_path = Path(os.getcwd())
 # parent_dir = cwd_path.parent
 def find_file(filename: str | Path, dirs: List[str | Path]) -> Path | None:
