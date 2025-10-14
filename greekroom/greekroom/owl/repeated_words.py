@@ -19,6 +19,7 @@ import string
 import sys
 from typing import Dict, List, Tuple
 from greekroom.gr_utilities import general_util, html_util
+from greekroom.versification.versification import BackVersification
 
 
 def legit_dupl_data_filenames(verbose: bool = False) -> List[str]:
@@ -259,6 +260,7 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
             n_instances = len(repeated_word_dict[duplicate])
             f_html.write(f"<li> {duplicate2} ({n_instances})\n   <ul>\n")
             for marked_up_verse in repeated_word_dict[duplicate]:
+                # sys.stderr.write(f"RWD d:{duplicate} m:{marked_up_verse} \n")
                 f_html.write(f"    <li> {marked_up_verse}\n")
             f_html.write("    </ul>\n")
         f_html.write("</ul>\n")
@@ -303,6 +305,7 @@ def main():
     parser.add_argument('--message_id', type=str, default=None)
     parser.add_argument('-d', '--data_filenames', default=None)
     parser.add_argument('--verbose', action='count', default=0)
+    parser.add_argument('--back_versification', type=str, default='vers/back_versification.json')
     args = parser.parse_args()
 
     verbose = args.verbose
@@ -311,6 +314,7 @@ def main():
     json_out_filename = args.out_filename
     corpus = None
     task_s = None
+    bv = BackVersification(args.back_versification)
     data_filename_dict = load_data_filename(args.data_filenames, verbose)
     if args.json and isinstance(args.json, str):
         if os.path.exists(args.json):
@@ -356,6 +360,7 @@ def main():
         lang_code = mcp_d.get("lang-code") or args.lang_code
         write_to_html(feedback, misc_data_dict, corpus, html_out_filename, lang_code, lang_name,
                       project_name or args.in_filename)
+    sys.stderr.write(bv.report_stats("owl/repeated_words.py"))
 
 
 if __name__ == "__main__":
