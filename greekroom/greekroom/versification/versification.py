@@ -14,6 +14,7 @@ import regex
 import sys
 from typing import List, TextIO, Tuple
 from greekroom.gr_utilities import general_util
+from greekroom.usfm.ualign_utilities import BibleUtilities
 
 
 class BibleStructure:
@@ -646,21 +647,28 @@ class BackVersification:
         else:
             sys.stderr.write(f"No file specified for back-versification.\n")
 
-    def report_stats(self, max_n_examples: int = 10) -> str:
+    def report_stats(self, calling_script: str | None = None, max_n_examples: int = 10) -> str:
         """Can be called by other tools after back-versification."""
         if self.log_d:
             n_verse_types = len(self.log_d.keys())
             n_verse_tokens = sum(self.log_d.values())
             bv_examples = dict([(v_id, self.d.get(v_id)) for v_id in list(self.log_d.keys())[:max_n_examples]])
-            return f"Back-versified {n_verse_types:,d}/{n_verse_tokens:,d} verse types/tokens, incl. {bv_examples}\n"
+            calling_script_clause = f" in {calling_script}" if calling_script else ""
+            return (f"Back-versified {n_verse_types:,d}/{n_verse_tokens:,d} verse types/tokens{calling_script_clause},"
+                    f" incl. {bv_examples}\n")
         else:
             return ""
 
     def back_verse_id(self, verse_id: str) -> str:
         return (self.d and self.d.get(verse_id)) or verse_id
 
-    def m(self, verse_id: str, html: bool = False) -> str:
+    def m(self, verse_id: str | None, html: bool = False) -> str | None:
         """Map verse_id back to user's original versification (default: NOT in HTML-format)"""
+        # Do this also for ranges such as "GEN 1:10-20"
+        if from_to_verse_id_pair := BibleUtilities.split_vref_start_end(verse_id):
+            if ((m_from := self.m(from_to_verse_id_pair[0], html))
+                    and (m_to := self.m(from_to_verse_id_pair[1], html))):
+                return BibleUtilities.combine_vref_start_end(m_from, m_to)
         if (back_verse_id := self.back_verse_id(verse_id)) and (back_verse_id != verse_id):
             self.log_d[verse_id] += 1
             # if (self.log_d[verse_id] == 1) and (len(self.log_d) <= 10):
@@ -697,7 +705,7 @@ class BackVersification:
         back_versification1 = BackVersification(filename1)
         back_versification2 = BackVersification(filename2)
         diff = back_versification1.diff(back_versification2)
-        out.write(f"{len(diff)} diffs: {diff}\n")
+        out.write(f"No. of diff. back versifications: {len(diff)}   {diff}\n")
 
 
 def main():
