@@ -404,6 +404,11 @@ class Versification:
             f_log.write(f"  Loaded {v.n_books} books; {v.n_chapters:,d} chapters; {v.n_verses:,d} verses; "
                         f"{v.n_mappings:,d} mappings\n")
 
+    @staticmethod
+    def vref_filename() -> Path:
+        versification_dir = os.path.dirname(os.path.realpath(__file__))
+        return Path(versification_dir) / 'data' / 'vref.txt'
+
 
 class MergeObject:
     """This class is for n-to-1 mappings (merges)."""
@@ -715,13 +720,14 @@ def main():
     parser.add_argument('-j', '--input_verse_id_filename')
     parser.add_argument('-s', '--input_schema', default=None)
     parser.add_argument('-o', '--output_corpus_filename')
-    parser.add_argument('-t', '--output_verse_id_filename')
+    parser.add_argument('-t', '--output_verse_id_filename', default=Versification.vref_filename())
     parser.add_argument('-d', '--data_log_filename', default='vers/versification_data_log.txt')
     parser.add_argument('-l', '--corpus_log_filename', default='vers/corpus_versification_log.txt')
     parser.add_argument('-b', '--back_versification_filename', default='vers/back_versification.json')
     parser.add_argument('-m', '--standard_mapping_dir')
     parser.add_argument('--back_versification_diff', nargs=2)
     args = parser.parse_args()
+    # sys.stderr.write(f"vref: {args.output_verse_id_filename}\n")
     f_corpus_log = sys.stderr  # default
     if bv_filenames := args.back_versification_diff:
         sys.stderr.write(f"back_versification_diff: {bv_filenames}\n")

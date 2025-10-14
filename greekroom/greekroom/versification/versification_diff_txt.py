@@ -6,13 +6,14 @@
 
 import argparse
 import sys
+from versification import Versification
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('filename1', type=str)
     parser.add_argument('filename2', type=str)
-    parser.add_argument('snt_id_filename', type=str)
+    parser.add_argument('--snt_id_filename', type=str, default=Versification.vref_filename())
     args = parser.parse_args()
     psalms_with_descriptive_titles_in_org_schema \
         = [3, 4, 5, 6, 7, 8, 9, 12, 13, 18, 19, 20, 21, 22, 30, 31, 34, 36, 38, 39, 40, 41, 42, 44, 45,

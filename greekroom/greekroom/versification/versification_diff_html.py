@@ -15,6 +15,7 @@ import sys
 from typing import List
 import uroman as ur
 from greekroom.gr_utilities import general_util
+from versification import Versification
 
 
 uroman = ur.Uroman()
@@ -256,7 +257,8 @@ def main():
     parser.add_argument('input_filename', nargs='*', type=str)
     parser.add_argument('-r', '--reference_filename', nargs='*', type=str)
     parser.add_argument('-l', '--file_legend', nargs='*', type=str)
-    parser.add_argument('-v', '--vref_filename', type=str, help='sentence IDs, e.g. GEN 1:1')
+    parser.add_argument('-v', '--vref_filename', type=str, default=Versification.vref_filename(),
+                        help='sentence IDs, e.g. GEN 1:1')
     parser.add_argument('-o', '--output_filename', type=Path, help="Diff visualization (html)")
     args = parser.parse_args()
     n_input_files = 0
@@ -399,7 +401,7 @@ def main():
         f_html.write(f"<p>\nNumber of vref diffs: {n_vref_diffs}\n")
         print_html_foot(f_html)
         sys.stderr.write(f"Number of vref diffs: {n_vref_diffs}\n")
-        sys.stderr.write(f"Wrote diff viz to {args.output_filename}\n")
+        sys.stderr.write(f"Wrote diff viz to {general_util.absolute_path(str(args.output_filename))}\n")
 
 
 if __name__ == "__main__":
