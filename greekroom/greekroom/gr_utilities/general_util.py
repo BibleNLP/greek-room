@@ -65,6 +65,10 @@ def standard_data_dirs() -> List[str]:
     return result
 
 
+def absolute_path(path: str) -> str:
+    return path if path.startswith("/") else f"{Path(os.path.abspath(os.getcwd()))}/{path}"
+
+
 def findall3(match_regex: str, text: str) -> Tuple[List[str], List[int], List[str]]:
     """returns matches, inter-matches, start-positions, inter-matches (len(matches)+1)"""
     full_regex = '(.*?)(' + match_regex + ')(.*)$'
