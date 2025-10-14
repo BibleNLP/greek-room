@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import regex
 import sys
-from typing import List, Optional
+from typing import List, Optional, Tuple
 import unicodedata as ud
 
 
@@ -375,6 +375,19 @@ class BibleUtilities:
             return f"{snt_id1}-{snt_id2}"
         if default == 'first-last':
             return f"{snt_id1}-{snt_id2}"
+        else:
+            return None
+
+    @staticmethod
+    def split_vref_start_end(snt_id_span: str) -> Tuple[str, str] | None:
+        # Bible format "GEN 1:10-20" -> "GEN 1:10", "GEN 1:20"
+        if m := regex.match(r'([A-Z1-3][A-Z][A-Z])\s+(\d+):(\d+[ab]?)-(\d+[ab]?)$', snt_id_span):
+            return f'{m.group(1)} {m.group(2)}:{m.group(3)}', f'{m.group(1)} {m.group(2)}:{m.group(4)}'
+        elif m := regex.match(r'([A-Z1-3][A-Z][A-Z])\s+(\d+):(\d+[ab]?)-(\d+):(\d+[ab]?)$', snt_id_span):
+            return f'{m.group(1)} {m.group(2)}:{m.group(3)}', f'{m.group(1)} {m.group(4)}:{m.group(5)}'
+        elif m := regex.match(r'([A-Z1-3][A-Z][A-Z])\s+(\d+):(\d+[ab]?)-([A-Z1-3][A-Z][A-Z])\s+(\d+):(\d+[ab]?)$',
+                              snt_id_span):
+            return f'{m.group(1)} {m.group(2)}:{m.group(3)}', f'{m.group(4)} {m.group(5)}:{m.group(6)}'
         else:
             return None
 
