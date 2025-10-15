@@ -399,7 +399,9 @@ class Versification:
             f_log.write(f"  Found {n} {s}: {'; '.join(splits)}\n")
 
     @staticmethod
-    def load_versifications(bible: BibleStructure, f_log: TextIO, standard_mapping_dir: str | None = None):
+    def load_versifications(bible: BibleStructure, f_log: TextIO,
+                            standard_mapping_dir: str | None = None,
+                            supplementary_mapping_filename: str | None = None):
         versification_dir = os.path.dirname(os.path.realpath(__file__))
         if standard_mapping_dir is None:
             standard_mapping_dir = Path(versification_dir) / 'data' / 'standard_mappings'
@@ -407,6 +409,11 @@ class Versification:
             filename = f"{standard_mapping_dir}/{schema}.json"
             f_log.write(f"Loading versification from {filename} ...\n")
             v = Versification(filename, schema, bible, f_log)
+            if supplementary_mapping_filename:
+                with open(supplementary_mapping_filename) as f:
+                    if mapped_verses_s := f.read():
+                        if mapped_verses_d := json.loads(mapped_verses_s):
+                            v.add_mapped_verses(mapped_verses_d, bible, f_log)
             v.check_mappings(bible)
             v.report_issues(f_log)
             f_log.write(f"  Loaded {v.n_books} books; {v.n_chapters:,d} chapters; {v.n_verses:,d} verses; "
@@ -422,14 +429,17 @@ class Versification:
         cwd = Path(os.path.abspath(os.getcwd()))
         if ((info_dict := general_util.read_corpus_json_info("info.json"))
                 and (project_id := info_dict.get('id'))):
-            for d in (cwd, Path(os.path.dirname(cwd))):
-                if os.path.isdir(sm_dir := d / 'supplementary-mappings'):
-                    supplementary_mappings_filename = sm_dir / f'{project_id}.json'
-                    if os.path.isfile(supplementary_mappings_filename):
-                        return supplementary_mappings_filename
-                if os.path.isdir(supplementary_mappings_filename := d / f'suppl_map_{project_id}.json'):
-                    if os.path.isfile(supplementary_mappings_filename):
-                        return supplementary_mappings_filename
+            supplementary_mappings_filename = f'suppl_map_{project_id}.json'
+        else:
+            supplementary_mappings_filename = 'suppl_map.json'
+        for d in (cwd, Path(os.path.dirname(cwd))):
+            if os.path.isdir(sm_dir := d / 'supplementary-mappings'):
+                full_supplementary_mappings_filename = sm_dir / supplementary_mappings_filename
+                if os.path.isfile(full_supplementary_mappings_filename):
+                    return full_supplementary_mappings_filename
+            if os.path.isfile(full_supplementary_mappings_filename := (d / supplementary_mappings_filename)):
+                if os.path.isfile(full_supplementary_mappings_filename):
+                    return full_supplementary_mappings_filename
         return None
 
 
