@@ -149,9 +149,12 @@ class Versification:
         self.infos = defaultdict(list)
         # self.target_verse_ids_to_be_monitored = ()
         self.target_verse_ids_to_be_monitored = ('PSA 86:1',)  # for testing
+        self.n_max_verses_entries = 0
+        self.n_mapped_verses_entries = 0
         with open(versification_filename) as f:
             data = json.load(f)
             if max_verses_d := data.get("maxVerses"):
+                self.n_max_verses_entries += 1
                 self.book_ids = max_verses_d.keys()
                 for book_id in self.book_ids:
                     self.n_books += 1
@@ -168,68 +171,73 @@ class Versification:
                         else:
                             f_log.write(f'  ** Error: Last verse number for {book_id} {chapter_number} '
                                         f'is not integer: {max_verse_s}\n')
-            else:
-                f_log.write(f'  ** Error: Did not find "maxVerses" in {versification_filename}\n')
             if mapped_verses_d := data.get("mappedVerses"):
-                for from_verse_id_entry in mapped_verses_d.keys():
-                    ec = f'  ** Error: in schema "{schema}",'
-                    to_verse_id_entry = mapped_verses_d[from_verse_id_entry]
-                    book1, chapter1, from_verse1, to_verse1 = self.split_verse_id(from_verse_id_entry)
-                    book2, chapter2, from_verse2, to_verse2 = self.split_verse_id(to_verse_id_entry)
-                    if book1 and book2:
-                        # range of equal length on both sides (n-to-n mapping)
-                        if (isinstance(to_verse1, int) and isinstance(to_verse2, int)
-                                and (from_verse1 < to_verse1) and (from_verse2 < to_verse2)
-                                and ((to_verse1 - from_verse1) == (to_verse2 - from_verse2))):
-                            for i in range(to_verse1 - from_verse1 + 1):
-                                verse_id1 = f"{book1} {chapter1}:{from_verse1+i}"
-                                verse_id2 = f"{book2} {chapter2}:{from_verse2+i}"
-                                self.add_mapping(verse_id1, verse_id2, bible)
-                        # 1-to-1 mapping
-                        elif (to_verse1 is None) and (to_verse2 is None):
-                            self.add_mapping(from_verse_id_entry, to_verse_id_entry, bible)
-                        # merge
-                        elif isinstance(to_verse1, int) and (from_verse1 < to_verse1) and (to_verse2 is None):
-                            self.add_merge_range(book1, chapter1, from_verse1, to_verse1, to_verse_id_entry)
-                            mapping = f"{from_verse_id_entry} -> {to_verse_id_entry}"
-                            n_verses_to_be_merged = to_verse1 - from_verse1 + 1
-                            if n_verses_to_be_merged >= 4:
-                                self.errors["merges"].append(mapping)
-                            else:
-                                self.infos["merges"].append(mapping)
-                        # split
-                        elif isinstance(to_verse2, int) and (from_verse2 < to_verse2) and (to_verse1 is None):
-                            self.add_split(from_verse_id_entry, book2, chapter2, from_verse2, to_verse2)
-                            self.infos["splits"].append(f"{from_verse_id_entry} -> {to_verse_id_entry}")
-                        else:
-                            reported_error = False
-                            if isinstance(to_verse1, int) and isinstance(to_verse2, int):
-                                if from_verse1 >= to_verse1:
-                                    f_log.write(f'{ec} bad source range {from_verse1}-{to_verse1}\n')
-                                    reported_error = True
-                                if from_verse2 >= to_verse2:
-                                    f_log.write(f'{ec} bad target range {from_verse2}-{to_verse2}\n')
-                                    reported_error = True
-                                if (to_verse1 - from_verse1) != (to_verse2 - from_verse2):
-                                    f_log.write(f'{ec} ranges have different lengths: '
-                                                f'{from_verse_id_entry} -> {to_verse_id_entry}\n')
-                                    reported_error = True
-                            if not reported_error:
-                                f_log.write(f'{ec} bad mapping: {from_verse_id_entry} -> {to_verse_id_entry}\n')
-                    elif ((',' in from_verse_id_entry) and (source_verse_ids := from_verse_id_entry.split(','))
-                            and all([self.valid_verse_id(source_verse_id, bible)
-                                     for source_verse_id in source_verse_ids])
-                            and self.valid_verse_id(to_verse_id_entry, bible)):
-                        self.add_merge_list(source_verse_ids, to_verse_id_entry)
-                        mapping = f"{from_verse_id_entry} -> {to_verse_id_entry}"
-                        self.infos["merges"].append(mapping)
+                self.add_mapped_verses(mapped_verses_d, bible, f_log)
+        if self.n_max_verses_entries == 0:
+            f_log.write(f'  ** Error: Did not find "maxVerses" in {versification_filename}\n')
+        if self.n_mapped_verses_entries == 0:
+            f_log.write(f'  ** Error: Did not find "mappedVerses" in {versification_filename}\n')
+
+    def add_mapped_verses(self, mapped_verses_d: dict, bible: BibleStructure, f_log: TextIO):
+        self.n_mapped_verses_entries += 1
+        schema = self.schema
+        for from_verse_id_entry in mapped_verses_d.keys():
+            ec = f'  ** Error: in schema "{schema}",'
+            to_verse_id_entry = mapped_verses_d[from_verse_id_entry]
+            book1, chapter1, from_verse1, to_verse1 = self.split_verse_id(from_verse_id_entry)
+            book2, chapter2, from_verse2, to_verse2 = self.split_verse_id(to_verse_id_entry)
+            if book1 and book2:
+                # range of equal length on both sides (n-to-n mapping)
+                if (isinstance(to_verse1, int) and isinstance(to_verse2, int)
+                        and (from_verse1 < to_verse1) and (from_verse2 < to_verse2)
+                        and ((to_verse1 - from_verse1) == (to_verse2 - from_verse2))):
+                    for i in range(to_verse1 - from_verse1 + 1):
+                        verse_id1 = f"{book1} {chapter1}:{from_verse1+i}"
+                        verse_id2 = f"{book2} {chapter2}:{from_verse2+i}"
+                        self.add_mapping(verse_id1, verse_id2, bible)
+                # 1-to-1 mapping
+                elif (to_verse1 is None) and (to_verse2 is None):
+                    self.add_mapping(from_verse_id_entry, to_verse_id_entry, bible)
+                # merge
+                elif isinstance(to_verse1, int) and (from_verse1 < to_verse1) and (to_verse2 is None):
+                    self.add_merge_range(book1, chapter1, from_verse1, to_verse1, to_verse_id_entry)
+                    mapping = f"{from_verse_id_entry} -> {to_verse_id_entry}"
+                    n_verses_to_be_merged = to_verse1 - from_verse1 + 1
+                    if n_verses_to_be_merged >= 4:
+                        self.errors["merges"].append(mapping)
                     else:
-                        if not book1:
-                            f_log.write(f'{ec} unrecognized mapping source "{from_verse_id_entry}"\n')
-                        if not book2:
-                            f_log.write(f'{ec} unrecognized mapping target "{to_verse_id_entry}"\n')
+                        self.infos["merges"].append(mapping)
+                # split
+                elif isinstance(to_verse2, int) and (from_verse2 < to_verse2) and (to_verse1 is None):
+                    self.add_split(from_verse_id_entry, book2, chapter2, from_verse2, to_verse2)
+                    self.infos["splits"].append(f"{from_verse_id_entry} -> {to_verse_id_entry}")
+                else:
+                    reported_error = False
+                    if isinstance(to_verse1, int) and isinstance(to_verse2, int):
+                        if from_verse1 >= to_verse1:
+                            f_log.write(f'{ec} bad source range {from_verse1}-{to_verse1}\n')
+                            reported_error = True
+                        if from_verse2 >= to_verse2:
+                            f_log.write(f'{ec} bad target range {from_verse2}-{to_verse2}\n')
+                            reported_error = True
+                        if (to_verse1 - from_verse1) != (to_verse2 - from_verse2):
+                            f_log.write(f'{ec} ranges have different lengths: '
+                                        f'{from_verse_id_entry} -> {to_verse_id_entry}\n')
+                            reported_error = True
+                    if not reported_error:
+                        f_log.write(f'{ec} bad mapping: {from_verse_id_entry} -> {to_verse_id_entry}\n')
+            elif ((',' in from_verse_id_entry) and (source_verse_ids := from_verse_id_entry.split(','))
+                    and all([self.valid_verse_id(source_verse_id, bible)
+                             for source_verse_id in source_verse_ids])
+                    and self.valid_verse_id(to_verse_id_entry, bible)):
+                self.add_merge_list(source_verse_ids, to_verse_id_entry)
+                mapping = f"{from_verse_id_entry} -> {to_verse_id_entry}"
+                self.infos["merges"].append(mapping)
             else:
-                f_log.write(f'  ** Error: Did not find "mappedVerses" in {versification_filename}\n')
+                if not book1:
+                    f_log.write(f'{ec} unrecognized mapping source "{from_verse_id_entry}"\n')
+                if not book2:
+                    f_log.write(f'{ec} unrecognized mapping target "{to_verse_id_entry}"\n')
 
     @staticmethod
     def split_verse_id(verse_id: str) -> Tuple[str | None, int | None, int | str | None, int | None]:
@@ -408,6 +416,21 @@ class Versification:
     def vref_filename() -> Path:
         versification_dir = os.path.dirname(os.path.realpath(__file__))
         return Path(versification_dir) / 'data' / 'vref.txt'
+
+    @staticmethod
+    def supplementary_mapping_filename() -> Path | None:
+        cwd = Path(os.path.abspath(os.getcwd()))
+        if ((info_dict := general_util.read_corpus_json_info("info.json"))
+                and (project_id := info_dict.get('id'))):
+            for d in (cwd, Path(os.path.dirname(cwd))):
+                if os.path.isdir(sm_dir := d / 'supplementary-mappings'):
+                    supplementary_mappings_filename = sm_dir / f'{project_id}.json'
+                    if os.path.isfile(supplementary_mappings_filename):
+                        return supplementary_mappings_filename
+                if os.path.isdir(supplementary_mappings_filename := d / f'suppl_map_{project_id}.json'):
+                    if os.path.isfile(supplementary_mappings_filename):
+                        return supplementary_mappings_filename
+        return None
 
 
 class MergeObject:
@@ -714,6 +737,8 @@ class BackVersification:
 
 
 def main():
+    supplementary_mapping_filename = Versification.supplementary_mapping_filename()
+    sys.stderr.write(f"SMF: {supplementary_mapping_filename}\n")
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--check')
     parser.add_argument('-i', '--input_corpus_filename')
@@ -726,6 +751,7 @@ def main():
     parser.add_argument('-b', '--back_versification_filename', default='vers/back_versification.json')
     parser.add_argument('-m', '--standard_mapping_dir')
     parser.add_argument('--back_versification_diff', nargs=2)
+    parser.add_argument('--supplementary_verse_mapping', default=supplementary_mapping_filename)
     args = parser.parse_args()
     # sys.stderr.write(f"vref: {args.output_verse_id_filename}\n")
     f_corpus_log = sys.stderr  # default
