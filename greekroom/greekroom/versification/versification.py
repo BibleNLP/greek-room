@@ -783,7 +783,7 @@ def main():
         except IOError:
             sys.stderr.write(f"Cannot write to {args.data_log_filename}")
     bible = BibleStructure()
-    Versification.load_versifications(bible, f_data_log, args.standard_mapping_dir)
+    Versification.load_versifications(bible, f_data_log, args.standard_mapping_dir, args.supplementary_verse_mapping)
     if args.input_corpus_filename and args.input_verse_id_filename:
         input_corpus = VersifiedCorpus(args.input_schema)
         input_corpus.load_corpus(args.input_corpus_filename, args.input_verse_id_filename, f_corpus_log)
