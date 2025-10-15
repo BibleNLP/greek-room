@@ -411,9 +411,10 @@ class Versification:
             v = Versification(filename, schema, bible, f_log)
             if supplementary_mapping_filename:
                 with open(supplementary_mapping_filename) as f:
-                    if mapped_verses_s := f.read():
-                        if mapped_verses_d := json.loads(mapped_verses_s):
-                            v.add_mapped_verses(mapped_verses_d, bible, f_log)
+                    if file_content := f.read():
+                        if file_d := json.loads(file_content):
+                            if mapped_verses_d := file_d.get("mappedVerses"):
+                                v.add_mapped_verses(mapped_verses_d, bible, f_log)
             v.check_mappings(bible)
             v.report_issues(f_log)
             f_log.write(f"  Loaded {v.n_books} books; {v.n_chapters:,d} chapters; {v.n_verses:,d} verses; "
@@ -429,7 +430,7 @@ class Versification:
         cwd = Path(os.path.abspath(os.getcwd()))
         if ((info_dict := general_util.read_corpus_json_info("info.json"))
                 and (project_id := info_dict.get('id'))):
-            supplementary_mappings_filename = f'suppl_map_{project_id}.json'
+            supplementary_mappings_filename = f'{project_id}.json'
         else:
             supplementary_mappings_filename = 'suppl_map.json'
         for d in (cwd, Path(os.path.dirname(cwd))):
@@ -748,7 +749,7 @@ class BackVersification:
 
 def main():
     supplementary_mapping_filename = Versification.supplementary_mapping_filename()
-    sys.stderr.write(f"SMF: {supplementary_mapping_filename}\n")
+    # sys.stderr.write(f"SMF: {supplementary_mapping_filename}\n")
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--check')
     parser.add_argument('-i', '--input_corpus_filename')
