@@ -716,8 +716,9 @@ class BackVersification:
                 title = f"User versification: {back_verse_id}\n'org'  versification: {verse_id}"
                 title = title.replace("'", '&apos;')
                 title = title.replace('"', '&quot;')
-                title = title.replace('\n', '&#xA;')
-                title = title.replace(' ', '&nbsp;')
+                title = title.replace('\n', '&#xA;')  # newline character
+                title = title.replace(' ', '&nbsp;')  # non-breaking space
+                title = title.replace('-', '\u2011')  # non-breaking hyphen
                 # style = "font-style:italic;border-bottom:1px dotted;"
                 style = "border-bottom:2px dotted;"
                 return f"<span patitle='{title}' style='{style}'>{back_verse_id}</span>"
