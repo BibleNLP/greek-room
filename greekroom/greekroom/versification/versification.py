@@ -430,7 +430,7 @@ class Versification:
         cwd = Path(os.path.abspath(os.getcwd()))
         if ((info_dict := general_util.read_corpus_json_info("info.json"))
                 and (project_id := info_dict.get('id'))):
-            supplementary_mappings_filename = f'{project_id}.json'
+            supplementary_mappings_filename = f'sm-{project_id}.json'
         else:
             supplementary_mappings_filename = 'suppl_map.json'
         for d in (cwd, Path(os.path.dirname(cwd))):
