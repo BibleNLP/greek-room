@@ -23,7 +23,8 @@ from greekroom.versification.versification import BackVersification
 
 
 def legit_dupl_data_filenames(verbose: bool = False) -> List[str]:
-    """find data files that list legitimate repeated words, both system and user defined"""
+    """Returns a list of data files that list legitimate repeated words,
+    checking for both system and potential user defined files."""
     result = []
     if owl_dir := os.path.dirname(os.path.realpath(__file__)):
         if verbose:
@@ -45,7 +46,7 @@ def legit_dupl_data_filenames(verbose: bool = False) -> List[str]:
 
 def read_legitimate_duplicate_data(filename: Path, d: dict, lang_code_restriction: str | None = None, 
                                    verbose: bool = False) -> None:
-    """read in data files of legitimate repeated words"""
+    """Reads legitimate repeated words from data file 'filename', collecting them in dictionary 'd'."""
     with open(filename) as f_in:
         line_number = 0
         n_entries = 0
@@ -99,7 +100,7 @@ def read_legitimate_duplicate_data(filename: Path, d: dict, lang_code_restrictio
 
 
 def markup_duplicate_words(s: str, duplicate_words: str, color: str) -> str:
-    """mark up string with color, typically green (known to be legitimate repeated word), red otherwise"""
+    """Marks up a string with color, typically green (known to be legitimate repeated word), red otherwise"""
     duplicate_word = regex.sub(r'(?:\pZ|\pC).*', '', duplicate_words)
     s = regex.sub(rf'\b({duplicate_word}(?:(?:\pZ|\pC)+{duplicate_word})+)\b',
                   rf'<span style="color:{color};">\1</span>',
@@ -110,7 +111,7 @@ def markup_duplicate_words(s: str, duplicate_words: str, color: str) -> str:
 def check_for_repeated_words_in_line(line: str, snt_id: str, lang_code: str,
                                      repeated_word_list: List[dict], misc_data_dict: dict) \
         -> None:
-    """identifies repeated words in a given line and adds result to corpus-wide list of repeated word entries"""
+    """Identifies repeated words in a given line of text and adds result to corpus-wide list of repeated word entries"""
     if line:
         line_lc = line.rstrip().lower()
         words, start_positions, inter_words \
@@ -137,8 +138,14 @@ def new_corpus(corpus_id: str | None = None) -> general_util.Corpus:
 def check_for_repeated_words(param_d: dict, data_filename_dict: Dict[str, List[str]],
                              corpus: general_util.Corpus | None = None, verbose: bool = False) \
         -> Tuple[dict, dict, dict]:
-    """Input object to result object, error object, data dict
-    snt_id2snt stores text (needed for HTML output)"""
+    """Input: (1) param_d object contains language code, 'check-corpus': any sub-corpus to be checked
+              (2) data_filename_dict contains data files of legitimate repeated words
+              (3) corpus is a dictionary of sentences indexed by sentence/verse ID;
+                  used unless param_d specifies another corpus (usually a sub-corpus)
+       Output: a tuple consisting of
+              (1) result (dictionary)
+              (2) error (dictionary; empty for now)
+              (3) misc_data_dict (dictionary) with info regarding repeated words"""
     misc_data_dict = {}
     lang_code = param_d.get("lang-code")
     check_corpus = param_d.get("check-corpus")
@@ -205,6 +212,8 @@ def get_feedback(output_d: dict, tool: str, check: str) -> List[dict] | None:
 
 def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Corpus, html_out_filename: str,
                   lang_code: str, lang_name: str | None = None, project_id: str | None = None) -> None:
+    """This function writes out the results collected in feedback to file html_out_filename
+    in human-friendly HTML format."""
     if lang_name is None:
         lang_name = lang_code
     if project_id is None:
@@ -272,10 +281,10 @@ def write_to_html(feedback: list, misc_data_dict: dict, corpus: general_util.Cor
         sys.stderr.write(f"Wrote HTML to {full_html_output_filename}\n")
 
 
-def load_data_filename(explicit_date_filenames: List[str] | None = None, verbose: bool = False) -> dict:
+def load_data_filename(explicit_data_filenames: List[str] | None = None, verbose: bool = False) -> dict:
     data_filename_dict = defaultdict(list)
     repeated_words_data_filenames = data_filename_dict["repeated-words"]
-    data_filenames = explicit_date_filenames or legit_dupl_data_filenames(verbose)
+    data_filenames = explicit_data_filenames or legit_dupl_data_filenames(verbose)
     for data_filename in data_filenames:
         if data_filename not in repeated_words_data_filenames:
             repeated_words_data_filenames.append(data_filename)
