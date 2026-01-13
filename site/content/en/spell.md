@@ -6,10 +6,10 @@ weight: 10
 The Greek Room offers a spell checker based on phonetic string similarity and word alignment, rather than relying on the need of laboriously curated lists of words and morphological rules used in traditional spell checkers. It allows to identify spelling inconsistencies early on in Bible translation projects. In the word alignment visualization tool, the Greek Room uses the ⟡ symbol to mark spell-checking information.
 
 ## Hindi IRV
-The <a href="https://www.bible.com/bible/1980" target="_HinIRV">Hindi IRV</a> is a Bible translation that has undergone multiple rounds of checking over several years. 
+The <a href="https://www.bible.com/bible/1980" target="_HinIRV">Hindi IRV</a> is a Bible translation that has undergone multiple rounds of checking over several years.
 Still, our spell checker has found a number of likely spelling inconsistencies for both names and non-names.
 
-▶ <a href="/spell/data/spell-summary_hi-IRVHin_en-ESVUS16.html" target="_blank">Spell checker in summary view for Hindi IRV (using ESV 2016 US as pivot)</a>
+▶ <a href="/static/spell/data/spell-summary_hi-IRVHin_en-ESVUS16.html" target="_blank">Spell checker in summary view for Hindi IRV (using ESV 2016 US as pivot)</a>
 
 Example: चरवाहों (caravaahom) vs.  चरावाहों (caraavaahom)
 * IRV GEN 29:4  अतः याकूब ने **चरवाहों** से पूछा, “हे मेरे भाइयों, तुम कहाँ के हो?” उन्होंने कहा, “हम हारान के हैं।”
@@ -27,7 +27,7 @@ For reference, both English NIV and English ESVUS16 use **Jehoshaphat** for both
 ## English NRSV
 The English NRSV is a highly curated translation. While our checker did not find any common word typos, it did find a number of potential spelling inconsistencies for Biblical names.
 
-▶ <a href="/spell/data/spell-summary_en-NRSV_de-LU84NR06.html" target="_blank">Spell checker in summary view for English NRSV (using German LU84NR06 as pivot)</a>
+▶ <a href="/static/spell/data/spell-summary_en-NRSV_de-LU84NR06.html" target="_blank">Spell checker in summary view for English NRSV (using German LU84NR06 as pivot)</a>
 
 Example: Addan vs. Addon
 * NRSV EZR 2:59   The following were those who came up from Tel-melah, Tel-harsha, Cherub, **Addan**, and Immer, though they could not prove their families or their descent, whether they belonged to Israel:
