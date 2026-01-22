@@ -1,49 +1,40 @@
-name: Deploy to GitHub Pages
+name: Deploy to Cloudflare Pages
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'site/**' 
+      - 'site/**'
       - '.github/workflows/deploy-pages.yml'
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          submodules: true  # Ensures theme submodules are cloned
+          submodules: true
 
       - name: Update theme submodules
-        run: |
-          git submodule update --init --recursive --remote
+        run: git submodule update --init --recursive --remote
         working-directory: site
 
       - name: Install Hugo (Extended)
-        uses: peaceiris/actions-hugo@v2
+        uses: peaceiris/actions-hugo@v3
         with:
           hugo-version: 'latest'
-          extended: true  # Ensure extended version is installed
+          extended: true
 
       - name: Build Hugo site
-        run: |
-          cd site
-          hugo --minify  
-          
-      - name: Deploy to Cloudflare Workers
+        run: hugo --minify
+        working-directory: site
+
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-            apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-            accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-        
-      # - name: Deploy to GitHub Pages
-      #   uses: JamesIves/github-pages-deploy-action@v4
-      #   with:
-      #     branch: gh-pages  # Deploy to this branch
-      #     folder: site/public  # Hugo output directory
-      #     clean: true  # Remove old files
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site/public --project-name=site
