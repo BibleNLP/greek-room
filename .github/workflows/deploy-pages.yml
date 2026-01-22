@@ -39,7 +39,6 @@ jobs:
         with:
             apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
             accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-            directory: site/public  # Hugo output directory
 
         
       # - name: Deploy to GitHub Pages
