@@ -33,10 +33,18 @@ jobs:
         run: |
           cd site
           hugo --minify  
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+          
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
         with:
-          branch: gh-pages  # Deploy to this branch
-          folder: site/public  # Hugo output directory
-          clean: true  # Remove old files
+            apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+            accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+            directory: site/public  # Hugo output directory
+
+        
+      # - name: Deploy to GitHub Pages
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #     branch: gh-pages  # Deploy to this branch
+      #     folder: site/public  # Hugo output directory
+      #     clean: true  # Remove old files
