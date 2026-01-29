@@ -2,5 +2,5 @@ name = "site"
 compatibility_date = "2026-01-21"
 
 [assets]
-directory = "site/public"
+directory = "./site/public"
 not_found_handling = "404-page"
