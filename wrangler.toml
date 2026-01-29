@@ -1,6 +1,2 @@
 name = "site"
 pages_build_output_dir = "./site/public"
-
-[assets]
-directory = "./site/public"
-not_found_handling = "404-page"
