@@ -1,7 +1,5 @@
 name = "site"
-compatibility_date = "2026-01-21"
+pages_build_output_dir = "./site/public"
 
 [assets]
-directory = "site/public"
-pages_build_output_dir = "site/public"
 not_found_handling = "404-page"
