@@ -1,2 +1,5 @@
 name = "site"
-pages_build_output_dir = "./site/public"
+compatibility_date = "2026-02-12"
+
+[assets]
+directory = "./site/public"
