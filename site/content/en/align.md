@@ -7,8 +7,8 @@ Word alignment supports applications such as spell-checking and learning word or
 
 ## Examples from English-German and English-Hindi
 
-* <a href="/static/align/data/eng-deu-sel.html" target="_blank">Word alignment visualization for English NRSV and German LU84NR06 (selection)</a>
-* <a href="/static/align/data/eng-hin-sel.html" target="_blank">Word alignment visualization for English ESVUS16 and Hindi IRV (selection)</a>
+* <a href="https://app.greekroom.org/static/align/data/eng-deu-sel.html" target="_blank">Word alignment visualization for English NRSV and German LU84NR06 (selection)</a>
+* <a href="https://app.greekroom.org/static/align/data/eng-hin-sel.html" target="_blank">Word alignment visualization for English ESVUS16 and Hindi IRV (selection)</a>
 
 ## Color and text-decoration codes
 
@@ -39,4 +39,3 @@ When you hover over a word, additional information becomes available. Below are 
 * s: score
 * rom: romanization (conversion to Latin alphabet)
 * []: number in square brackets indicates word position starting at 0: [0] = first word, [1] = second word etc.
-
