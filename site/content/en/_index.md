@@ -14,9 +14,9 @@ The Greek Room offers a spell checker based on phonetic string similarity and wo
 Word alignment supports applications such as spell-checking and learning word order and morphology. Even  more directly, it indicates the strength of translation consistency. With its color-coded word alignment strengths, the Greek Room specifically helps to pinpoint words that are unusual translations, or missing or spurious words. Hovering with the mouse over a word in the source or target language will reveal additional information such as the gloss of a word. Click <a href="/align">here</a> to see some examples, including English-German and English-Hindi.
 
 ## About
-**Research team:** Dr. Ulf Hermjakob, University of Southern California (<a target="_USC" href="https://www.usc.edu">USC</a>) Information Sciences Institute (<a target="_ISI" href="https://www.isi.edu">ISI</a>) 1997-2025; and Joel Mathew at the same USC-ISI 2016-2025; both still active on Greek Room research, development and support from 2026 onward.<br>
+**Research team:** Dr. Ulf Hermjakob, University of Southern California (<a target="_USC" href="https://www.usc.edu">USC</a>) Information Sciences Institute (<a target="_ISI" href="https://www.isi.edu">ISI</a>) 1997-2025; and Joel Mathew at the same USC-ISI 2016-2025; both still active on Greek Room research, development and support from 2026 onward. This work is carried out in partnership with the <a target="_LAB" href="https://www.etenlab.org/">ETEN Innovation Lab</a>.<br />
 Email: <a target="_GR_EMAIL" href="mailto:support@greekroom.org">support@greekroom.org</a>
-<br>
+<br />
 
 ***Greek Room* in the news:** 
 <a title="USC Viterbi &nbsp; (June 19, 2023)&#10;&quot;To the Ends of the Earth: Bringing the Bible to Languages Never Before Reached&quot;" target="_NEWS" href="https://viterbischool.usc.edu/news/2023/06/to-the-ends-of-the-earth-bringing-the-bible-to-languages-never-before-reached">USC Viterbi</a>,
