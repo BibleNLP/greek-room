@@ -1,0 +1,87 @@
+::lexical :a ::lcode swe ::left-context \d ::eng th ::comment ordinal suffix ::syntax-checked True
+::lexical :an ::lcode swe ::left-context \d ::eng th ::comment ordinal suffix ::syntax-checked True
+::lexical :e ::lcode swe ::left-context \d ::eng th ::comment ordinal suffix ::syntax-checked True
+::lexical :en ::lcode swe ::left-context \d ::eng th ::comment ordinal suffix ::syntax-checked True
+
+::abbrev A. ::right-context \s*\S
+::abbrev B. ::right-context \s*\S
+::abbrev C. ::right-context \s*\S
+::abbrev D. ::right-context \s*\S
+::abbrev E. ::right-context \s*\S
+::abbrev F. ::right-context \s*\S
+::abbrev G. ::right-context \s*\S
+::abbrev H. ::right-context \s*\S
+::abbrev I. ::right-context \s*\S ::case-sensitive True
+::abbrev J. ::right-context \s*\S
+::abbrev K. ::right-context \s*\S
+::abbrev L. ::right-context \s*\S
+::abbrev M. ::right-context \s*\S
+::abbrev N. ::right-context \s*\S
+::abbrev O. ::right-context \s*\S
+::abbrev P. ::right-context \s*\S
+::abbrev Q. ::right-context \s*\S
+::abbrev R. ::right-context \s*\S
+::abbrev S. ::right-context \s*\S
+::abbrev T. ::right-context \s*\S
+::abbrev U. ::right-context \s*\S
+::abbrev V. ::right-context \s*\S
+::abbrev W. ::right-context \s*\S
+::abbrev X. ::right-context \s*\S
+::abbrev Y. ::right-context \s*\S
+::abbrev Z. ::right-context \s*\S
+::abbrev Å. ::right-context \s*\S
+::abbrev Ä. ::right-context \s*\S
+::abbrev Ö. ::right-context \s*\S ::case-sensitive True
+
+::abbrev AB. ::lcode swe
+::abbrev VG. ::lcode swe
+::abbrev dvs. ::lcode swe
+::abbrev d.v.s. ::lcode swe
+::abbrev etc. ::lcode swe
+::abbrev from. ::lcode swe
+::abbrev fr.o.m. ::lcode swe
+::abbrev iaf. ::lcode swe
+::abbrev i.a.f. ::lcode swe
+::abbrev jfr. ::lcode swe
+::abbrev kl. ::lcode swe
+::abbrev kr. ::lcode swe
+::abbrev mao. ::lcode swe
+::abbrev m.a.o. ::lcode swe
+::abbrev mfl. ::lcode swe
+::abbrev m.fl. ::lcode swe
+::abbrev mm. ::lcode swe
+::abbrev m.m. ::lcode swe
+::abbrev osv. ::lcode swe
+::abbrev o.s.v. ::lcode swe
+::abbrev pga. ::lcode swe
+::abbrev p.g.a. ::lcode swe
+::abbrev tex. ::lcode swe
+::abbrev t.ex. ::lcode swe
+::abbrev tom. ::lcode swe ::eng tom. is risky, as tom is a word, and can be at end of sentence. One recent text has 9 tom., and 52 tom not at end of sentence..
+::abbrev t.o.m. ::lcode swe
+::abbrev vs. ::lcode swe
+::abbrev adv. ::lcode swe
+::abbrev jur. ::lcode swe
+::abbrev kand. ::lcode swe
+::abbrev mag. ::lcode swe
+::abbrev fil. ::lcode swe
+::abbrev lic. ::lcode swe
+::abbrev prop. ::lcode swe
+::abbrev d. ::lcode swe
+::abbrev f. ::lcode swe
+::abbrev s. ::lcode swe
+::abbrev mha. ::lcode swe
+::abbrev m.h.a. ::lcode swe
+::abbrev Stockh. ::lcode swe
+::abbrev vol. ::lcode swe
+::abbrev jan. ::lcode swe
+::abbrev feb. ::lcode swe
+::abbrev mar. ::lcode swe
+::abbrev apr. ::lcode swe
+::abbrev jun. ::lcode swe
+::abbrev jul. ::lcode swe
+::abbrev aug. ::lcode swe
+::abbrev sep. ::lcode swe
+::abbrev okt. ::lcode swe
+::abbrev nov. ::lcode swe
+::abbrev dec. ::lcode swe

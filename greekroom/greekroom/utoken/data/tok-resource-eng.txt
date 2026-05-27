@@ -1,0 +1,51 @@
+# Entries not to be used for English-global. Might conflict with other languages such as French dont.
+::contraction aint ::target ai n't ::lcode eng ::char-split 2,2 ::substandard True
+::contraction arenot ::target are not ::lcode eng ::substandard True
+::contraction arent ::target are n't ::lcode eng ::substandard True
+::contraction cant ::target can n't ::lcode eng ::substandard True
+::contraction c'mon ::target come on ::lcode eng ::nonstandard True
+::contraction couldnot ::target could not ::lcode eng ::substandard True
+::contraction didnot ::target did not ::lcode eng ::substandard True
+::contraction didnt ::target did n't ::lcode eng ::substandard True
+::contraction doesnot ::target does not ::lcode eng ::substandard True
+::contraction doesnt ::target does n't ::lcode eng ::substandard True
+::contraction donot ::target do not ::lcode eng ::substandard True
+::contraction dont ::target do n't ::lcode eng ::substandard True ::lcode-not fra
+::contraction hadnot ::target had not ::lcode eng ::substandard True
+::contraction hadnt ::target had n't ::lcode eng ::substandard True
+::contraction hasnot ::target has not ::lcode eng ::substandard True
+::contraction hasnt ::target has n't ::lcode eng ::substandard True
+::contraction havenot ::target have not ::lcode eng ::substandard True
+::contraction havent ::target have n't ::lcode eng ::substandard True
+::contraction isnot ::target is not ::lcode eng ::substandard True
+::contraction isnt ::target is n't ::lcode eng ::substandard True
+::contraction mightnot ::target might not ::lcode eng ::substandard True
+::contraction mustnot ::target must not ::lcode eng ::substandard True
+::contraction mustnt ::target must n't ::lcode eng ::substandard True
+::contraction neednot ::target need not ::lcode eng ::substandard True
+::contraction shallnot ::target shall not ::lcode eng ::substandard True
+::contraction shant ::target shall n't ::lcode eng ::substandard True
+::contraction shouldnot ::target should not ::lcode eng ::substandard True
+::contraction shouldnt ::target should n't ::lcode eng ::substandard True
+::contraction 'tis ::target it is ::lcode eng ::nonstandard True
+::contraction 'tisn't ::target it is n't ::lcode eng ::nonstandard True
+::contraction 'twas ::target it was ::lcode eng ::nonstandard True
+::contraction 'twasn't ::target it was n't ::lcode eng ::nonstandard True
+::contraction 'twere ::target it were ::lcode eng ::nonstandard True
+::contraction 'tweren't ::target it were n't ::lcode eng ::nonstandard True
+::contraction wasnot ::target was not ::lcode eng ::substandard True
+::contraction wasnt ::target was n't ::lcode eng ::substandard True
+::contraction werenot ::target were not ::lcode eng ::substandard True
+::contraction willnot ::target will not ::lcode eng ::substandard True
+::contraction wont ::target will n't ::lcode eng ::char-split 2,2 ::substandard True
+::contraction wouldnot ::target would not ::lcode eng ::substandard True
+::contraction wouldnt ::target would n't ::lcode eng ::substandard True
+::contraction y'all ::target you all ::lcode eng ::nonstandard True
+::contraction y'know ::target you know ::lcode eng ::nonstandard True
+::contraction y're ::target you 're ::lcode eng ::substandard True
+
+::punct-split - ::side both ::lcode eng ::left-context \p{Ll} ::right-context [IAa]\s  # Yes-I agree to phase-I.
+
+::abbrev Sens. ::exp Senators ::lcode eng ::sem-class pre-name-title
+
+::lexical I ::lcode eng ::left-context \b(?:am)\s* ::right-context \. ::priority high ::example So am I. And ...

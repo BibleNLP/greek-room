@@ -1,0 +1,827 @@
+# split off punctuation anywhere
+::punct-split &quot; ::side both ::group True
+::punct-split " ::side both ::group True
+::punct-split “ ::side both
+::punct-split ” ::side both
+::punct-split „ ::side both
+::punct-split ‟ ::side both
+::punct-split ( ::side both
+::punct-split ) ::side both
+::punct-split { ::side both
+::punct-split } ::side both
+::punct-split « ::side both
+::punct-split » ::side both
+::punct-split [ ::side both
+::punct-split ] ::side both
+::punct-split 〈 ::side both
+::punct-split 〉 ::side both
+::punct-split （ ::side both
+::punct-split ） ::side both
+::punct-split ［ ::side both
+::punct-split ］ ::side both
+::punct-split 【 ::side both
+::punct-split 】 ::side both
+::punct-split 「 ::side both
+::punct-split 」 ::side both
+::punct-split 《 ::side both
+::punct-split 》 ::side both
+::punct-split 『 ::side both
+::punct-split 』 ::side both
+::punct-split 【 ::side both
+::punct-split 】 ::side both
+::punct-split 〔 ::side both
+::punct-split 〕 ::side both
+::punct-split 〖 ::side both
+::punct-split 〗 ::side both
+::punct-split 〘 ::side both
+::punct-split 〙 ::side both
+::punct-split 〚 ::side both
+::punct-split 〛 ::side both
+::punct-split ⸤ ::side both
+::punct-split ⸥ ::side both
+::punct-split ‹ ::side both ::group True
+::punct-split › ::side both ::group True
+::punct-split 。 ::side both
+::punct-split ， ::side both
+::punct-split 、 ::side both
+::punct-split ։ ::side both
+::punct-split ። ::side both
+::punct-split ፣ ::side both
+::punct-split ፤ ::side both
+::punct-split ፥ ::side both
+::punct-split ፦ ::side both
+::punct-split ፧ ::side both
+::punct-split ፨ ::side both
+::punct-split ፠ ::side both
+::punct-split । ::side both ::comment Devanagari danda
+::punct-split ॥ ::side both ::comment Devanagari double danda
+::punct-split ৷ ::side both ::group True ::comment Bengali currency numerator four, often operating as Bengali danda
+::punct-split ། ::side both ::comment Tibetan mark Shad (danda)
+::punct-split ༎ ::side both ::comment Tibetan mark Nyis Shad (double danda)
+::punct-split % ::side both
+::punct-split ‰ ::side both
+::punct-split ‱ ::side both
+::punct-split ٪ ::side both
+::punct-split ¢ ::side both
+::punct-split £ ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split € ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split ¥ ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split ₹ ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split ฿ ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split ₱ ::side both ::token-category prefix ::sem-class currency-unit
+::punct-split © ::side both
+::punct-split ® ::side both
+::punct-split ™ ::side both
+::punct-split № ::side both ::group True ::comment №№ plural form in Russian, Georgian
+::punct-split $ ::side both ::token-category prefix ::sem-class currency-unit ::group True
+::punct-split — ::side both ::group True
+::punct-split -- ::side both ::group True ::left-context (?:\pL\pM*|\d) ::right-context (?:\pL\pM*|\d)
+::punct-split ־ ::side both ::group True ::comment Hebrew maqaf (hyphen)
+::punct-split … ::side both ::group True
+::punct-split .. ::side both ::group True
+::punct-split ، ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`:]* ::right-context (?:\pL|[‘])
+::punct-split , ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`:]* ::right-context (?:\pL|[‘])
+::punct-split ， ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`:]* ::right-context (?:\pL|[‘])
+::punct-split | ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`]* ::right-context (?:\pL|[‘]) ::group True
+::punct-split ׀ ::side both ::group True ::comment Hebrew paseq (separator), typically at the end of words
+::punct-split ! ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`?]* ::right-context (?:\pL|[‘?]) ::group True
+::punct-split ！ ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`?]* ::right-context (?:\pL|[‘?]) ::group True
+::punct-split ? ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`!]* ::right-context (?:\pL|[‘!]) ::group True
+::punct-split ？ ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘`!]* ::right-context (?:\pL|[‘!]) ::group True
+::punct-split : ::side both ::left-context \pL\pM*\pL\pM*[)]* ::right-context [-\/(]*\pL\pM*\pL ::lcode-not hin;swe;fin;mun
+::punct-split ： ::side both ::left-context \pL\pM*[)]* ::right-context [-\/(‘]*\pL ::lcode-not hin;swe;fin;mun
+::punct-split = ::side both ::group True ::left-context \pL\pM*\pL\pM*[)]* ::right-context [-=\/(]*\pL\pM*\pL
+::punct-split , ::side both ::left-context \d:\d{1,2} ::right-context \d{1,2}[-]\d  # Genesis 1:1,26-28
+::punct-split , ::side both ::left-context \d\.\d{1,2} ::right-context \d
+::punct-split , ::side both ::left-context \d-\d+ ::right-context \d+-\d ::example 2015-16,2019-20
+::punct-split , ::side both ::left-context \pL\pM* ::right-context \d
+::punct-split , ::side both ::left-context \d ::right-context \pL\pM*\pL
+::punct-split / ::side both ::left-context \pL\pM*(?:\pL\pM*|\d) ::right-context (?:\pL\pM*\pL|[㎀-㏟])  #right-context-not (?:hr|yr)\b
+::punct-split ; ::side both ::left-context \pL\pM*\pL\pM* ::right-context [-\/]*\pL\pM*\pL ::left-context-not &(?:amp|apos|gt|lt|nbsp|quot|#\d+|#x[0-9A-F]+)  # xml tags
+::punct-split ； ::side both ::left-context \pL\pM* ::right-context [-\/]*\pL
+::punct-split / ::side both ::left-context -\d+ ::right-context \d+-
+::punct-split \ ::side both ::left-context (?:\pL\pM*|/d) ::right-context (?:\pL|/d)
+::punct-split ~ ::side both ::group True ::left-context \pL\pM*(?:\d|\pP)*
+::punct-split ~ ::side both ::group True ::right-context \pL
+::punct-split . ::side both ::left-context (?:\p{Ll}\p{Ll}|\d|[IVXL]+) ::right-context \p{Lu}\p{Ll}
+::punct-split . ::side both ::left-context (?<!\pL|\d|[-_.])\d+ ::right-context \pL
+::punct-split . ::side both ::left-context \d ::right-context \pL\pM*\pL
+::punct-split . ::side both ::left-context \p{Lo}\pM*\p{Lo}\pM* ::right-context [-\/]*\p{Lo}\pM*\p{Lo}
+::punct-split . ::side both ::left-context (?:[\p{Latin}&&\p{Letter}]\pM*){2,} ::right-context [-\/]*\p{Lo}\pM*\p{Lo}
+::punct-split . ::side both ::left-context \p{Lo}\pM*\p{Lo}\pM* ::right-context [-\/]*(?:[\p{Latin}&&\p{Letter}]\pM*){2,}
+::punct-split . ::side both ::left-context [\)\]}] ::right-context \pL
+::punct-split ． ::side both ::left-context (?:\pL\pM*|\d)[-_+*'’‘”`? ]* ::right-context \pL
+::punct-split ؟ ::side both ::comment Arabic question mark
+::punct-split ؛ ::side both ::comment Arabic semicolon
+::punct-split ۔ ::side both ::comment Arabic period
+::punct-split § ::side both ::comment section sign
+::punct-split ¶ ::side both ::comment pillcrow
+::punct-split ∆ ::side both ::comment increment symbol
+::punct-split × ::side both ::comment multiplication sign
+::punct-split ± ::side both ::comment plus-minus sign
+::punct-split ° ::side both ::group True ::comment degree sign
+::punct-split º ::side both ::comment masculine ordinal indicator, sometimes used as degree sign
+::punct-split ・ ::side both ::group True ::comment Katakana middle dot
+::punct-split ¬ ::side both
+# ::punct-split - ::side both ::left-context (?<!\d)(?:19|20)\d\d ::right-context \d\d(?!\d)
+::punct-split - ::side both ::left-context \d ::right-context \d
+::punct-split ༄ ::side both ::comment TIBETAN MARK INITIAL YIG MGO MDUN MA
+::punct-split ༅ ::side both ::comment TIBETAN MARK CLOSING YIG MGO SGAB MA
+::punct-split ⵰ ::side both ::comment TIFINAGH SEPARATOR MARK
+
+# split off punctuation from start of token
+::punct-split &apos; ::side start ::group True
+::punct-split ' ::side start ::group True
+::punct-split ‘ ::side start ::group True
+::punct-split ’ ::side start ::group True
+::punct-split ` ::side start ::group True
+::punct-split ‚ ::side start ::group True
+::punct-split ¡ ::side start ::group True
+::punct-split ¿ ::side start ::group True
+::punct-split ~ ::side start ::group True
+::punct-split ～ ::side start ::group True ::comment full-width tilde
+::punct-split _ ::side start ::group True
+::punct-split | ::side start ::group True
+::punct-split ¦ ::side start ::group True
+::punct-split / ::side start ::group True ::right-context \pL
+::punct-split * ::side start ::right-context (?:\pL|['‘])  # don't group, because of ****ing
+::punct-split - ::side start ::group True ::right-context -*\pL\pM*\pL
+::punct-split – ::side start ::group True ::right-context -*\pL\pM*\pL
+::punct-split ― ::side start ::group True ::right-context -*\pL\pM*\pL ::comment horizontal bar
+::punct-split ; ::side start ::group True ::right-context [-\/]*\pL\pM*\pL
+::punct-split = ::side start ::group True ::right-context [-\/]*\pL\pM*\pL
+::punct-split : ::side start ::left-context \d ::right-context \d+[-,]\d  # Genesis 1:26-28
+::punct-split : ::side start ::left-context \d ::right-context \pL
+::punct-split ． ::side start ::left-context \s
+::punct-split ： ::side start ::left-context \s
+::punct-split ； ::side start ::left-context \s
+::punct-split ？ ::side start ::left-context \s
+::punct-split ！ ::side start ::left-context \s
+::punct-split , ::side start
+::punct-split • ::side start
+::punct-split ※ ::side start
+::punct-split · ::side start
+::punct-split ، ::side start
+::punct-split &lt; ::side start ::right-context (?:\d|\pL|[&])
+::punct-split &gt; ::side start ::right-context (?:\d|\pL|[&])
+::punct-split \ ::side start ::right-context (?:\pL|/d)
+::punct-split � ::side start
+::punct-split † ::side start
+::punct-split ‡ ::side start
+::punct-split ‛ ::side start
+::punct-split ″ ::side start ::comment double prime
+::punct-split . ::side start ::left-context \s ::right-context (?:18|19|20)\d\d(?!\d)  # .year -- but not .45 caliber
+
+# split off punctuation from end of token
+::punct-split &apos; ::side end ::group True
+::punct-split ' ::side end ::group True
+::punct-split ’ ::side end ::group True
+::punct-split ‘ ::side end ::group True
+::punct-split ` ::side end ::group True
+::punct-split . ::side end
+::punct-split ． ::side end ::comment fullwidth period
+::punct-split ׃ ::side end ::comment Hebrew sof pasuq (sentence period)
+::punct-split ? ::side end ::group True
+::punct-split ! ::side end ::group True
+::punct-split ՛ ::side end ::group True ::comment Armenian emphasis mark
+::punct-split | ::side end ::group True
+::punct-split ‼ ::side end
+::punct-split ⁇ ::side end
+::punct-split ⁈ ::side end
+::punct-split ⁉ ::side end
+::punct-split ‽ ::side end
+::punct-split ، ::side end
+::punct-split , ::side end
+::punct-split ՝ ::side end ::comment Armenian comma
+::punct-split ꓾ ::side end ::comment Lisu punctuation comma
+::punct-split ꓿ ::side end ::comment Lisu punctuation period
+::punct-split ; ::side end ::left-context-not &(?:amp|apos|gt|lt|nbsp|quot|#\d+|#x[0-9A-F]+)  # XML tags, e.g. &#x234;
+::punct-split ！ ::side end
+::punct-split ; ::side end
+::punct-split ？ ::side end
+::punct-split ； ::side end
+::punct-split : ::side end ::lcode-not mun
+::punct-split ： ::side end
+::punct-split ~ ::side end ::group True
+::punct-split ～ ::side end ::comment full-width tilde
+::punct-split * ::side end ::left-context (?:\pL\pM*|[’,.])
+::punct-split _ ::side end ::group True
+::punct-split / ::side end ::group True ::left-context (?:\pL\pM*\pL\pM*|[.,;:!?'’‘])
+::punct-split - ::side end ::group True ::left-context (?:\pL\pM*\pL\pM*|[.,;:!?'’‘])
+::punct-split - ::side end ::group True ::left-context \pL\pM* ::right-context \d+[.,]\d
+::punct-split = ::side end ::group True ::left-context (?:\pL\pM*\pL\pM*|[.,;:!?'’‘])
+::punct-split – ::side end ::group True ::left-context (?:\pL\pM*\pL\pM*|[.,;:!?'’‘])
+::punct-split + ::side end ::group True ::left-context [.,;:!?'’‘]
+::punct-split · ::side end
+::punct-split << ::side both ::left-context-not [<]
+::punct-split >> ::side both ::right-context-not [>]
+::punct-split < ::side start ::right-context (?:\d|\pL) ::left-context-not [<]
+::punct-split > ::side start ::right-context (?:\d|\pL) ::left-context-not [>]
+::punct-split < ::side end ::left-context (?:\d|\pL\pM*) ::right-context-not [<]
+::punct-split > ::side end ::left-context (?:\d|\pL\pM*) ::right-context-not [>]
+::punct-split < ::side end ::left-context-not [<] ::right-context-not [-<]
+::punct-split > ::side end ::left-context-not [->] ::right-context-not [>]
+::punct-split \ ::side end ::left-context (?:\d|\pL\pM*)
+::punct-split &lt; ::side end ::left-context (?:\d|\pL\pM*|[;])
+::punct-split &gt; ::side end ::left-context (?:\d|\pL\pM*|[;])
+::punct-split � ::side end
+::punct-split † ::side end
+::punct-split ‡ ::side end
+::punct-split ‛ ::side end
+::punct-split ′ ::side end ::comment prime
+::punct-split ″ ::side end ::comment double prime
+::punct-split @ ::side end ::left-context \d
+
+::repair & gt ; ::target &gt; ::lcode eng ::problem previous tokenizer
+::repair & lt ; ::target &lt; ::lcode eng ::problem previous tokenizer
+::repair & quot ; ::target &quot; ::lcode eng ::problem previous tokenizer
+::repair & amp ; ::target &amp; ::lcode eng ::problem previous tokenizer
+::repair ፡፡ ::target ። ::problem Ethiopic period look-alike
+::repair ፡- ::target ፦ ::problem Ethiopic preface-colon look-alike
+
+::abbrev AT&T ::sem-class company
+::abbrev ES&S ::sem-class company
+::abbrev WaPo ::exp Washington Post ::sem-class company
+
+::abbrev EE.UU. ::exp Estados Unidos; United States ::sem-class country
+::abbrev UAE ::exp United Arab Emirates ::sem-class country
+::abbrev U.K. ::exp United Kingdom ::sem-class country
+::abbrev U.S. ::exp United States ::sem-class country
+::abbrev U.S.A. ::exp United States of America ::sem-class country
+::abbrev USA ::exp United States of America; United States ::sem-class country
+
+::abbrev ¥ ::exp yen; yuan ::token-category prefix ::sem-class currency-unit
+::abbrev ฿ ::exp baht ::token-category prefix ::sem-class currency-unit
+::abbrev ₩ ::exp won ::token-category prefix ::sem-class currency-unit
+::abbrev ₪ ::exp shekel ::token-category prefix ::sem-class currency-unit
+::abbrev € ::exp Euro ::token-category prefix ::sem-class currency-unit
+::abbrev ₹ ::exp rupee ::token-category prefix ::sem-class currency-unit
+::abbrev ₺ ::exp lira ::token-category prefix ::sem-class currency-unit
+::abbrev ₽ ::exp ruble ::token-category prefix ::sem-class currency-unit
+::abbrev A$ ::exp Australian dollar ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev AUD ::exp Australian dollar ::token-category prefix ::sem-class currency-unit
+::abbrev BRL ::exp Brazilian real ::token-category prefix ::sem-class currency-unit
+::abbrev C$ ::exp Canadian dollar ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev CAD ::exp Canadian dollar ::token-category prefix ::sem-class currency-unit
+::abbrev CHF ::exp Swiss franc ::token-category prefix ::sem-class currency-unit
+::abbrev CLP ::exp Chilean peso ::token-category prefix ::sem-class currency-unit
+::abbrev CNY ::exp Chinese yuan ::token-category prefix ::sem-class currency-unit
+::abbrev COL$ ::exp Colombian peso ::token-category prefix ::sem-class currency-unit
+::abbrev COP ::exp Colombian peso ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev CZK ::exp Czech koruna ::token-category prefix ::sem-class currency-unit
+::abbrev DKK ::exp Danish krone ::token-category prefix ::sem-class currency-unit
+::abbrev EUR ::exp Euro ::token-category prefix ::sem-class currency-unit
+::abbrev GBP ::exp pound sterling ::token-category prefix ::sem-class currency-unit
+::abbrev HK$ ::exp Hong Kong dollar ::token-category prefix ::sem-class currency-unit
+::abbrev HKD ::exp Hong Kong dollar ::token-category prefix ::sem-class currency-unit
+::abbrev HUF ::exp Hungarian forint ::token-category prefix ::sem-class currency-unit
+::abbrev IDR ::exp Indonesian rupiah ::token-category prefix ::sem-class currency-unit
+::abbrev ILS ::exp Israeli shekel ::token-category prefix ::sem-class currency-unit
+::abbrev INR ::exp Indian rupee ::token-category prefix ::sem-class currency-unit
+::abbrev JPY ::exp Japanese yen ::token-category prefix ::sem-class currency-unit
+::abbrev KRW ::exp South Korean won ::token-category prefix ::sem-class currency-unit
+::abbrev MXN ::exp Mexican peso ::token-category prefix ::sem-class currency-unit
+::abbrev MYR ::exp Malaysian Ringgit ::token-category prefix ::sem-class currency-unit
+::abbrev NOK ::exp Norwegian krone ::token-category prefix ::sem-class currency-unit
+::abbrev NT$ ::exp New Taiwan dollar ::token-category prefix ::sem-class currency-unit
+::abbrev NZ$ ::exp New Zealand dollar ::token-category prefix ::sem-class currency-unit
+::abbrev NZD ::exp New Zealand dollar ::token-category prefix ::sem-class currency-unit
+::abbrev PLN ::exp Polish zloty ::token-category prefix ::sem-class currency-unit
+::abbrev R$ ::exp Brazilian real ::token-category prefix ::sem-class currency-unit
+::abbrev RMB ::exp Renminbi ::token-category prefix ::sem-class currency-unit
+::abbrev Rp ::exp rupiah ::token-category prefix ::sem-class currency-unit
+::abbrev Rs ::exp Indian rupee ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev Rs. ::exp Indian rupee ::token-category prefix ::sem-class currency-unit
+::abbrev RUB ::exp Russian ruble ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev S$ ::exp Singapore dollar ::token-category prefix ::sem-class currency-unit
+::abbrev SAR ::exp Saudi riyal ::token-category prefix ::sem-class currency-unit
+::abbrev SEK ::exp Swedish krona ::token-category prefix ::sem-class currency-unit
+::abbrev SGD ::exp Singapore dollar ::token-category prefix ::sem-class currency-unit
+::abbrev THB ::exp Thai baht ::token-category prefix ::sem-class currency-unit
+::abbrev TRY ::exp Turkish lira ::token-category prefix ::sem-class currency-unit ::case-sensitive True
+::abbrev TWD ::exp New Taiwan dollar ::token-category prefix ::sem-class currency-unit
+::abbrev US$ ::exp United States dollar ::token-category prefix ::sem-class currency-unit
+::abbrev USD ::exp United States dollar ::token-category prefix ::sem-class currency-unit ::comment USD500
+::abbrev ZAR ::exp South African Rand ::token-category prefix ::sem-class currency-unit
+
+::abbrev AIDS ::exp Acquired Immunodeficiency Syndrome ::sem-class disease
+::abbrev HIV/AIDS ::exp human immunodeficiency virus; Acquired Immunodeficiency Syndrome ::sem-class disease
+
+::abbrev ISI ::exp Information Sciences Institute ::sem-class educational-organization ::case-sensitive True
+::abbrev MIT ::exp Massachusetts Institute of Technology ::sem-class educational-organization ::case-sensitive True
+::abbrev UCLA ::exp University of California, Los Angeles ::sem-class educational-organization
+::abbrev USC ::exp University of Southern California ::sem-class educational-organization
+
+::abbrev DoD ::exp Department of Defense ::sem-class government-organiztion
+::abbrev DoJ ::exp Department of Justice ::sem-class government-organiztion
+::abbrev ESA ::exp European Space Agency ::sem-class government-organiztion
+::abbrev NASA ::exp National Aeronautics and Space Administration ::sem-class government-organiztion
+::abbrev USPS ::exp United States Postal Service ::sem-class government-organiztion
+
+::abbrev ASEAN ::exp Association of Southeast Asian Nations ::sem-class international-organization
+::abbrev E.U. ::exp European Union ::sem-class international-organization
+::abbrev EU ::exp European Union ::sem-class international-organization
+::abbrev GCC ::exp Golf Cooperation Council ::sem-class international-organization
+::abbrev IAEA ::exp International Atomic Energy Agency ::sem-class international-organization
+::abbrev NATO ::exp North Atlantic Treaty Organization ::sem-class international-organization
+::abbrev OSCE ::exp Organization for Security and Cooperation in Europe ::sem-class international-organization
+::abbrev U.N. ::exp United Nations ::sem-class international-organization
+::abbrev UN ::exp United Nations ::sem-class international-organization ::case-sensitive True
+::abbrev UNDCP ::exp United Nations Drug Control Program ::sem-class international-organization
+::abbrev UNODC ::exp United Nations Office for Drugs and Crime ::sem-class international-organization
+::abbrev WHO ::exp World Health Organization ::sem-class international-organization ::case-sensitive True
+::abbrev WTO ::exp World Trade Organization ::sem-class international-organization
+
+::abbrev ABC ::exp American Broadcasting Corporation ::sem-class media-organization
+::abbrev ABC ::exp Australian Broadcasting Corporation ::sem-class media-organization
+::abbrev CCTV ::exp China Central Television ::sem-class media-organization
+::abbrev ITAR-TASS ::sem-class media-organization
+::abbrev NYT ::exp New York Times ::sem-class media-organization
+::abbrev WSJ ::exp Wall Street Journal ::sem-class media-organization
+
+::abbrev CO2 ::exp carbon dioxide ::sem-class substance
+::abbrev H2O ::exp water ::sem-class substance
+::abbrev TNT ::exp trinitrotoluene ::sem-class substance
+
+::abbrev cm ::exp centimeter ::sem-class unit-of-measurement ::alt-spelling ㎝
+::abbrev cm² ::exp square centimeter ::sem-class unit-of-measurement
+::abbrev cm³ ::exp cubic centimeter ::sem-class unit-of-measurement
+::abbrev g ::exp gram ::sem-class unit-of-measurement ::case-sensitive True ::left-context \d\s?
+::abbrev kg ::exp kilogram ::sem-class unit-of-measurement ::alt-spelling kgs.
+::abbrev km ::exp kilometer ::sem-class unit-of-measurement
+::abbrev km² ::exp square kilometer ::sem-class unit-of-measurement ::alt-spelling km2; ㎢; km<sup>2</sup>
+::abbrev km³ ::exp cubic kilometer ::sem-class unit-of-measurement ::alt-spelling km3; ㎢; km<sup>3</sup>
+::abbrev kWh ::exp kilowatt-hour ::sem-class unit-of-measurement ::misspelling kW/h
+::abbrev M ::exp molar ::sem-class unit-of-measurement ::case-sensitive True ::left-context \d\s?
+::abbrev m ::exp meter ::sem-class unit-of-measurement ::case-sensitive True ::left-context \d\s?
+::abbrev m² ::exp square meter ::sem-class unit-of-measurement ::alt-spelling ㎡; sq.mtr.
+::abbrev m³ ::exp cubic meter ::sem-class unit-of-measurement ::alt-spelling ㎥
+::abbrev M🜨 ::exp earth mass ::sem-class unit-of-measurement ::alt-spelling M⊕  # split by tokenize_symbol_group
+::abbrev mg ::exp milligram ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev ml ::exp milliliter ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev mm ::exp millimeter ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev mm² ::exp square millimeter ::sem-class unit-of-measurement
+::abbrev mm³ ::exp cubic millimeter ::sem-class unit-of-measurement
+::abbrev mℳ ::exp millimolar ::sem-class unit-of-measurement
+::abbrev ng ::exp nanogram ::sem-class unit-of-measurement ::case-sensitive True ::left-context \d\s?
+::abbrev nM ::exp nanomolar ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev nℳ ::exp nanomolar ::sem-class unit-of-measurement
+::abbrev pℳ ::exp picomolar ::sem-class unit-of-measurement
+::abbrev µCi ::exp microcurie ::sem-class unit-of-measurement
+::abbrev µM ::exp micromolar ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev µm ::exp micrometer ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev μA ::exp microampere ::sem-class unit-of-measurement
+::abbrev μbar ::exp microbar ::sem-class unit-of-measurement
+::abbrev μC ::exp microcoulomb ::sem-class unit-of-measurement
+::abbrev μF ::exp microfarad ::sem-class unit-of-measurement
+::abbrev μg ::exp microgram ::sem-class unit-of-measurement
+::abbrev μGy ::exp microgray ::sem-class unit-of-measurement
+::abbrev μH ::exp microhenry ::sem-class unit-of-measurement
+::abbrev μHz ::exp microhertz ::sem-class unit-of-measurement
+::abbrev μJ ::exp microjoule ::sem-class unit-of-measurement
+::abbrev μl ::exp microliter ::sem-class unit-of-measurement
+::abbrev μM ::exp micromolar ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev μm ::exp micrometer ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev μmol ::exp micromole ::sem-class unit-of-measurement
+::abbrev μN ::exp micronewton ::sem-class unit-of-measurement
+::abbrev μPa ::exp micropascal ::sem-class unit-of-measurement
+::abbrev μR ::exp microroentgen ::sem-class unit-of-measurement
+::abbrev μS ::exp microsiemens ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev μs ::exp microsecond ::sem-class unit-of-measurement ::case-sensitive True
+::abbrev μSv ::exp microsievert ::sem-class unit-of-measurement
+::abbrev μV ::exp microvolt ::sem-class unit-of-measurement
+::abbrev μW ::exp microwatt ::sem-class unit-of-measurement
+::abbrev μWb ::exp microweber ::sem-class unit-of-measurement
+::abbrev μΩ ::exp micro-ohm ::sem-class unit-of-measurement
+::abbrev μℳ ::exp micromolar ::sem-class unit-of-measurement
+
+::abbrev HIV ::exp human immunodeficiency virus ::sem-class virus
+
+::abbrev AK-47 ::sem-class weapon ::plural +s
+::abbrev AK47 ::sem-class weapon ::plural +s
+::abbrev F-15 ::sem-class weapon ::plural +s
+::abbrev F-15C ::sem-class weapon ::plural +s
+::abbrev F-15K ::sem-class weapon ::plural +s
+::abbrev F-22 ::sem-class weapon ::plural +s
+::abbrev MiG ::sem-class weapon ::plural +s
+::abbrev MiG-21 ::sem-class weapon ::plural +s
+::abbrev MiG-25 ::sem-class weapon ::plural +s
+::abbrev MiG-27 ::sem-class weapon ::plural +s
+::abbrev MiG-29 ::sem-class weapon ::plural +s
+::abbrev RS-24 ::sem-class weapon ::plural +s
+::abbrev Su-27 ::sem-class weapon ::plural +s
+::abbrev Su-32 ::sem-class weapon ::plural +s
+::abbrev Su-35 ::sem-class weapon ::plural +s
+::abbrev Topol-M ::exp RT-2PM2 Topol-M ::sem-class weapon
+
+::abbrev 2D ::exp two-dimensional ::case-sensitive True
+::abbrev 3D ::exp three-dimensional ::case-sensitive True
+::abbrev 4D ::exp four-dimensional ::case-sensitive True
+::abbrev 4x4 ::exp four-wheel drive
+::abbrev CD ::exp compact disc ::case-sensitive True
+::abbrev CD-ROM ::exp compact disc read-only memory
+::abbrev COP21 ::exp United Nations Climate Change Conference ::comment conference of the parties, 21st century ::alt-spelling COP-21
+::abbrev COP26 ::exp United Nations Climate Change Conference ::comment 26th United Nations Climate Change conference ::alt-spelling COP-26
+::abbrev CPU ::exp central processing unit
+::abbrev DDoS ::exp distributed denial of service (attack)
+::abbrev DVD ::exp digital versatile disc
+::abbrev ISO 3166-2
+::abbrev Mφ ::exp macrophage ::alt-spelling MΦ; MØ
+::abbrev MφCM ::exp macrophage-conditioned medium ::alt-spelling MΦCM; MØCM
+
+::lexical Qur'an ::sem-class book
+
+::lexical C-SPAN ::sem-class broadcast-program
+::lexical X-Factor ::sem-class broadcast-program
+
+::lexical Abu Dhabi ::sem-class city
+::lexical Addis Ababa ::sem-class city
+::lexical Aix-en-Provence ::sem-class city
+::lexical Andorra la Vella ::sem-class city
+::lexical Banda Aceh ::sem-class city
+::lexical Bandar Lampung ::sem-class city
+::lexical Baton Rouge ::sem-class city
+::lexical Belo Horizonte ::sem-class city
+::lexical Bergisch Gladbach ::sem-class city
+::lexical Blue Mountains ::sem-class city
+::lexical Boulogne-Billancourt ::sem-class city
+::lexical Broken Hill ::sem-class city
+::lexical Buenos Aires ::sem-class city
+::lexical Campo Grande ::sem-class city
+::lexical Cape Town ::sem-class city
+::lexical Carson City ::sem-class city
+::lexical Ciudad Guayana ::sem-class city
+::lexical Ciudad Real ::sem-class city
+::lexical Clermont-Ferrand ::sem-class city
+::lexical Cluj-Napoca ::sem-class city
+::lexical Colorado Springs ::sem-class city
+::lexical Culver City ::sem-class city
+::lexical Dar es Salaam ::sem-class city
+::lexical Daytona Beach ::sem-class city
+::lexical Den Bosch ::sem-class city
+::lexical Den Haag ::sem-class city
+::lexical Des Moines ::sem-class city
+::lexical Duque de Caxias ::sem-class city
+::lexical El Alto ::sem-class city
+::lexical Fontaine-l'Étalon ::sem-class city
+::lexical Fort Lauderdale ::sem-class city
+::lexical Fort Wayne ::sem-class city
+::lexical Fort Worth ::sem-class city
+::lexical Frankfurt am Main ::sem-class city
+::lexical Frankfurt an der Oder ::sem-class city
+::lexical Freiburg im Breisgau ::sem-class city
+::lexical Fu'an ::sem-class city
+::lexical Gold Coast ::sem-class city
+::lexical Grand Rapids ::sem-class city
+::lexical Great Falls ::sem-class city
+::lexical Green Bay ::sem-class city
+::lexical Guatemala City ::sem-class city
+::lexical Ho Chi Minh City ::sem-class city
+::lexical Hong Kong ::sem-class city
+::lexical Jian'ou ::sem-class city
+::lexical Johor Bahru ::sem-class city
+::lexical Kalyan-Dombivali ::sem-class city
+::lexical Kansas City ::sem-class city
+::lexical Kingston upon Hull ::sem-class city
+::lexical Kuala Lumpur ::sem-class city
+::lexical Kuwait City ::sem-class city
+::lexical La Paz ::sem-class city
+::lexical La Plata ::sem-class city
+::lexical Las Vegas ::sem-class city
+::lexical Le Havre ::sem-class city
+::lexical Le Mans ::sem-class city
+::lexical Little Rock ::sem-class city
+::lexical Los Angeles ::sem-class city
+::lexical Lu'an ::sem-class city
+::lexical Ma'anshan ::sem-class city
+::lexical Marina del Rey ::sem-class city
+::lexical Mexico City ::sem-class city
+::lexical Miami Beach ::sem-class city
+::lexical Nan'an ::sem-class city
+::lexical Navi Mumbai ::sem-class city
+::lexical N'Djamena ::sem-class city
+::lexical New Delhi ::sem-class city
+::lexical New Haven ::sem-class city
+::lexical New Orleans ::sem-class city
+::lexical New York City ::sem-class city
+::lexical Nizhny Novgorod ::sem-class city
+::lexical Novi Sad ::sem-class city
+::lexical Oklahoma City ::sem-class city
+::lexical Palo Alto ::sem-class city
+::lexical Panama City ::sem-class city
+::lexical Phnom Penh ::sem-class city
+::lexical Pimpri-Chinchwad ::sem-class city
+::lexical Port-au-Prince ::sem-class city
+::lexical Port Elizabeth ::sem-class city
+::lexical Port Louis ::sem-class city
+::lexical Port Moresby ::sem-class city
+::lexical Porto Alegre ::sem-class city
+::lexical Port of Spain ::sem-class city
+::lexical Porto-Novo ::sem-class city
+::lexical Rio de Janeiro ::sem-class city
+::lexical Rostov-on-Don ::sem-class city
+::lexical Saint-Denis ::sem-class city
+::lexical Sainte-Etienne ::sem-class city
+::lexical Sainte-Mère-Église ::sem-class city
+::lexical Saint Petersburg ::sem-class city
+::lexical Salt Lake City ::sem-class city
+::lexical San Antonio ::sem-class city
+::lexical San Bernadino ::sem-class city
+::lexical San Diego ::sem-class city
+::lexical San Francisco ::sem-class city
+::lexical San Jose ::sem-class city
+::lexical San Jose ::sem-class city
+::lexical San José ::sem-class city
+::lexical Sankt Gallen ::sem-class city
+::lexical Sankt Pölten ::sem-class city ::alt-spelling Sankt Poelten
+::lexical San Luis Obispo ::sem-class city
+::lexical San Salvador ::sem-class city
+::lexical Santa Barbara ::sem-class city
+::lexical Santa Cruz ::sem-class city
+::lexical Santa Cruz de la Sierra ::sem-class city
+::lexical Santa Fe ::sem-class city
+::lexical Santa Monica ::sem-class city
+::lexical Santo Domingo ::sem-class city
+::lexical São Gonçalo ::sem-class city ::alt-spelling Sao Goncalo
+::lexical São Luís ::sem-class city ::alt-spelling Sao Luis
+::lexical São Paulo ::sem-class city ::alt-spelling Sao Paulo
+::lexical 's-Gravenhage ::sem-class city
+::lexical 's-Hertogenbosch ::sem-class city
+::lexical Sioux City ::sem-class city
+::lexical Sioux Falls ::sem-class city
+::lexical South Bend ::sem-class city
+::lexical St. Louis ::sem-class city
+::lexical St. Moritz ::sem-class city
+::lexical St. Paul ::sem-class city
+::lexical St. Petersburg ::sem-class city
+::lexical Stratford-upon-Avon ::sem-class city
+::lexical Tel Aviv ::sem-class city
+::lexical The Hague ::sem-class city
+::lexical Ujung Pandang ::sem-class city
+::lexical Ulan Bator ::sem-class city
+::lexical Ulan-Ude ::sem-class city
+::lexical Vasai-Virar ::sem-class city
+::lexical Wagga Wagga ::sem-class city
+::lexical West Hollywood ::sem-class city
+::lexical West Palm Beach ::sem-class city
+::lexical Xi’an ::sem-class city
+::lexical Yong'an ::sem-class city
+
+::lexical Chick-fil-A ::sem-class company
+::lexical eBay ::sem-class company
+::lexical E.ON ::sem-class company ::priority high
+::lexical GlaxoSmithKline ::sem-class company
+::lexical HarperCollins ::sem-class company
+::lexical Hewlett-Packard ::sem-class company
+::lexical K-Mart ::sem-class company
+::lexical MasterCard ::sem-class company
+::lexical McDonalds ::sem-class company
+::lexical MetroPCS ::sem-class company
+::lexical PanAm ::sem-class company
+::lexical PricewaterhouseCoopers ::sem-class company
+::lexical StubHub ::sem-class company
+::lexical T-Mobile ::sem-class company
+::lexical Walmart ::sem-class company ::alt-spelling Wal-Mart; WalMart
+::lexical WebMD ::sem-class company
+::lexical YouTube ::sem-class company
+
+::lexical Antigua and Barbuda ::sem-class country
+::lexical Bosnia and Herzegovina ::sem-class country ::alt-spelling Bosnia-Herzegovina
+::lexical Burkina Faso ::sem-class country
+::lexical Cape Verde ::sem-class country
+::lexical Costa Rica ::sem-class country
+::lexical Côte d'Ivoire ::sem-class country ::alt-spelling Cote d'Ivoire
+::lexical Czech Republic ::sem-class country
+::lexical East Germany ::sem-class country
+::lexical East Timor ::sem-class country
+::lexical El Salvador ::sem-class country
+::lexical Guinea-Bissau ::sem-class country
+::lexical Ivory Coast ::sem-class country
+::lexical New Zealand ::sem-class country
+::lexical Northern Ireland ::sem-class country
+::lexical North Korea ::sem-class country
+::lexical North Vietnam ::sem-class country
+::lexical Papua New Guinea ::sem-class country
+::lexical Russian Federation ::sem-class country
+::lexical Saint Kitts and Nevis ::sem-class country
+::lexical Saint Vincent and the Grenadines ::sem-class country
+::lexical San Marino ::sem-class country
+::lexical São Tomé and Príncipe ::sem-class country
+::lexical Saudi Arabia ::sem-class country
+::lexical Sierra Leone ::sem-class country
+::lexical South Africa ::sem-class country
+::lexical South Korea ::sem-class country
+::lexical South Sudan ::sem-class country
+::lexical South Vietnam ::sem-class country
+::lexical Soviet Union ::sem-class country
+::lexical Sri Lanka ::sem-class country
+::lexical Timor-Leste ::sem-class country
+::lexical Trinidad and Tobago ::sem-class country
+::lexical United Arab Emirates ::sem-class country
+::lexical United Kingdom ::sem-class country
+::lexical United Kingdom of Great Britain and Northern Ireland ::sem-class country
+::lexical United States ::sem-class country
+::lexical United States of America ::sem-class country
+::lexical Vatican City ::sem-class country
+::lexical West Germany ::sem-class country
+
+::lexical Auvergne-Rhône-Alpes ::sem-class country-region
+::lexical Bourgogne-Franche-Comté ::sem-class country-region
+::lexical Centre-Val de Loire ::sem-class country-region
+::lexical Grand Est ::sem-class country-region
+::lexical Hauts-de-France ::sem-class country-region
+::lexical Île-de-France ::sem-class country-region
+::lexical Nouvelle-Aquitaine ::sem-class country-region
+::lexical Pays de la Loire ::sem-class country-region
+::lexical Provence-Alpes-Côte d'Azur ::sem-class country-region
+
+::lexical al-Qaeda ::sem-class criminal-organization ::alt-spelling al-Qaida
+::lexical al-Shabaab ::sem-class criminal-organization ::alt-spelling al-Shabab
+::lexical Lashkar-e-Taiba ::sem-class criminal-organization
+::lexical 'NDrangheta ::sem-class criminal-organization ::country Italy
+::lexical Qaeda ::sem-class criminal-organization ::alt-spelling Qa'ida; Qai'da
+
+::lexical COVID-19 ::sem-class disease ::case-sensitive True
+
+::lexical Eid al-Fitr ::sem-class festival
+
+::lexical ObamaCare ::sem-class government-program
+
+::lexical Baffin Island ::sem-class island
+::lexical Ellesmere Island ::sem-class island
+::lexical Great Britain ::sem-class island
+::lexical New Guinea ::sem-class island
+::lexical O'ahu ::sem-class island
+::lexical Puerto Rico ::sem-class island
+::lexical Vancouver Island ::sem-class island
+::lexical Victoria Island ::sem-class island
+
+::lexical L'Anse aux Meadows ::sem-class location ::country Canada
+
+::lexical Al-Jazeera ::sem-class media-organization
+::lexical FoxNews ::sem-class media-organization
+
+::lexical Al-Qassam Brigades ::sem-class military
+
+::lexical EU ::sem-class organization ::case-sensitive True
+::lexical G20 ::sem-class organization ::case-sensitive True
+::lexical G7 ::sem-class organization ::case-sensitive True ::alt-spelling G-7
+::lexical G8 ::sem-class organization ::case-sensitive True ::alt-spelling G-8
+::lexical Organization for Security and Co-operation in Europe ::sem-class organization
+
+::lexical al-Zawahiri ::sem-class person-last-name
+::lexical D'Alessio ::sem-class person-last-name
+::lexical D'Artagnan ::sem-class person-last-name
+::lexical ElBaradei ::sem-class person-last-name
+::lexical O'Brien ::sem-class person-last-name
+::lexical O'Callaghan ::sem-class person-last-name
+::lexical O'Carroll ::sem-class person-last-name
+::lexical O'Connell ::sem-class person-last-name
+::lexical O'Connor ::sem-class person-last-name
+::lexical O'Doherty ::sem-class person-last-name
+::lexical O'Donnell ::sem-class person-last-name
+::lexical O'Dwyer ::sem-class person-last-name
+::lexical O'Farrell ::sem-class person-last-name
+::lexical O'Keefe ::sem-class person-last-name
+::lexical O'Keeffe ::sem-class person-last-name
+::lexical O'Leary ::sem-class person-last-name
+::lexical O'Mahony ::sem-class person-last-name
+::lexical O'Neill ::sem-class person-last-name
+::lexical O'Reilly ::sem-class person-last-name
+::lexical O'Riley ::sem-class person-last-name
+::lexical O'Rourke ::sem-class person-last-name
+::lexical O'Shea ::sem-class person-last-name
+::lexical O'Sullivan ::sem-class person-last-name
+
+::lexical Malcolm X ::sem-class person-name
+
+::lexical Jamaat-e-Islami ::sem-class political-party ::alt-spelling Jamaat-i-Islami
+::lexical ZANU-PF ::sem-class political-party
+
+::lexical Q-tip ::sem-class product ::plural +s
+
+::lexical 14-3-3 ::sem-class protein
+
+::lexical Hauts-de-Seine ::sem-class province ::country France
+::lexical Seine-Saint-Denis ::sem-class province ::country France
+::lexical British Columbia ::sem-class province ::country Canada
+::lexical New Brunswick ::sem-class province ::country Canada
+::lexical Newfoundland and Labrador ::sem-class province ::country Canada
+::lexical Nova Scotia ::sem-class province ::country Canada
+::lexical Prince Edward Island ::sem-class province ::country Canada
+::lexical Inner Mongolia ::sem-class province ::country China
+::lexical Sistan-Baluchestan ::sem-class province ::country Iran
+::lexical West Papua ::sem-class province ::country Indonesia
+
+::lexical Agence France-Presse ::sem-class publication
+::lexical Al Jazeera ::sem-class publication ::alt-spelling Al-Jazeera
+::lexical ITAR-TASS ::sem-class publication
+::lexical L'Express ::sem-class publication
+
+::lexical Andhra Pradesh ::sem-class state
+::lexical Arunachal Pradesh ::sem-class state
+::lexical Baden-Württemberg ::sem-class state ::alt-spelling Baden-Wuerttemberg
+::lexical Himachal Pradesh ::sem-class state
+::lexical Jammu and Kashmir ::sem-class state
+::lexical Jammu-Kashmir ::sem-class state
+::lexical Lower Saxony ::sem-class state
+::lexical Madhya Pradesh ::sem-class state
+::lexical Mecklenburg-Vorpommern ::sem-class state
+::lexical New Hampshire ::sem-class state
+::lexical New Jersey ::sem-class state
+::lexical New South Wales ::sem-class state
+::lexical New York ::sem-class state
+::lexical North Carolina ::sem-class state
+::lexical North Dakota ::sem-class state
+::lexical North Rhine-Westphalia ::sem-class state
+::lexical Rhineland-Palatinate ::sem-class state
+::lexical Saxony-Anhalt ::sem-class state
+::lexical Schleswig-Holstein ::sem-class state
+::lexical South Australia ::sem-class state
+::lexical South Carolina ::sem-class state
+::lexical South Dakota ::sem-class state
+::lexical Tamil Nadu ::sem-class state
+::lexical Uttar Pradesh ::sem-class state
+::lexical West Bengal ::sem-class state
+::lexical Western Australia ::sem-class state
+::lexical West Virginia ::sem-class state
+
+::lexical 49ers ::sem-class team
+::lexical 76ers ::sem-class team
+
+::lexical START-II ::sem-class treaty
+
+::lexical Middle East ::sem-class world-region
+::lexical Sub-Saharan Africa ::sem-class world-region
+
+::lexical E. coli ::taxon species
+::lexical SARS-CoV-2 ::taxon species
+
+::lexical http:// ::token-category URL-prefix
+::lexical https:// ::token-category URL-prefix
+
+::lexical *\0/* ::token-category symbol ::comment cheerleader emoji
+::lexical +/- ::token-category symbol ::comment wild-type
+::lexical -/+ ::token-category symbol ::comment wild-type
+::lexical -/- ::token-category symbol ::comment wild-type
+::lexical 3′ ::token-category symbol ::comment 3 prime (to mark end in DNA sequences)
+::lexical 5′ ::token-category symbol ::comment 5 prime (to mark end in DNA sequences)
+::lexical 8-) ::token-category symbol ::comment large eyes emoji
+::lexical :| ::token-category symbol ::comment neutral face emoji ::last-char-repeatable True
+::lexical :-| ::token-category symbol ::comment straight face emoji ::last-char-repeatable True
+::lexical :( ::token-category symbol ::comment sad emoji ::right-context-not (?:\pL|\d)
+::lexical :(( ::token-category symbol ::comment sad crying
+::lexical :) ::token-category symbol ::comment smiley emoji ::last-char-repeatable True ::lcode-not mun  # comment includes :)) etc.
+::lexical :-) ::token-category symbol ::comment smiley emoticon
+::lexical :--) ::token-category symbol ::comment smiley long nose emoticon
+::lexical :/ ::token-category symbol
+::lexical :-/ ::token-category symbol ::comment slant emoji
+::lexical :// ::token-category symbol ::comment could be part of broken URL
+::lexical ;) ::token-category symbol ::comment wink emoji
+::lexical ;-) ::token-category symbol ::comment nose wink emoji ::left-context-not [+]
+::lexical =) ::token-category symbol ::comment equal smile emoji ::last-char-repeatable True
+::lexical :( ::token-category symbol ::comment frown emoji ::right-context-not (?:\pL|\d) ::lcode-not mun
+::lexical :'( ::token-category symbol ::comment cry emoji ::right-context-not (?:\pL|\d)
+::lexical °C ::token-category symbol ::comment degree celsius ::alt-spelling ºC; °С; ºС; ℃
+::lexical :D ::token-category symbol ::comment emoji grin ::case-sensitive True ::lcode-not mun
+::lexical :-D ::token-category symbol ::comment emoji nose grin ::case-sensitive True ::lcode-not mun
+::lexical =D ::token-category symbol ::comment emoji equal grin ::case-sensitive True
+::lexical °F ::token-category symbol ::comment degree fahrenheit ::alt-spelling ºF; ℉
+::lexical :facepalm: ::token-category symbol ::comment emoji
+::lexical :headbang: ::token-category symbol ::comment emoji
+::lexical :lol: ::token-category symbol ::comment emoji
+::lexical \m/ ::token-category symbol ::comment rock out emoji
+::lexical Nº ::token-category symbol ::alt-spelling N° ::comment variant of numero sign (№)
+::lexical :P ::token-category symbol ::comment tongue-out emoji ::lcode-not mun
+::lexical %pw ::token-category symbol
+::lexical :rofl: ::token-category symbol ::comment emoji
+::lexical :sad: ::token-category symbol ::comment emoji
+::lexical :shocked: ::token-category symbol ::comment emoji
+::lexical :slam: ::token-category symbol ::comment emoji
+::lexical :smile: ::token-category symbol ::comment emoji
+::lexical :wink: ::token-category symbol ::comment emoji
+::lexical ¯\_(ツ)_/¯ ::token-category symbol ::comment shrug emoji
+
+::lexical bisphenol A
+::lexical Galeed ::alt-spelling Gal'Ed; Gal`ed; Gal-Ed
+::lexical Model T
+::lexical Saturn V
+::lexical w3af
+::lexical X.509
+
+# Short URLs can be tricky, as they compete with non-URLs of similar structure such as sq.km ir ago.In
+::lexical 24.kz ::sem-class url
+::lexical 31.kz ::sem-class url
+::lexical el.kz ::sem-class url
+::lexical pm.kz ::sem-class url
+::lexical sk.kz ::sem-class url
+::lexical x.org ::sem-class url
+::lexical 120.su ::sem-class url
+::lexical GeoNames.Org ::sem-class url  # tricky: CamelCase
+
+# Some otherwise-symbols are part of can be of tokens, e.g. −8.5 and should not be marked as symbols
+# by heuristic tokenize_symbol_group, which (might) rank(s) above lexical entries.
+::non-symbol − ::right-context \d
+::non-symbol ≡ ::left-context \pL\d* ::right-context \pL
+::non-symbol ⊕ ::left-context M
+::non-symbol 🜨 ::left-context M
