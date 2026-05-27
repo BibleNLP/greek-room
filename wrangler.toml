@@ -1,0 +1,5 @@
+name = "greekroom-website"
+compatibility_date = "2026-02-12"
+
+[assets]
+directory = "./site/public"
