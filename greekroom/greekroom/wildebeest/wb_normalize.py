@@ -89,7 +89,7 @@ import regex
 import sys
 from typing import Callable, List, Match, Optional, TextIO
 import unicodedata as ud
-from wildebeest import __version__, last_mod_date
+from . import __version__, last_mod_date
 
 
 log.basicConfig(level=log.INFO)

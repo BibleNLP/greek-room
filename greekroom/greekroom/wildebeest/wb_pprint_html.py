@@ -18,8 +18,8 @@ from typing import Optional
 import unicodedata as ud
 from utilities import ScriptDirection
 import wb_analysis as wb_ana
-from gr_versification import BackVersification
-from gr_utilities import general_util
+from ..versification.versification import BackVersification
+from ..gr_utilities import general_util
 
 
 js_functions = """

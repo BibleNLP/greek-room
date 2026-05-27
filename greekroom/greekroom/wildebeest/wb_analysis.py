@@ -26,10 +26,10 @@ import unicodedata as ud
 import unicodeblock.blocks
 if __name__ == "__main__":
     import wb_pprint_html as wb_pp
-from wildebeest.utilities import ScriptDirection
-from wildebeest.wb_normalize import Wildebeest
-from wildebeest import __version__, last_mod_date
-from gr_versification import BackVersification
+from utilities import ScriptDirection
+from wb_normalize import Wildebeest
+from . import __version__, last_mod_date
+from ..versification.versification import BackVersification
 
 
 log.basicConfig(level=log.INFO)
