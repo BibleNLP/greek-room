@@ -1,0 +1,25 @@
+Pashto: په چې ﭘﻪ ﺍﻟﻠﻪ يې کيږي یې كې کې 
+Farsi: وبلاگ اﺳﺪ ريختگي این یك که 
+Arabic: بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ ٠١٢٣٤٥٦٧٨٩ ۰۱۲۳۴۵۶۷۸۹ ۲۰٫۰۰۰رحــــــيم
+Devanagari: बड़े टुकड़े गाज़ा क़ख़ग़ज़ड़ढ़फ़य़ क़ख़ग़ज़ड़ढ़फ़य़ ऩऱऴ  ऩऱऴ टुकडे़ बडे़ ₹९०
+Malayalam: ₹൯൦
+Hebrew: כֹּל עוֹד בַּלֵּבָב פְּנִימָה נֶפֶשׁ יְהוּדִי הוֹמִיָּה
+Width: ９０Ａｚ！  ｟￠￦｠  ｶｰ ﾸ ￥ ￮
+Spaces: In this sentence, there are many	different　spaces.
+Control characters: ABC​‌‍‎‏︀︁︂︃︄︅︆︇︈︉︊︋︌︍︎️﻿DE󠄀󠇯F
+Double conversion: Donât tell your âfiancÃ©â â SchÃ¶ne GrÃ¼Ãe aus MÃ¤hrenâ¦ â Ma sÅur trouve Ã§a Â«bÃªteÂ». Â¡CoÃ±o! â¬50 â¢ 25kmÂ² â¢ Â½Âµm
+Wrong conversion: Dont tell your fiancé  Schöne Grüße aus Mähren  Ma sur trouve ça «bête». ¡Coño! 50  25km²  ½µm
+Font, small, vertical, punctuation, more encoding: ℂℳℹ ﬡ 𝐀 𝐴𝑨𝒜𝔄𝔸𝖠𝗔𞸀  ﹐﹠﹫  ︐︱﹇﹈   ‑༌ ‐་  ÂŒ Â™
+Replacement character: China�s flag isn�t green. Espa�a.
+Typos: The Phillippine offical was embarassed about the kidnaping in Sao Paolo.
+XML, URL escapes: &bullet; &#8204; &#x200C; &amp;quot; &amp;amp;#8204; &amp;amp;amp;#x200C;  Jo%25C3%25ABlle_Aubron %25E2%2582%25AC%25E2%2582%25AC
+Ligatures, symbols, signs, CJK: sœur bær bĳ ǈubljana Luſt   2µm 2Å 2kΩ 273.15K   ㎢ km² ㍻31年㋀㏾  ㉐🈀  ℃℉₨ℇ  ำຳໜໝ ําໍາຫນຫມ ևեւ№ t:ཱ ི ཱི ུ   ཱུ ྲྀ ཷ ླྀ   ཹ ེ ཻ ོ   ཽ ཾ ཿ ྀ ཱྀ
+Combining modifiers: schön schön José José  ΥΎΫ ϒϓϔ   𝅘𝅥𝅮 𝅘𝅥𝅮 𝅘𝅥𝅮   آ آ ̀́̓
+Superscripts, subscripts: 2³² aⁿ aₙ O₂-detector O²⁻detector
+Enclosed characters: ①⒇㉑⒜Ⓐ🄰🄐㈀㉰㈤㊄㈷㊗㉄㋐🅏🉀🉐 ㉼㈎ 〶🈁🈩🈯
+Non-decimal numerals: 二百五十, ⅭⅭⅬ, ፪፻፶ 〹
+Punct: ∭ 〈〉 ⒈⒛🄆 ‼  ;·ʹ 。、﹑､｡｢｣『』【】「」
+￠￡￢￣￤￥￦￨￩￪￫￬￭￮
+Look-alikes: aйды жəне Austіn CTVтелеарнасына
+Georgian: ქრისტჱ სხჳსი ჴლმწიფე ჵ ᲪᲘ ჰⴀⴥ  ႠჅ ᲐᲯ
+Spaces and tabs: field1 	field2  	  
