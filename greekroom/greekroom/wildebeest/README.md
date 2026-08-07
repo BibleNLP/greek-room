@@ -53,7 +53,7 @@ wb_analysis.py -j '{"jsonrpc": "2.0",
 
 ##### Sample outputs
 
-For example 1/2:
+For examples 1 and 2:
 ```bash
 {"jsonrpc": "2.0", "id": "eng-test-02", "resultTimestamp": "2026-08-07T18:45:10", "corpusLangCode": "eng", "result": [
   {"sntId": "GEN 1:1", "span": [[19, 20]], "orig": ",",
@@ -88,3 +88,40 @@ For example 1/2:
  "version": {"GreekRoom": "0.0.21", "GreekRoom interface format": "0.0.4", "GreekRoom:Wildebeest": "0.11.1"},
  "skippedChecks": []}
 ```
+
+### Using *Wildebeest* inside Python
+
+```python 
+import wildebeest.wb_analysis as wb_ana
+check_request = {"jsonrpc": "2.0",
+  "id": "eng-test-02",
+  "method": "BibleTranslationCheck",
+  "params": [{"checks": ["GreekRoom:Wildebeest"],
+              "corpus": {"langCode": "eng",
+                         "body": [{"sntId": "GEN 1:1", "text": "In in the beginning,God created the heavens and the earth."},
+                                  {"sntId": "GEN 1:3", "text": "And God said , `“Let there be light ,аnd there was light."},
+                                  {"sntId": "NUM 1:21", "text": "those listed of the tribe of Reuben were 46,500."},
+                                  {"sntId": "NUM 1:23", "text": "those listed of the tribe of Simeon were 59.300,. डे़|"}
+                                 ]}}]}
+check_response = wb_ana.check(check_request)
+version_dict = wb_ana.version()
+cprops = wb_ana.corpus_props(check_request)    # Typically built from full Bible corpus, not just a few verses.
+```
+
+###  Corpus props
+
+Corpus props are built based on an analysis of a large corpus, e.g. all available parts of a Bible.
+Props useful for Wildebeest are of modest size; props for alignments/spell-checking are large.
+
+```bash
+cprops = {"langCode": "ukr",
+          "nChars": 3498859,
+          "scriptDirection": {"direction": "left-to-right"},
+          "punctStyle": {"quotationPairs": [["«", "»"], ["„", "“"]]},
+          "numberStyle": {"style": {"decimalGrouping": "Western", "decimalSeparator": ",", "digitGroupSeparator": "\u00A0"}}}
+}
+```
+
+Notes
+* *script-direction* and *number-style* have sub-keys *direction* and *style* to allow for addition detailed information such as *counts*.
+* *Western* decimal grouping is by groups of 3; Chinese by groups of 4; Indian by group of 3 and then groups of 2.
