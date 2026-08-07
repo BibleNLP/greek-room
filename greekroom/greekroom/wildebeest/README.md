@@ -157,3 +157,4 @@ cprops = {"langCode": "ukr",
 Notes
 * *script-direction* and *number-style* have sub-keys *direction* and *style* to allow for addition detailed information such as *counts*.
 * *Western* decimal grouping is by groups of 3; Chinese by groups of 4; Indian by group of 3 and then groups of 2.
+
