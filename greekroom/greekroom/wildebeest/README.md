@@ -76,7 +76,7 @@ For examples 1 and 2:
   {"sntId": "NUM 1:23", "span": [[47, 49]], "orig": ",.",
      "check": "GreekRoom:Wildebeest:punctuation:cluster", "severity": 0.7,
      "actionMenu": [{"substitute": ".", "confidence": 0.4},
-                     {"substitute": ",", "confidence": 0.4}]},
+                    {"substitute": ",", "confidence": 0.4}]},
   {"sntId": "NUM 1:23", "span": [[50, 53]], "orig": "\u0921\u0947\u093c",
      "check": "GreekRoom:Wildebeest:encoding:nukta-position", "severity": 0.9,
      "actionMenu": [{"substitute": "\u0921\u093c\u0947", "confidence": 0.99}]},
@@ -85,7 +85,7 @@ For examples 1 and 2:
   {"sntId": "NUM 1:23", "span": [[53, 54]], "orig": "|",
      "check": "GreekRoom:Wildebeest:punctuation:repair:vertical line:danda", "severity": 0.7,
      "actionMenu": [{"substitute": "\u0964", "confidence": 0.6}]}],
- "version": {"GreekRoom": "0.0.21", "GreekRoom interface format": "0.0.4", "GreekRoom:Wildebeest": "0.11.1"},
+ "version": {"GreekRoom": "0.0.21", "GreekRoomFormat": "0.0.4", "GreekRoomWildebeest": "0.11.1"},
  "skippedChecks": []}
 ```
 
@@ -116,6 +116,7 @@ Props useful for Wildebeest are of modest size; props for alignments/spell-check
 ```bash
 cprops = {"langCode": "ukr",
           "nChars": 3498859,
+          "letterScripts": {"CYRILLIC": 2755634, "LATIN": 2},
           "scriptDirection": {"direction": "left-to-right"},
           "punctStyle": {"quotationPairs": [["«", "»"], ["„", "“"]]},
           "numberStyle": {"style": {"decimalGrouping": "Western", "decimalSeparator": ",", "digitGroupSeparator": "\u00A0"}}}
