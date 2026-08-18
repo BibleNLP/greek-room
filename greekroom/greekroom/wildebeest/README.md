@@ -104,8 +104,22 @@ check_request = {"jsonrpc": "2.0",
                                   {"sntId": "NUM 1:23", "text": "those listed of the tribe of Simeon were 59.300,. डे़|"}
                                  ]}}]}
 check_response = wb_ana.check(check_request)
+
+# Returns versions for Wildebeest, Greek Room in general etc.
 version_dict = wb_ana.version()
-cprops = wb_ana.corpus_props(check_request)    # Typically built from full Bible corpus, not just a few verses.
+
+# Zero or more of the following; could be the whole Bible, of in chunks such as a sequence of books (with same corpusId and langCode).
+# For Wildebeest, the corpus statistics will support identifying characters that are rare/unusual/suspicious. For spell checking, the corpus statistics will be even more important.
+# This initialization is typically done before Greek Room corpus checks. The initialization might take a little longer than a check (since it includes the available corpus, not just a chapter or so), but it needs to be called only once per session. Corpus statistics are automatically updated by Greek Room checks, but benefit from any corpus updates (using corpus_init) after editing changes.
+init_request = {"jsonrpc": "2.0",
+  "id": "eng-init-03",
+  "method": "CorpusInit",
+  "params": [{"corpus": {"langCode": "eng",  "corpusId": "eng-bible-v01",
+                         "body": [{"sntId": "GEN 1:1", "text": "In in the beginning,God created the heavens and the earth."},
+                                  {"sntId": "GEN 1:2", "text": "Now the earth was formless and empty, darkness was over the surface of the deep, and the Spirit of God was hovering over the waters."},
+                                  {"sntId": "GEN 1:3", "text": "And God said , `“Let there be light ,аnd there was light."}
+                                 ]}}]}
+cprops = wb_ana.corpus_init(init_request)
 ```
 
 ###  Corpus props
