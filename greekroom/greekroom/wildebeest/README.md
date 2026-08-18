@@ -108,9 +108,15 @@ check_response = wb_ana.check(check_request)
 # Returns versions for Wildebeest, Greek Room in general etc.
 version_dict = wb_ana.version()
 
-# Zero or more of the following; could be the whole Bible, of in chunks such as a sequence of books (with same corpusId and langCode).
-# For Wildebeest, the corpus statistics will support identifying characters that are rare/unusual/suspicious. For spell checking, the corpus statistics will be even more important.
-# This initialization is typically done before Greek Room corpus checks. The initialization might take a little longer than a check (since it includes the available corpus, not just a chapter or so), but it needs to be called only once per session. Corpus statistics are automatically updated by Greek Room checks, but benefit from any corpus updates (using corpus_init) after editing changes.
+# Initialize corpus with zero or more of the following.
+# A corpus initialization could be for the whole Bible, of in chunks such as a sequence of books (with same corpusId and langCode).
+# For Wildebeest, the corpus statistics will support identifying characters that are rare/unusual/suspicious.
+# For spell checking, the corpus statistics will be even more important.
+# This initialization is typically done before Greek Room corpus checks.
+# The initialization might take a little longer than a check (since it includes the available corpus, not just a chapter or so),
+# but it needs to be called only once per session for the whole corpus.
+# Corpus statistics are automatically updated by Greek Room checks, but will benefit from any corpus updates (using corpus_init) after editing changes.
+# If CorpusInit calls have the same SntId, only the last one be used for the corpus statistics. 
 init_request = {"jsonrpc": "2.0",
   "id": "eng-init-03",
   "method": "CorpusInit",
