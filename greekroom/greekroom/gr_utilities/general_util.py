@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from __future__ import annotations
+import io
 import json
 import math
 from pathlib import Path
@@ -53,8 +54,30 @@ def valid_offset(lst: list, offset: int) -> bool:
     return isinstance(lst, list) and isinstance(offset, int) and (0 <= offset < len(lst))
 
 
-# cwd_path = Path(os.getcwd())
+cwd_path = Path(os.getcwd())
 # parent_dir = cwd_path.parent
+
+
+def full_filename(file: str | io.TextIOWrapper, default_dirs: list | None = None, must_exist: bool = False) -> str:
+    if isinstance(file, io.TextIOWrapper):
+        filename = file.name
+    elif isinstance(file, str):
+        filename = file
+    else:
+        filename = str(file)
+    if filename.startswith("/"):
+        return filename
+    if default_dirs:
+        for default_dir in default_dirs:
+            full_filename_s = f"{default_dir}/{filename}"
+            if must_exist:
+                if os.path.exists(full_filename_s):
+                    return full_filename_s
+            else:
+                return full_filename_s
+    return f"{cwd_path}/{filename}"
+
+
 def find_file(filename: str | Path, dirs: List[str | Path]) -> Path | None:
     if os.path.exists(filename):
         return filename if isinstance(filename, Path) else Path(filename)
@@ -123,16 +146,18 @@ def pmi_list(item_counts: List[float], combined_count: float, total_count: float
             return -99
         else:
             if verbose:
-                sys.stderr.write(f'  PMI {item_counts}; {combined_count}; {total_count}: {expected_count} -> {(combined_count + smoothing) / (expected_count + smoothing)} -> {math.log((combined_count + smoothing) / (expected_count + smoothing))}\n')
+                sys.stderr.write(f'  PMI {item_counts}; {combined_count}; {total_count}: {expected_count}'
+                                 f' -> {(combined_count + smoothing) / (expected_count + smoothing)}'
+                                 f' -> {math.log((combined_count + smoothing) / (expected_count + smoothing))}\n')
             return math.log((combined_count + smoothing) / (expected_count + smoothing))
 
 
-
 def findall3(match_regex: str, text: str) -> Tuple[List[str], List[int], List[str]]:
-    """returns matches, inter-matches, start-positions, inter-matches (len(matches)+1)"""
+    """returns matches, start-positions, inter-matches (len(matches)+1)"""
     full_regex = '(.*?)(' + match_regex + ')(.*)$'
     matches, start_positions, inter_matches = [], [], []
     rest, position = text, 0
+    # sys.stderr.write(f'Findall3: {full_regex} :: {rest}\n')
     while m := regex.match(full_regex, rest):
         pre, core, rest = m.group(1, 2, 3)
         position += len(pre)

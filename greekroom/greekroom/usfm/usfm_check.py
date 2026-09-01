@@ -937,7 +937,7 @@ class BibleTextExtracts:
                     elif sub_element.tag in ('rem',):
                         sc.extract_ignore_tag_count[sub_element.tag] += 1
                     else:
-                        if sub_element.tag in ('f', 'ef'):
+                        if sub_element.tag in ('f', 'ef', 'fe'):
                             footnote_index = len(self.footnotes) + 1
                             footnote_dict = {"bk": self.book_id, "c": self.chapter_number}
                             if self.verse_number:
@@ -962,7 +962,7 @@ class BibleTextExtracts:
                         # if verbose: sys.stderr.write(f"ADD-SE 1b {location} \\{se.tag} R:{sub_result} "
                         #                              f"S:{sub_element} A:{anchor_tag}\n")
                         if isinstance(sub_result, str):
-                            if sub_element.tag in ('f', 'ef'):
+                            if sub_element.tag in ('f', 'ef', 'fe'):
                                 self.footnotes[-1]['txt'] += sub_result
                             elif sub_element.tag in ('fig',):
                                 self.figures[-1]['desc'] += sub_result
@@ -973,7 +973,7 @@ class BibleTextExtracts:
                                         and (not regex.match(r'\pC*(?:\pZ$|\r|\n)', sub_result))):
                                     result += ' '
                                 result += sub_result
-                        elif sub_element.tag in ('f', 'ef', 'fig'):
+                        elif sub_element.tag in ('f', 'ef', 'fe', 'fig'):
                             pass
                         else:
                             error_message = f"add_se_issue: unexpected sub-result type {type(sub_result)} " \
@@ -1921,7 +1921,7 @@ class UsfmElement:
                             error_cat = (error_cat_top, 'Sub tags', 'Change \\tag to \\+tag inside nested markup',
                                          recommendation)
                             display_element = self
-                            while display_element.parent and display_element.parent.tag in ('f', 'ft'):
+                            while display_element.parent and display_element.parent.tag in ('f', 'fe', 'ft'):
                                 display_element = display_element.parent
                             display_string = display_element.flat_print()
                             sc.record_error(error_cat, loc, display_string)

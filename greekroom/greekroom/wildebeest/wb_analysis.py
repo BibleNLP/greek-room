@@ -8,10 +8,10 @@ When using STDIN and/or STDOUT, it might be necessary, particularly for older ve
 """
 # -*- encoding: utf-8 -*-
 
+from __future__ import annotations
 import argparse
 import io
 import json
-import time
 import datetime
 from collections import defaultdict
 import logging as log
@@ -21,15 +21,18 @@ import re
 import regex
 import sys
 from tqdm.auto import tqdm
-from typing import IO, Optional, TextIO, Tuple, Union, List
+from typing import IO, Optional, TextIO, Tuple, List
 import unicodedata as ud
-import unicodeblock.blocks
 if __name__ == "__main__":
-    import wb_pprint_html as wb_pp
-from utilities import ScriptDirection
-from wb_normalize import Wildebeest
-from . import __version__, last_mod_date
-from ..versification.versification import BackVersification
+    import greekroom.wildebeest.wb_pprint_html as wb_pp
+# from utilities import ScriptDirection
+from greekroom.gr_utilities import general_util, html_util, script_direction, corpus
+from greekroom import __version__ as __greekRoomVersion__
+from greekroom import __formatVersion__ as __greekRoomFormatVersion__
+from greekroom.wildebeest import __version__ as __wildebeestVersion__
+from greekroom.wildebeest import last_mod_date as wildebeest_last_mod_date
+from greekroom.wildebeest.wb_normalize import Wildebeest
+from greekroom.versification.versification import BackVersification
 
 
 log.basicConfig(level=log.INFO)
@@ -58,12 +61,21 @@ def control_character_name(char: str) -> str | None:
         '\x0D': 'CARRIAGE RETURN', 'x1B': 'ESCAPE', '\x7F': 'DELETE'}
     if char in control_character_dict:
         return f'control character {control_character_dict[char]}'
-    elif char <= '\x1F':            # Unicode block C0
-        return "control character"
+    hex_code = f"U+{ord(char):04X}"
+    if char <= '\x1F':            # Unicode block C0
+        return f"control character {hex_code}"
     elif '\x80' <= char <= '\x9F':  # Unicode block C1
-        return "control character"
+        return f"control character {hex_code}"
     else:
         return None
+
+
+def simple_char_unicode_name(char: str) -> str:
+    return ud.name(char, None) or control_character_name(char) or f"U+{ord(char):04X}"
+
+
+def simple_unicode_names(s: str, delimiter: str = ', ') -> str:
+    return delimiter.join(map(simple_char_unicode_name, s))
 
 
 def print_char_unicode_name(char: str) -> str:
@@ -77,6 +89,95 @@ def print_str_unicode_names(s: str, delimiter: str = ', ') -> str:
     return delimiter.join(map(print_char_unicode_name, s))
 
 
+class ScriptRepair:
+    """For automatic repair of look-alike characters in the wrong script."""
+    def __init__(self, wb: WildebeestAnalysis):
+        self.wb = wb
+        cyr2lat = {'Ѕ': 'S', 'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H', 'О': 'O', 'Р': 'P',
+                   'С': 'C', 'Т': 'T', 'Х': 'X', 'Ԛ': 'Q', 'Ԝ': 'W', 'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p',
+                   'с': 'c', 'у': 'y', 'х': 'x', 'ѕ': 's', 'і': 'i', 'ј': 'j', 'ԛ': 'q', 'ԝ': 'w'}
+        grk2lat = {'Α': 'A', 'Β': 'B', 'Ε': 'E', 'Ζ': 'Z', 'Η': 'H', 'Ι': 'I', 'Κ': 'K', 'Μ': 'M', 'Ν': 'N',
+                   'Ο': 'O', 'Ρ': 'P', 'Τ': 'T', 'Υ': 'Y', 'Χ': 'X',
+                   'α': 'a', 'γ': 'y', 'η': 'n', 'κ': 'k', 'ν': 'v', 'ο': 'o', 'ρ': 'p', 'υ': 'u', 'χ': 'x',
+                   'ε': 'ɛ'}
+        misc2lat = {'ɑ': 'a',   # LATIN SMALL LETTER ALPHA
+                    'ɡ': 'g'}   # LATIN SMALL LETTER SCRIPT G
+        # ?? ipa2lat = {'ɑ': 'a', 'ɡ': 'g'}
+        self.char_map = defaultdict(dict)
+        for key, value in cyr2lat.items():
+            self.char_map["LATIN"][key] = value
+            self.char_map["CYRILLIC"][value] = key
+        for key, value in grk2lat.items():
+            self.char_map["LATIN"][key] = value
+            self.char_map["GREEK"][value] = key
+        for key, value in misc2lat.items():
+            self.char_map["LATIN"][key] = value
+        # to be added: greek <-> cyrillic, Persian <-> Arabic (k, y), ...
+
+    def repair_string(self, s: str, target_script: str) -> Tuple[str, str]:
+        n_letters = 0
+        n_repaired_letters = 0
+        n_irreparable_letters = 0
+        result = ""
+        char_map = self.char_map.get(target_script)
+        for char in s:
+            n_letters += 1
+            repaired_char = char_map.get(char) if char_map else None
+            if repaired_char is not None:
+                result += repaired_char
+                n_repaired_letters += 1
+            else:
+                result += char
+                unicode_script = self.wb.unicode_util.char_unicode_script(char)
+                if unicode_script != target_script:
+                    n_irreparable_letters += 1
+        if n_repaired_letters and n_irreparable_letters:
+            category = "partially repaired"
+        elif n_repaired_letters:
+            category = "repaired"
+        elif n_irreparable_letters:
+            category = "unrepaired"
+        else:
+            category = "no repair needed"
+        return result, category
+
+
+class DynJsonResults:
+    """
+    Manages list of GreekRoom results, especially sorting the output.
+    """
+    def __init__(self):
+        self.n_issues = 0
+        self.snt_id_set = set()
+        self.results_by_snt_id = defaultdict(list)
+        self.results_by_check_id = defaultdict(list)
+        self.results_by_check_id_and_snt_id = defaultdict(list)
+        self.check_id_snt_ids = defaultdict(list)
+
+    def add(self, result: dict, snt_id: str | None = None) -> None:
+        if snt_id is None:
+            snt_id = result.get('sntId')
+        self.results_by_snt_id[snt_id].append(result)
+        check_id = result.get('check', "GreekRoom:unspecified")   # "unspecified" should never actually occur
+        self.results_by_check_id[check_id].append(result)
+        self.results_by_check_id_and_snt_id[(check_id, snt_id)].append(result)
+        if snt_id not in self.check_id_snt_ids[check_id]:
+            self.check_id_snt_ids[check_id].append(snt_id)
+        self.snt_id_set.add(snt_id)
+        self.n_issues += 1
+
+    def listify(self, snt_id_list: List[str]) -> List[dict]:
+        result = []
+        # sort by sentence ID, position, length of substring (longer first), severity (higher first)
+        for snt_id in snt_id_list:
+            for result_for_snt_id in sorted(self.results_by_snt_id[snt_id],
+                                            key=lambda d: (d.get('span', [[0]])[0][0],
+                                                           -len(d.get('orig', 0)),
+                                                           -d.get('severity', 0))):
+                result.append(result_for_snt_id)
+        return result
+
+
 class WildebeestAnalysis:
     """
     Object stores raw and aggregate information of a Wildebeest test checking analysis.
@@ -85,6 +186,9 @@ class WildebeestAnalysis:
     def __init__(self, args, verbose: Optional[bool] = False):
         self.wildebeest = Wildebeest()
         self.lang_code = args.lc
+        self.lang_name = None
+        self.corpus_id = None
+        self.corpus_name = None
         self.verbose = verbose
         self.filename = None
         self.character_count = defaultdict(int)
@@ -135,11 +239,28 @@ class WildebeestAnalysis:
         self.pattern_class_counts = defaultdict(lambda: [0, 0, 0])
         # Key: (pattern_character_of_interest, pattern)
         # Value: List of counts for '-'/''/'+'
-        self.script_direction = ScriptDirection(lang_code=self.lang_code or args.input)
+        self.script_direction = script_direction.ScriptDirection(lang_code=self.lang_code or args.input)
         self.log_message_counts = defaultdict(int)
         self.abbreviations = defaultdict(set)         # key: lang_code, e.g. "fas"
         self.active_abbreviations = defaultdict(set)  # key: lang_code, e.g. "fas"
         self.in_word_punct_patterns = set()
+        self.norm_char_dict = {}
+        self.dyn_json = {}
+        self.dyn_json_results = DynJsonResults()
+        self.dyn_check_selectors: List[str] | None = None
+        self.dyn_skipped_checks: List[str] | None = []
+        self.snt_list = []
+        self.ref_id_list = []
+        self.snt_index_to_ref_id = defaultdict(str)
+        self.ref_id_to_snt_index = defaultdict(int)
+        self.ref_id_to_text = {}  # HHERE possibly use self.text_corpus.snt_id_to_snt
+        self.script_repair = None
+        self.char_script_dict = {}
+        self.auto_correct_threshold: float | None = None
+        self.n_snt = 0
+        self.wb_corpus = {}
+        self.unicode_util = corpus.UnicodeUtilities()
+        self.text_corpus = None
 
         # The following blocks will be printed out in order as specified below:
         for block in ['LOW_SURROGATES', 'REPLACEMENT', 'C0_CONTROL', 'C1_CONTROL', 'ZERO_WIDTH', 'DIRECTIONAL',
@@ -161,81 +282,7 @@ class WildebeestAnalysis:
                       'HEBREW', 'HEBREW_ALPHABETIC_PRESENTATION_FORMS', 'HEBREW_PRESENTATION_FORMS']:
             self.analysis['block'][block] = {}
 
-        self.char_to_name_dict = {
-            '\0': 'NULL',
-            '': 'START OF HEADING',
-            '': 'START OF TEXT',
-            '': 'END OF TEXT',
-            '': 'END OF TRANSMISSION',
-            '': 'ENQUIRY',
-            '': 'ACKNOWLEDGE',
-            '': 'BELL',
-            '': 'BACKSPACE',
-            '\t': 'TAB',
-            '\n': 'LINE FEED',
-            '': 'LINE TABULATION',
-            '': 'FORM FEED',
-            '\r': 'CARRIAGE RETURN',
-            '': 'SHIFT OUT',
-            '': 'SHIFT IN',
-            '': 'DATA LINK ESCAPE',
-            '': 'DEVICE CONTROL ONE',
-            '': 'DEVICE CONTROL TWO',
-            '': 'DEVICE CONTROL THREE',
-            '': 'DEVICE CONTROL FOUR',
-            '': 'NEGATIVE ACKNOWLEDGE',
-            '': 'SYNCHRONOUS IDLE',
-            '': 'END OF TRANSMISSION BLOCK',
-            '': 'CANCEL',
-            '': 'END OF MEDIUM',
-            '': 'SUBSTITUTE',
-            '': 'ESCAPE',
-            '': 'INFORMATION SEPARATOR FOUR',
-            '': 'INFORMATION SEPARATOR THREE',
-            '': 'INFORMATION SEPARATOR TWO',
-            '':  'INFORMATION SEPARATOR ONE',
-            '': 'DELETE',
-            '':   'PADDING CHARACTER (W1252: Euro Sign)',
-            '': 'HIGH OCTET PRESET',
-            '': 'BREAK PERMITTED HERE (W1252: Single Low-9 Quotation Mark)',
-            '': 'NO BREAK HERE (W1252: Latin Small Letter F With Hook)',
-            '': 'INDEX (W1252: Double Low-9 Quotation Mark)',
-            '': 'NEXT LINE (W1252: Horizontal Ellipsis)',
-            '': 'START OF SELECTED AREA (W1252: Dagger)',
-            '': 'END OF SELECTED AREA (W1252: Double Dagger)',
-            '': 'CHARACTER TABULATION SET (W1252: Modifier Letter Circumflex Accent)',
-            '': 'CHARACTER TABULATION WITH JUSTIFICATION (W1252: Per Mille Sign)',
-            '': 'LINE TABULATION SET (W1252: Latin Capital Letter S With Caron)',
-            '': 'PARTIAL LINE FORWARD (W1252: Single Left-Pointing Angle Quotation Mark)',
-            '': 'PARTIAL LINE BACKWARD (W1252: Latin Capital Ligature OE)',
-            '': 'REVERSE LINE FEED',
-            '': 'SINGLE SHIFT TWO (W1252: Latin Capital Letter Z With Caron)',
-            '': 'SINGLE SHIFT THREE',
-            '': 'DEVICE CONTROL STRING',
-            '': 'PRIVATE USE ONE (W1252: Left Single Quotation Mark)',
-            '': 'PRIVATE USE TWO (W1252: Right Single Quotation Mark)',
-            '': 'SET TRANSMIT STATE (W1252: Left Double Quotation Mark)',
-            '': 'CANCEL CHARACTER (W1252: Right Double Quotation Mark)',
-            '': 'MESSAGE WAITING (W1252: Bullet)',
-            '': 'START OF GUARDED AREA (W1252: En Dash)',
-            '': 'END OF GUARDED AREA (W1252: Em Dash)',
-            '': 'START OF STRING (W1252: Small Tilde)',
-            '': 'SINGLE GRAPHIC CHARACTER INTRODUCER (W1252: Trade Mark Sign)',
-            '': 'SINGLE CHARACTER INTRODUCER (W1252: Latin Small Letter S With Caron)',
-            '': 'CONTROL SEQUENCE INTRODUCER (W1252: Single Right-Pointing Angle Quotation Mark)',
-            '': 'STRING TERMINATOR (W1252: Latin Small Ligature OE)',
-            '': 'OPERATING SYSTEM COMMAND',
-            '': 'PRIVACY MESSAGE (W1252: Latin Small Letter Z With Caron)',
-            '': 'APPLICATION PROGRAM COMMAND (W1252: Latin Capital Letter Y With Diaeresis)',
-            '﻿': 'ZERO WIDTH NO-BREAK SPACE (BYTE ORDER MARK)'
-        }
-        self.char_to_block_dict = defaultdict(str)
-        self.unicode_block_to_script_dict = defaultdict(str)
-        self.char_to_script_dict = defaultdict(str)
-        self.populate_char_to_block_dict()
         self.token_to_pattern_dict = defaultdict(list)
-        self.ref_id_dict = None
-        self.corpus = None
         self.corpus_w_rtf_delimiter_adjustments = None
         self.lrm = '‎'  # left-to-right directional mark
         # structure of dictionaries for unmatched, nesting_l, nesting_r:
@@ -275,6 +322,7 @@ class WildebeestAnalysis:
                                'cross_snt_spans': defaultdict(list),
                                'triple_nesting': defaultdict(list),
                                'ref_translations': []}
+        self.paired_delimiter_state = {}
         if self.lang_code in ('dan', 'deu'):
             self.punct_analysis['matching_punct'] += self.punct_analysis['matching_punct_supplement_low_quote']
         elif self.lang_code in ('ukr', 'bel'):
@@ -283,7 +331,9 @@ class WildebeestAnalysis:
             self.punct_analysis['matching_punct'] += self.punct_analysis['matching_punct_supplement_low_quote3']
         else:
             self.punct_analysis['matching_punct'] += self.punct_analysis['matching_punct_supplement_default']
-        i, punct_list = 0, self.punct_analysis['matching_punct']
+        i, punct_list = 0, self.punct_analysis.get('matching_punct')
+        # sys.stderr.write(f'''MP lc: {self.lang_code} m_punct: {punct_list}\n''')
+        self.init_paired_delimiter_state(punct_list)
         while i < len(punct_list):
             punct_l, punct_r = punct_list[i], punct_list[i+1]
             self.punct_analysis[('lr', punct_l)] = punct_r
@@ -327,92 +377,6 @@ class WildebeestAnalysis:
                     blocks_with_dicts_to_be_deleted.append(block)
             for block in blocks_with_dicts_to_be_deleted:
                 del self.analysis[key1][block]
-
-    def set_new_char_to_block_dict_entry(self, c: Union[str, int], block_name: str):
-        """Set block_name for given character. Do not overwrite any previous value."""
-        char = chr(c) if isinstance(c, int) else c
-        if not self.char_to_block_dict.get(char):
-            self.char_to_block_dict[char] = block_name
-
-    def populate_char_to_block_dict(self):
-        """Set block_name for characters (that differ from unicodedata block names)."""
-        for char in '⁰¹²³⁴⁵⁶⁷⁸⁹':
-            self.set_new_char_to_block_dict_entry(char, 'SUPERSCRIPT_DIGIT')
-        for char in '₀₁₂₃₄₅₆₇₈₉':
-            self.set_new_char_to_block_dict_entry(char, 'SUBSCRIPT_DIGIT')
-        for char in 'ªº':
-            self.set_new_char_to_block_dict_entry(char, 'SUPERSCRIPTS_AND_SUBSCRIPTS')
-        for char in '               ፡':
-            self.set_new_char_to_block_dict_entry(char, 'SPACE')
-        for char in '­​‌‍﻿':
-            self.set_new_char_to_block_dict_entry(char, 'ZERO_WIDTH')
-        for char in '‏‎':
-            self.set_new_char_to_block_dict_entry(char, 'DIRECTIONAL')
-        for char in '$¢£¤¥':
-            self.set_new_char_to_block_dict_entry(char, 'CURRENCY_SYMBOLS')
-        # noinspection SpellCheckingInspection
-        for char in "ʌɓɗɖɛəɡɠɨᵻɟᴋɫɲⁿɔɵᵽɹʃʉʋʊʒɣɩʔ":
-            self.set_new_char_to_block_dict_entry(char, 'LATIN')
-        self.set_new_char_to_block_dict_entry('ᵸ', 'CYRILLIC')
-        # noinspection SpellCheckingInspection
-        for char in "ᵉⁱᵏᵘ":
-            self.set_new_char_to_block_dict_entry(char, 'LATIN_SUPERSCRIPT_LETTER')
-        self.set_new_char_to_block_dict_entry('々', 'CJK')
-        self.set_new_char_to_block_dict_entry('�', 'REPLACEMENT')
-        for code_point in range(0x1D62, 0x1D66):
-            self.set_new_char_to_block_dict_entry(code_point, 'LATIN_SUBSCRIPT_LETTER')
-        for code_point in range(0x1C90, 0x1CC0):
-            self.set_new_char_to_block_dict_entry(code_point, 'GEORGIAN')
-        for code_point in range(0x2D00, 0x2D30):
-            self.set_new_char_to_block_dict_entry(code_point, 'GEORGIAN')
-        for code_point in range(0xFB00, 0xFB10):
-            self.set_new_char_to_block_dict_entry(code_point, 'LATIN_ALPHABETIC_PRESENTATION_FORMS')
-        for code_point in range(0xFB10, 0xFB20):
-            self.set_new_char_to_block_dict_entry(code_point, 'ARMENIAN_ALPHABETIC_PRESENTATION_FORMS')
-        for code_point in range(0xFB20, 0xFB4F):
-            self.set_new_char_to_block_dict_entry(code_point, 'HEBREW_ALPHABETIC_PRESENTATION_FORMS')
-        for code_point in range(0x00, 0x20):
-            self.set_new_char_to_block_dict_entry(code_point, 'C0_CONTROL')
-        self.set_new_char_to_block_dict_entry(0x7F, 'C0_CONTROL')
-        for code_point in range(0x80, 0xA0):
-            self.set_new_char_to_block_dict_entry(code_point, 'C1_CONTROL')
-        for code_point in range(0x21, 0x07F):
-            if regex.match(r'(?:\pP|\pS)', chr(code_point)):
-                self.set_new_char_to_block_dict_entry(code_point, 'ASCII_PUNCTUATION')
-        for code_point in range(0x30, 0x03A):
-            self.set_new_char_to_block_dict_entry(code_point, 'ASCII_DIGIT')
-        for code_point in range(0x0660, 0x066A):
-            self.set_new_char_to_block_dict_entry(code_point, 'ARABIC_INDIC_DIGIT')
-        for code_point in range(0x06F0, 0x06FA):
-            self.set_new_char_to_block_dict_entry(code_point, 'EXTENDED_ARABIC_INDIC_DIGIT')
-        for code_point in range(0xBC, 0xBF):
-            self.set_new_char_to_block_dict_entry(code_point, 'VULGAR_FRACTION')
-        for code_point in range(0x2150, 0x2160):
-            self.set_new_char_to_block_dict_entry(code_point, 'VULGAR_FRACTION')
-        self.set_new_char_to_block_dict_entry('↉', 'VULGAR_FRACTION')
-        for code_point in range(0x2160, 0x2180):
-            self.set_new_char_to_block_dict_entry(code_point, 'ROMAN_NUMERAL')
-        self.set_new_char_to_block_dict_entry('ↄ', 'ARCHAIC_CLAUDIAN_LETTER')
-        for code_point in range(0x2180, 0x2189):
-            self.set_new_char_to_block_dict_entry(code_point, 'ARCHAIC_ROMAN_NUMERAL')
-        for code_point in range(0x218A, 0x218C):
-            self.set_new_char_to_block_dict_entry(code_point, 'TURNED_DIGIT')
-        for code_point in range(0xA1, 0x0100):
-            if regex.match(r'(?:\pP|\pS)', chr(code_point)):
-                self.set_new_char_to_block_dict_entry(code_point, 'GENERAL_PUNCTUATION')
-        for code_point in range(0x16F00, 0x16FA0):
-            self.set_new_char_to_block_dict_entry(code_point, 'MIAO')
-        for char in '،؍؛؞؟٪٭٫٬۔':
-            self.set_new_char_to_block_dict_entry(char, 'ARABIC_PUNCTUATION')
-        for char in '።፣፤፥፦፧':
-            self.set_new_char_to_block_dict_entry(char, 'ETHIOPIC_PUNCTUATION')
-        for char in '。．、·，！？；：（）［］【】「」『』《》〈〉':
-            self.set_new_char_to_block_dict_entry(char, 'CHINESE_PUNCTUATION')
-        for char in '।॥':
-            self.set_new_char_to_block_dict_entry(char, 'DEVANAGARI_PUNCTUATION')
-        for char in '՜՝՞։՛':
-            self.set_new_char_to_block_dict_entry(char, 'ARMENIAN_PUNCTUATION')
-        self.set_new_char_to_block_dict_entry(0xB5, 'LETTERLIKE_SYMBOLS')  # micro sign
 
     def pattern_to_regex(self, pattern: str):
         pattern = regex.sub(r'[]', '', pattern)
@@ -482,7 +446,8 @@ class WildebeestAnalysis:
             if in_word_punct in token:
                 if (in_word_punct == "'") and not regex.match(r"[^']*\pL\pM*(?:'\pL\pM*)+[^']*$", token):
                     continue
-                if (in_word_punct == "\u00AD") and not regex.match(r"[^\u00AD]*\pL\pM*(?:\u00AD\pL\pM*)+[^\u00AD]*$", token):
+                if ((in_word_punct == "\u00AD")
+                        and not regex.match(r"[^\u00AD]*\pL\pM*(?:\u00AD\pL\pM*)+[^\u00AD]*$", token)):
                     continue
                 pattern3 = regex.sub(r'[]', '', token)
                 pattern3 = pattern3.replace(in_word_punct, '')
@@ -500,7 +465,7 @@ class WildebeestAnalysis:
 
     def snt_id(self, line_number: int, default: str = None) -> str:
         default_snt_id = default if default else str(line_number)
-        return self.ref_id_dict.get(line_number, default_snt_id) if self.ref_id_dict else default_snt_id
+        return self.snt_index_to_ref_id.get(line_number, default_snt_id) if self.snt_index_to_ref_id else default_snt_id
 
     def punct_analysis_in_line(self, line: str, line_number: int):
         refreshable_punctuations = self.punct_analysis['refreshable_punct']
@@ -515,10 +480,10 @@ class WildebeestAnalysis:
             full_pos2 = (line_number, char_pos, last_non_space_char_position)  # len helps gauge position in translation
             if right_char := self.punct_analysis.get(('lr', char), None):
                 triple_nesting = ((len(punct_stack) >= 2)
-                                   and (punct_stack[-2] == char)
-                                   and (punct_stack[-1] in refreshable_punctuations)
-                                   and (punct_stack[-2] in refreshable_punctuations)
-                                   and (punct_stack[-1] != punct_stack[-2]))
+                                  and (punct_stack[-2] == char)
+                                  and (punct_stack[-1] in refreshable_punctuations)
+                                  and (punct_stack[-2] in refreshable_punctuations)
+                                  and (punct_stack[-1] != punct_stack[-2]))
                 # if verbose and triple_nesting: print("PRELIM", line_number, char_pos, punct_stack)
                 quad_nesting1 = (triple_nesting and line[char_pos+1:].lstrip().startswith(punct_stack[-1]))
                 quad_nesting2 = ((len(punct_stack) >= 2)
@@ -598,7 +563,8 @@ class WildebeestAnalysis:
                     # todo: possibly elaborate
                     log_message = f"-----CLEAN?? {left_char}, {char}, {self.punct_analysis['open_lefts'][left_char]}"
                     if log_message not in self.log_message_counts:
-                        sys.stderr.write(log_message + "\n")
+                        pass
+                        # sys.stderr.write(log_message + "\n")
                     self.log_message_counts[log_message] += 1
                 if ((left_char in self.punct_analysis['open_first_lefts'])
                         and (not (triple_nesting and popped_pos))
@@ -607,7 +573,7 @@ class WildebeestAnalysis:
                         span_info = self.span_info_with_ids(open_pos, full_pos2)
                         self.punct_analysis['cross_snt_spans'][left_char].append(span_info)
                         if verbose:
-                            print("**CROSS", left_char, char, "TRIPLE" if triple_nesting else "",span_info)
+                            print("**CROSS", left_char, char, "TRIPLE" if triple_nesting else "", span_info)
                     self.punct_analysis['open_first_lefts'][left_char] = None
                 if (left_char in self.punct_analysis['refreshable_punct']) and not triple_nesting:
                     self.punct_analysis['open_lefts'][left_char] = []
@@ -617,7 +583,7 @@ class WildebeestAnalysis:
                 if verbose:
                     print('CLOSE2', line_number, left_char, char, self.snt_id(line_number),
                           self.punct_analysis['stack_plus'], self.punct_analysis['open_lefts'][left_char])
-        if self.ref_id_dict:
+        if self.snt_index_to_ref_id:
             snt_id = self.snt_id(line_number)
             next_snt_id = self.snt_id(line_number+1, 'None')
             snt_id_tokens1 = snt_id.split()
@@ -655,9 +621,9 @@ class WildebeestAnalysis:
                     return f'{m1.group(1)} {m1.group(2)}:{m1.group(3)}-{m2.group(2)}:{m2.group(3)}'
         return f"{snt_id1}-{snt_id2}"
 
-    def punct_analysis_at_end(self):
+    def punct_analysis_at_end(self, verbose: bool = False):
         # to be called after last line to mark any open punctuation as unmatched
-        if self.punct_analysis['stack_plus']:
+        if verbose and self.punct_analysis['stack_plus']:
             print("FINAL-PUNCT-STACK", self.punct_analysis['stack_plus'], len(self.punct_analysis['stack_plus']))
         ref_translation_names = [x.get('translation') for x in self.punct_analysis['ref_translations']
                                  if x.get('translation')]
@@ -693,7 +659,7 @@ class WildebeestAnalysis:
                 if example_pos_list := self.punct_analysis[punct_analysis_key][char]:
                     code_point = ord(char)
                     unicode_id = 'U+%04X' % code_point
-                    unicode_name = self.unicode_name(char)
+                    unicode_name = self.unicode_util.unicode_name(char)
                     self.analysis['notable-token-meta'][analysis_report_title]['ass-class'] = ass_class
                     self.analysis['notable-token-meta'][analysis_report_title]['ass-descr'] = ass_descr
                     self.analysis['notable-token'][analysis_report_title][char] \
@@ -853,9 +819,9 @@ class WildebeestAnalysis:
                             and (token_tuple not in self.token_examples[char]):
                         self.token_examples[char].append(token_tuple)
             # uc_block = None
-            if not (uc_script := self.char_to_script_dict[char]):
-                uc_block = self.unicode_block(char)
-                uc_script = self.unicode_script(uc_block)
+            if not (uc_script := self.unicode_util.char_to_script_dict[char]):
+                uc_block = self.unicode_util.unicode_block(char)
+                uc_script = self.unicode_util.unicode_script(uc_block, char)
             if len(self.script_lines[uc_script]) < self.max_script_lines:
                 self.script_lines[uc_script].add(line_number)
         words = regex.findall(r'((?:\pL\pM*){2,})', line, re.IGNORECASE)
@@ -888,151 +854,59 @@ class WildebeestAnalysis:
                     if len(self.pattern_lines[pattern]) < self.max_bad_pattern_lines:
                         self.pattern_lines[pattern].add(line_number)
 
-    def collect_counts_and_examples_in_file(self, input_file: IO, total_bytes=None, progress_bar=True) -> None:
+    def collect_counts_and_examples_in_text(self, line: str, stats: dict):
+        try:
+            line_w_rtf_delimiter_adjustments = None
+            stats['line_number'] += 1
+            line_number = stats['line_number']
+            if not re.match('\S', line):
+                stats['n_empty_lines'] += 1
+            self.collect_counts_and_examples_in_line(line, line_number)
+            ref_id = self.snt_id(line_number)
+            self.wb_corpus[ref_id] = line
+            line_rtl = script_direction.ScriptDirection.string_is_right_to_left(line)
+            if line_rtl:
+                if not self.corpus_w_rtf_delimiter_adjustments.get(ref_id):
+                    if self.script_direction.text_contains_switchable_chars(line):
+                        line_w_rtf_delimiter_adjustments \
+                            = self.script_direction.switch_delimiters_for_rtl_scripts(line)
+                        self.corpus_w_rtf_delimiter_adjustments[ref_id] = line_w_rtf_delimiter_adjustments
+            self.punct_analysis_in_line(line_w_rtf_delimiter_adjustments or line, line_number)
+        # Exception for safety only. Should not occur.
+        except UnicodeError as error:
+            sys.stderr.write(f"*** Unicode error: {error}\n")
+            sys.stderr.write(f"***    Input aborted. The input is not in valid UTF-8 encoding.\n")
+        self.punct_analysis_at_end()
+
+    def collect_counts_and_examples_in_file(self, args, total_bytes=None, progress_bar=True) -> None:
         """Collect counts and examples for characters, tokens, and patterns occurring in file."""
-        line_number = 0
-        n_empty_lines = 0
-        st = time.time()
+        stats = {'line_number': 0, 'n_empty_lines': 0}
         prefix = 'Checking'
-        with (tqdm(input_file, total=total_bytes, disable=not progress_bar, unit='b', unit_scale=True,
-                  dynamic_ncols=True, desc=prefix) as data_bar):
-            try:
+        input_file: IO = args.input
+        if input_file:
+            with (tqdm(input_file, total=total_bytes, disable=not progress_bar, unit='b', unit_scale=True,
+                      dynamic_ncols=True, desc=prefix) as data_bar):
                 for line in data_bar:
-                    line_w_rtf_delimiter_adjustments = None
-                    line_number += 1
-                    if not re.match('\S', line):
-                        n_empty_lines += 1
-                    if progress_bar:
-                        line_speed = int(line_number / (time.time() - st))
-                        data_bar.set_postfix_str(f'{line_speed}L/s', refresh=False)
-                        data_bar.set_description_str(f'{prefix} {line_number}', refresh=False)
-                        data_bar.update(len(line.encode()))  # bytes
-                    self.collect_counts_and_examples_in_line(line, line_number)
-                    ref_id = self.snt_id(line_number)
-                    self.corpus[ref_id] = line
-                    line_rtl = ScriptDirection.string_is_right_to_left(line)
-                    if line_rtl:
-                        if not self.corpus_w_rtf_delimiter_adjustments.get(ref_id):
-                            if self.script_direction.text_contains_switchable_chars(line):
-                                line_w_rtf_delimiter_adjustments \
-                                    = self.script_direction.switch_delimiters_for_rtl_scripts(line)
-                                self.corpus_w_rtf_delimiter_adjustments[ref_id] = line_w_rtf_delimiter_adjustments
-                    self.punct_analysis_in_line(line_w_rtf_delimiter_adjustments or line, line_number)
-            # Exception for safety only. Should not occur.
-            except UnicodeError as error:
-                sys.stderr.write(f"*** Unicode error: {error}\n")
-                sys.stderr.write(f"***    Input aborted. The input is not in valid UTF-8 encoding.\n")
-                if input_file is sys.stdin:
-                    sys.stderr.write(f"***    For a more encoding-robust input, consider using -i <input-filename> "
-                                     f"instead of reading from STDIN.\n")
-            self.punct_analysis_at_end()
-        self.analysis['n_lines'] = line_number
-        self.analysis['n_empty_lines'] = n_empty_lines
+                    self.collect_counts_and_examples_in_text(line, stats)
+        elif self.snt_list:
+            # sys.stderr.write(f' ARGS: {args}\n\n')
+            # sys.stderr.write(f'** Sentences: {args.snt_list}\nRefIdDict: {args.snt_index_to_ref_id}\n')
+            for line in self.snt_list:
+                self.collect_counts_and_examples_in_text(line, stats)
+        elif args.strings:
+            for line in args.strings:
+                self.collect_counts_and_examples_in_text(line, stats)
+        self.analysis['n_lines'] = stats['line_number']
+        self.analysis['n_empty_lines'] = stats['n_empty_lines']
         for char in self.character_count.keys():
             self.script_direction.add_stats(char, self.character_count[char])
         if self.script_direction.is_right_to_left():
             sys.stderr.write(self.script_direction.report(details=True))
 
-    @staticmethod
-    def unicode_category(char) -> str:
-        """Safe version of character to Unicode category. Example: 'a' -> 'Ll' (lowercase letter)"""
-        try:
-            unicode_cat = ud.category(char)
-        except ValueError:
-            unicode_cat = '_UNDEFINED_'
-        return unicode_cat
-
-    def unicode_name(self, char) -> str:
-        """Safe version of character to Unicode name,
-        which also includes locally defined names, e.g. for control characters.
-        Example: 'a' -> 'LATIN SMALL LETTER A'"""
-        if unicode_name := self.char_to_name_dict.get(char):
-            return unicode_name
-        try:
-            unicode_name = ud.name(char)
-        except ValueError:
-            unicode_name = '_UNDEFINED_'
-        return unicode_name
-
-    def unicode_block(self, char) -> str:
-        """Safe version of character to Unicode block, which also includes locally defined blocks.
-        Example: 'a' -> 'BASIC_LATIN'"""
-        if block_name := self.char_to_block_dict[char]:
-            return block_name
-        try:
-            block_name = unicodeblock.blocks.of(char) or 'OTHER'
-            if block_name == 'OTHER':
-                code_point = ord(char)
-                if 0x2B820 <= code_point <= 0x2CEA1:
-                    block_name = 'CJK_UNIFIED_IDEOGRAPHS'
-        except ValueError:
-            block_name = '_UNDEFINED_'
-        self.char_to_block_dict[char] = block_name
-        return block_name
-
-    def unicode_script(self, unicode_block: str) -> Optional[str]:
-        """Maps character to script.
-        Examples: 'a' -> 'LATIN', 'ä' -> 'LATIN' (collapses multiple Latin blocks to 'Latin')"""
-        if unicode_block:
-            if s := self.unicode_block_to_script_dict[unicode_block]:
-                return s
-            s = unicode_block
-            s = re.sub(r'^Basic[-_ ]+', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'^Supplemental[-_ ]+', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+Supplementary(?:[-_ ][A-Z])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+Additional(?:[-_ ][A-Z])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+Supplement(?:[-_ ][A-Z])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+Extended(?:[-_ ]Letter)?(?:[-_ ][A-Z])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+Extension(?:[-_ ][A-Z])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'[-_ ]+(?:Alphabetic[-_ ]?)?Presentation[-_ ]?Forms(?:[-_ ][A-Z])?$',
-                       '', s, flags=re.IGNORECASE)
-            s = re.sub(r'(?:-[A-Z1-9])?$', '', s, flags=re.IGNORECASE)
-            s = re.sub(r'^(ENCLOSED[-_ ]ALPHANUMERIC)$', r'\1S', s)
-            s = re.sub(r'^([Ee]nclosed[-_ ][Aa]lphanumeric)$', r'\1s', s)
-            if s in ('CJK_UNIFIED_IDEOGRAPHS', 'CJK_COMPATIBILITY_IDEOGRAPHS'):
-                s = 'CJK'
-            self.unicode_block_to_script_dict[unicode_block] = s
-            return s
-        else:
-            return None
-
-    @staticmethod
-    def unicode_form(s: str, default: Optional[str] = None) -> str:
-        if ud.normalize('NFC', s) == s:
-            return 'NFC'
-        elif ud.normalize('NFD', s) == s:
-            return 'NFD'
-        elif ud.normalize('NFKC', s) == s:
-            return 'NFKC'
-        elif ud.normalize('NFKD', s) == s:
-            return 'NFKD'
-        else:
-            return default
-
-    @staticmethod
-    def modified_unicode_script(unicode_cat: str, unicode_script: str) -> str:
-        if unicode_script:
-            if unicode_cat.startswith('M') and not regex.search(r'(?:MODIFIER|MARK|SELECTOR)',
-                                                                unicode_script, regex.IGNORECASE):
-                unicode_script += "_MODIFIERS"
-            elif unicode_cat.startswith('P') and not regex.search(r'(?:PUNCT)', unicode_script):
-                unicode_script += "_PUNCTUATION"
-        return unicode_script
-
-    def build_char_to_script_dict(self) -> None:
-        for cp in range(0x20000):
-            char = chr(cp)
-            unicode_cat = self.unicode_category(char)
-            unicode_block = self.unicode_block(char)
-            unicode_script = self.unicode_script(unicode_block)
-            unicode_script = self.modified_unicode_script(unicode_cat, unicode_script)
-            if unicode_script:
-                self.char_to_script_dict[char] = unicode_script
-
     def assess_pattern(self, pattern_character_of_interest: str, pattern: str) -> Tuple[str, str]:
         ass_class, ass_descr = '', ''
         if len(pattern_character_of_interest) == 1:
-            ass_char_name = self.unicode_name(pattern_character_of_interest) or pattern_character_of_interest
+            ass_char_name = self.unicode_util.unicode_name(pattern_character_of_interest) or pattern_character_of_interest
         else:
             ass_char_name = pattern_character_of_interest
         a = "an" if regex.match('AEIOU', ass_char_name, re.IGNORECASE) else "a"
@@ -1112,15 +986,445 @@ class WildebeestAnalysis:
             updated_counts[1] += pattern_count
         self.pattern_class_counts[(pattern_character_of_interest, pattern)] = updated_counts
 
+    def norm_char(self, token: str, dyn: bool) -> Tuple[str, dict|None]:
+        if cached_result := self.norm_char_dict.get(token):
+            return cached_result
+        elif regex.match(r'\pL\pM*$', token):
+            norm0 = token
+            norm1 = self.wildebeest.normalize_arabic_pres_form_characters(norm0)
+            norm2 = self.wildebeest.normalize_ligatures(norm1)
+            norm3 = self.wildebeest.normalize_hangul(norm2)
+            norm4 = self.wildebeest.repair_combining_modifiers_with_nukta(norm3)
+            norm5 = self.wildebeest.apply_combining_modifiers_compose(norm4)
+            norm6 = self.wildebeest.apply_combining_modifiers_decompose(norm5)
+            norm = norm6
+            if norm != token:
+                norm_count = self.token_count[norm] or self.character_count[norm]
+                changes = []
+                if norm1 != norm0:
+                    changes.append('arabic-presentation')
+                if norm2 != norm1:
+                    changes.append('ligature')
+                if norm3 != norm2:
+                    changes.append('hangul')
+                if norm4 != norm3:
+                    changes.append('nukta-position' if dyn else 'moved-nukta')
+                if norm5 != norm4:
+                    changes.append('compose')
+                if norm6 != norm5:
+                    changes.append('decompose')
+                unicode_form = self.unicode_util.unicode_form(token)
+                unicode_form2 = self.unicode_util.unicode_form(norm)
+                if sorted(token) == sorted(norm):
+                    form_clause = ''
+                    form_clause2 = 'REORDERED, '
+                elif sorted(set(token)) == sorted(set(norm)):
+                    form_clause = ''
+                    form_clause2 = 'REMOVED-DUPLICATE-DIACRITIC, '
+                elif changes == ['arabic-presentation']:
+                    form_clause = ''
+                    form_clause2 = 'NORM-ARABIC-PRES-FORM, '
+                elif changes == ['moved-nukta', 'compose']:
+                    form_clause = ''
+                    form_clause2 = 'REORDERED-AND-COMPOSED, '
+                elif unicode_form == 'NFD' and unicode_form2 == 'NFC' and changes == ['compose']:
+                    form_clause = f'{unicode_form}, '
+                    form_clause2 = f'{unicode_form2}, '
+                elif unicode_form is None and unicode_form2 in ['NFC', 'NFD'] \
+                        and (changes == ['compose'] or changes == ['decompose']):
+                    form_clause = ''
+                    form_clause2 = f'{unicode_form2}, '
+                else:
+                    form_clause = f'{unicode_form}, '
+                    form_clause2 = f'{unicode_form2}, '
+                d = {"form-clause": form_clause, "form-clause2": form_clause2, "norm_count": norm_count, "changes": changes}
+                return norm, d
+        return token, None
+
+    def dyn_selector_match(self, check: str) -> bool:
+        if self.dyn_check_selectors is None:
+            # sys.stderr.write(f'Smatch disabled {check}\n')
+            return True
+        else:
+            for check_selector in self.dyn_check_selectors:
+                if (check_selector == check) \
+                        or check_selector.startswith(check + ':') \
+                        or check.startswith(check_selector + ':'):
+                    # sys.stderr.write(f'Smatch {check} {check_selector}\n')
+                    return True
+            self.dyn_skipped_checks.append(check)
+            # sys.stderr.write(f'Smatch failed {check} {self.dyn_check_selectors}\n')
+        return False
+
+    @staticmethod
+    def simple_span(offset: int, s: str) -> List[List[int]]:
+        return [[offset, offset+len(s)]]
+
+    def dyn_encoding_check(self) -> None:
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            self.wildebeest.set_lv(snt)
+            # sys.stderr.write(f' CC {snt_id} {snt}\n')
+            matches, start_positions, inter_matches = general_util.findall3(r'\pL\pM*', snt)
+            for match_s, start_pos in zip(matches, start_positions):
+                norm, norm_d = self.norm_char(match_s, True)
+                if _verbose := (len(match_s) > 111):
+                    sys.stderr.write(f'    D {norm} {norm_d}\n')
+                if (norm != match_s) and norm_d:
+                    # end_pos = start_pos + len(match_s)
+                    changes = norm_d.get("changes")
+                    change_s = ", ".join(changes)
+                    span = self.simple_span(start_pos, match_s)
+                    self.dyn_json_results.add({"sntId": snt_id, "span": span, "orig": match_s,
+                                               "check": f"GreekRoom:Wildebeest:encoding:{change_s}",
+                                               "severity": 0.9,
+                                               "actionMenu": [{"substitute": norm, "confidence": 0.99}]})
+                    # sys.stderr.write(f"NORM-CHAR in {snt_id} {start_pos}-{end_pos}: {match_s}->{norm} ({changes})\n")
+
+    def dyn_script_check(self) -> None:
+        unicode_scripts_letter = sorted(self.script_count_letter, key=self.script_count_letter.get, reverse=True)
+        # unicode_scripts_number = sorted(self.script_count_number, key=self.script_count_number.get, reverse=True)
+        # _unicode_scripts_other = sorted(self.script_count_other, key=self.script_count_other.get, reverse=True)
+        dominant_script_letter = unicode_scripts_letter[0] if unicode_scripts_letter else None
+        # _dominant_script_number = unicode_scripts_number[0] if unicode_scripts_number else None
+        if len(unicode_scripts_letter) <= 1:
+            check_for_minority_letter_scripts = False
+        elif self.script_count_letter[unicode_scripts_letter[0]] < 0.5 * self.script_count_letter[unicode_scripts_letter[1]]:
+            check_for_minority_letter_scripts = False
+        elif self.lang_code == "jap" and set(unicode_scripts_letter).issubset({"KANJI", "HIRAGANA", "KATAKANA"}):
+            check_for_minority_letter_scripts = False
+        else:
+            check_for_minority_letter_scripts = True
+        if check_for_minority_letter_scripts:
+            # for unicode_script in unicode_scripts_letter:
+            for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+                tokens, start_positions, inter_tokens = general_util.findall3(r'(?:\pL\pM*)+', snt)
+                for token, start_pos in zip(tokens, start_positions):
+                    letters, start_positions2, inter_letters = general_util.findall3(r'\pL\pM*', token)
+                    token_script_counts = defaultdict(int)
+                    non_dominant_letters = []
+                    positions3 = []
+                    for letter, start_pos2 in zip(letters, start_positions2):
+                        core_letter = letter[0]
+                        # _unicode_cat = self.unicode_util.unicode_category(core_letter)
+                        unicode_script = self.unicode_util.char_unicode_script(core_letter)
+                        token_script_counts[unicode_script] += 1
+                        if unicode_script != dominant_script_letter:
+                            non_dominant_letters.append(core_letter)
+                            positions3.append((start_pos+start_pos2, start_pos+start_pos2+len(letter)))
+                    token_scripts = list(token_script_counts.keys())
+                    n_base_scripts = len(token_script_counts)
+                    for script in ('SPACING_MODIFIER_LETTERS', 'MODIFIER_TONE_LETTERS'):
+                        if token_script_counts.get(script):
+                            n_base_scripts -= 1
+                    if len(token_script_counts) == 1:
+                        if not token_script_counts[dominant_script_letter]:
+                            check_type = f"GreekRoom:Wildebeest:script:token-in-minority-script"
+                            span = self.simple_span(start_pos, token)
+                            dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": token,
+                                                 "check": check_type, "minorityScript": token_scripts[0],
+                                                 "severity": 0.7}
+                            repaired_token, repair_outcome = self.script_repair.repair_string(token,
+                                                                                              dominant_script_letter)
+                            if repair_outcome == "repaired":
+                                action_menu = [{"substitute": repaired_token, "confidence": 0.6}]
+                                dyn_feedback_item["actionMenu"] = action_menu
+                            # sys.stderr.write(f'Script1: {json.dumps(dyn_feedback_item)}\n')
+                            self.dyn_json_results.add(dyn_feedback_item)
+                    elif n_base_scripts >= 2:
+                        check_type = f"GreekRoom:Wildebeest:script:token-with-multiple-scripts"
+                        span = self.simple_span(start_pos, token)
+                        dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": token,
+                                             "check": check_type, "severity": 0.9,
+                                             "scripts": token_scripts,
+                                             "minorityScriptLetters": non_dominant_letters,
+                                             "minorityScriptSpan": positions3}
+                        repaired_token, repair_outcome = self.script_repair.repair_string(token, dominant_script_letter)
+                        if repair_outcome == "repaired":
+                            action_menu = [{"substitute": repaired_token, "confidence": 0.9}]
+                            dyn_feedback_item["actionMenu"] = action_menu
+                        # sys.stderr.write(f'Script2: {json.dumps(dyn_feedback_item)}\n')
+                        self.dyn_json_results.add(dyn_feedback_item)
+
+    def init_paired_delimiter_state(self, punct_list) -> None:
+        self.paired_delimiter_state['all-open-delimiters'] = set()
+        self.paired_delimiter_state['all-close-delimiters'] = set()
+        self.paired_delimiter_state['close-to-open-delimiters'] = defaultdict(list)  # key: close-delimiter
+        self.paired_delimiter_state['open-to-close-delimiters'] = defaultdict(list)  # key: open-delimiter
+        self.paired_delimiter_state['unpaired-open-delimiters'] = defaultdict(list)  # key: open-del v:list(sntId, pos)
+        self.paired_delimiter_state['repeating-open-delimiters'] = defaultdict(list)  # key: open-del v:list(sntId, pos)
+        self.paired_delimiter_state['paired-delimiters'] = defaultdict(list)  # key open-or-clise-del v:list(open,close)
+        for i in range(int(len(punct_list) / 2)):
+            open_delimiter = punct_list[2 * i]
+            close_delimiter = punct_list[2 * i + 1]
+            self.paired_delimiter_state['all-open-delimiters'].add(open_delimiter)
+            self.paired_delimiter_state['all-close-delimiters'].add(close_delimiter)
+            self.paired_delimiter_state['close-to-open-delimiters'][close_delimiter].append(open_delimiter)
+            self.paired_delimiter_state['open-to-close-delimiters'][open_delimiter].append(close_delimiter)
+        # sys.stderr.write(f' PDS: {self.paired_delimiter_state}\n')
+
+    def is_repeating_open_delimiter(self, char: str, pos4: Tuple) -> bool:
+        line_number, pos, snt_id, c = pos4
+        unpaired_open_delimiters = self.paired_delimiter_state['unpaired-open-delimiters'][char]
+        repeating_open_delimiters = self.paired_delimiter_state['repeating-open-delimiters'][char]
+        if unpaired_open_delimiters or repeating_open_delimiters:
+            last_unpaired_line_number = unpaired_open_delimiters[-1][0] if unpaired_open_delimiters else -999
+            last_repeating_line_number = repeating_open_delimiters[-1][0] if repeating_open_delimiters else -999
+            last_open_pos4 = unpaired_open_delimiters[-1] if last_unpaired_line_number > last_repeating_line_number \
+                else repeating_open_delimiters[-1]
+            verbose = False
+            # verbose = snt_id.startswith('ACT 7:')
+            last_line_number, last_pos, last_snt_id, last_c = last_open_pos4
+            if paired_delimiters := self.paired_delimiter_state['paired-delimiters'][char]:
+                paired_open_pos4, paired_close_pos4 = paired_delimiters[-1]
+                if paired_open_pos4[0] > last_line_number:
+                    if verbose: sys.stderr.write(
+                        f"is_repeating_open_delimiter False1 {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+                    return False
+            if (pos == 0) and (line_number - last_line_number <= 10):
+                if verbose: sys.stderr.write(f"is_repeating_open_delimiter True {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+                return True
+            if verbose: sys.stderr.write(f"is_repeating_open_delimiter False2 {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+        return False
+
+    def dyn_paired_delimiter_check(self) -> None:
+        # self.paired_delimiter_state['all-open-delimiters'].add(open_delimiter)
+        # self.paired_delimiter_state['all-close-delimiters'].add(close_delimiter)
+        # self.paired_delimiter_state['close-to-open-delimiters'][close_delimiter].append(open_delimiter)
+        # self.paired_delimiter_state['unpaired-open-delimiters'] = defaultdict(list) # key: open-del v:list(sntId, pos)
+        testing_verbose = False
+
+        line_number = 0
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            testing_verbose = False   # snt_id.startswith('ACT 7:')
+            line_number += 1
+            pos = 0
+            for char in snt:
+                pos4 = (line_number, pos, snt_id, char)
+                if char in self.paired_delimiter_state['all-close-delimiters']:
+                    # sys.stderr.write(f'close {char} {snt_id} {pos}\n')
+                    open_delimiters = self.paired_delimiter_state['close-to-open-delimiters'][char]
+                    most_recent_open_delimiter, most_recent_open_delimiter_pos = None, None
+                    for open_delimiter in open_delimiters:
+                        if positions := self.paired_delimiter_state['unpaired-open-delimiters'][open_delimiter]:
+                            # sys.stderr.write(f'open_delimiters {open_delimiter} {positions}\n')
+                            last_pos = positions[-1]
+                            if (most_recent_open_delimiter_pos is None) \
+                                    or (last_pos > most_recent_open_delimiter_pos):
+                                most_recent_open_delimiter = open_delimiter
+                                most_recent_open_delimiter_pos = last_pos
+                    # sys.stderr.write(f"most_recent_open_delimiter {most_recent_open_delimiter} {self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter]}\n")
+                    if most_recent_open_delimiter:
+                        open_pos4 = self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter].pop()
+                        open_char = open_pos4[3]
+                        self.paired_delimiter_state['paired-delimiters'][char].append([open_pos4, pos4])
+                        self.paired_delimiter_state['paired-delimiters'][open_char].append([open_pos4, pos4])
+                        self.paired_delimiter_state['repeating-open-delimiters'][open_char] = []
+                        if testing_verbose:
+                            sys.stderr.write(f'''pair: {open_pos4} {pos4} {self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter]}\n''')
+                    else:
+                        snt_id, pos = pos4[2], pos4[1]
+                        close_delimiter = char
+                        unicode_name = self.unicode_util.unicode_name(close_delimiter)
+                        check_type = f"GreekRoom:Wildebeest:punctuation:unpaired-delimiter:close:{unicode_name.lower()}"
+                        span = self.simple_span(pos, char)
+                        dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": close_delimiter,
+                                             "check": check_type, "severity": 0.5}
+                        self.dyn_json_results.add(dyn_feedback_item)
+                elif char in self.paired_delimiter_state['all-open-delimiters']:
+                    if testing_verbose:
+                        sys.stderr.write(f'open {char} {snt_id} {pos}\n')
+                    if self.is_repeating_open_delimiter(char, pos4):
+                        self.paired_delimiter_state['repeating-open-delimiters'][char].append(pos4)
+                    else:
+                        # if any long distance open of same type, flag them and reset
+                        if open_pos4_list := self.paired_delimiter_state['unpaired-open-delimiters'][char]:
+                            distance = line_number - open_pos4_list[-1][0]
+                            if distance > 50:
+                                for prev_open_pos4 in open_pos4_list:
+                                    (prev_line_number, prev_pos, prev_snt_id, prev_char) = prev_open_pos4
+                                    open_delimiter = prev_char
+                                    unicode_name = self.unicode_util.unicode_name(open_delimiter)
+                                    check_type = f"GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open:{unicode_name.lower()}"
+                                    prev_span = self.simple_span(prev_pos, prev_char)
+                                    dyn_feedback_item = {"sntId": prev_snt_id, "span": prev_span, "orig": open_delimiter,
+                                                         "check": check_type, "severity": 0.5}
+                                    self.dyn_json_results.add(dyn_feedback_item)
+                                self.paired_delimiter_state['unpaired-open-delimiters'][char] = []
+                            # elif distance > 10:
+                            #    sys.stderr.write(f"Somewhat long distance re-open: {pos4} ** {open_pos4_list}\n")
+                        self.paired_delimiter_state['unpaired-open-delimiters'][char].append(pos4)
+                pos += 1
+        if testing_verbose:
+            sys.stderr.write(f"unpaired-open {self.paired_delimiter_state['unpaired-open-delimiters']}\n")
+        for open_delimiter in self.paired_delimiter_state['unpaired-open-delimiters'].keys():
+            for pos4 in self.paired_delimiter_state['unpaired-open-delimiters'][open_delimiter]:
+                snt_id, pos = pos4[2], pos4[1]
+                unicode_name = self.unicode_util.unicode_name(open_delimiter)
+                check_type = f"GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open:{unicode_name.lower()}"
+                span = self.simple_span(pos, open_delimiter)
+                dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": open_delimiter,
+                                     "check": check_type, "severity": 0.5}
+                self.dyn_json_results.add(dyn_feedback_item)
+
+    def dyn_punctuation_cluster_check(self) -> None:
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            matches, start_positions, inter_matches = general_util.findall3(r'[।॥.።։,፣;፤!?:፦،؛؟۔]{2,}', snt)
+            for i in range(len(matches)):
+                punct_chars = matches[i]
+                # don't flag "..."
+                if regex.match(r'\.+$', punct_chars):
+                    continue
+                else:
+                    punct_start_pos = start_positions[i]
+                    check_type = "GreekRoom:Wildebeest:punctuation:cluster"
+                    span = self.simple_span(punct_start_pos, punct_chars)
+                    dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": punct_chars,
+                                         "check": check_type, "severity": 0.7}
+                    if len(punct_chars) == 2:
+                        if punct_chars[0] == punct_chars[1]:
+                            action_menu = [{"substitute": punct_chars[1], "confidence": 0.8}]
+                        else:
+                            action_menu = [{"substitute": punct_chars[1], "confidence": 0.4},
+                                           {"substitute": punct_chars[0], "confidence": 0.4}]
+                        dyn_feedback_item["actionMenu"] = action_menu
+                    self.dyn_json_results.add(dyn_feedback_item)
+
+    def dyn_punctuation_unexpected_check(self) -> None:   # suspicious
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            matches, start_positions, inter_matches = general_util.findall3(r'[+*<=>|`_]', snt)
+            for i in range(len(matches)):
+                punct_char = matches[i]
+                punct_start_pos = start_positions[i]
+                left_context = inter_matches[i]
+                # right_context = inter_matches[i+1]
+                check_type = "GreekRoom:Wildebeest:punctuation:unexpected"
+                span = self.simple_span(punct_start_pos, punct_char)
+                dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": punct_char,
+                                     "check": check_type, "severity": 0.7}
+                if punct_char == "|":
+                    m = regex.search(r'(\pL)(\pM*)$', left_context)
+                    if self.unicode_util.char_unicode_script(m.group(1)) in ("DEVANAGARI", ):
+                        action_menu = [{"substitute": "।", "confidence": 0.6}]
+                        dyn_feedback_item["actionMenu"] = action_menu
+                        dyn_feedback_item["check"] = "GreekRoom:Wildebeest:punctuation:repair:vertical line:danda"
+                # sys.stderr.write(f'Script1: {json.dumps(dyn_feedback_item)}\n')
+                self.dyn_json_results.add(dyn_feedback_item)
+
+    def dyn_suspicious_char_check(self) -> None:
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            for offset in range(len(snt)):
+                char = snt[offset]
+                if char in self.unicode_util.suspicious_characters:
+                    check_type = "GreekRoom:Wildebeest:character:suspicious"
+                    action_menu = None
+                    block_name = self.unicode_util.char_to_block_dict.get(char)
+                    if block_name in ('C1_CONTROL', 'VARIATION_SELECTORS'):
+                        check_type += ':' + block_name
+                        action_menu = [{"substitute": '', "confidence": 0.9}]
+                    span = self.simple_span(offset, char)
+                    dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": char,
+                                         "check": check_type, "severity": 0.8}
+                    if action_menu:
+                        dyn_feedback_item["actionMenu"] = action_menu
+                    self.dyn_json_results.add(dyn_feedback_item)
+
+    def dyn_rare_char_check(self) -> None:
+        total_char_count = self.text_corpus.total_char_count
+        if total_char_count >= 50000:
+            for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+                for offset in range(len(snt)):
+                    char = snt[offset]
+                    char_count = self.text_corpus.counts[char]
+                    check_type = None
+                    if char.isdigit():
+                        unicode_block = self.unicode_util.unicode_block(char)
+                        block_count = self.text_corpus.counts[unicode_block]
+                        if block_count * 100000 <= total_char_count:
+                            check_type = f"GreekRoom:Wildebeest:character:rare:{unicode_block}"
+                    elif (char_count == 1) or (char_count * 1000000 <= total_char_count):
+                        check_type = "GreekRoom:Wildebeest:character:rare"
+                        unicode_name = self.unicode_util.unicode_name(char)
+                        if "ZERO WIDTH" in unicode_name:
+                            check_type += ':zero width'
+                    if check_type:
+                        span = self.simple_span(offset, char)
+                        dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": char,
+                                             "check": check_type, "severity": 0.6}
+                        self.dyn_json_results.add(dyn_feedback_item)
+
+    def dyn_punctuation_space_check(self) -> None:
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            matches, start_positions, inter_matches = general_util.findall3(r'[।॥.።։,፣;፤!?:፦،؛؟۔]', snt)
+            for i in range(len(matches)):
+                punct_char = matches[i]
+                punct_start_pos = start_positions[i]
+                left_context = inter_matches[i]
+                right_context = inter_matches[i+1]
+                m_left = regex.search(r'(\pL\pM*|\d)([’”»›」』⌟)\]}）］】》〉]*)(\s*)$', left_context)
+                m_right = regex.match(r'(\s*)([‘“«‹「『⌞(\[{（［【《〈]*)(\pL|\d)', right_context)
+                left_space = m_left.group(3) if m_left else None
+                right_space = m_right.group(1) if m_right else None
+                # exclude numerical items such as 3.14 or 20,000 or 3:16
+                if m_left and m_right and (left_space == '') and (right_space == '') \
+                    and m_left.group(1).isdigit() and m_right.group(3).isdigit():
+                    continue
+                if left_space or (right_space == ''):
+                    punct_name = self.unicode_util.unicode_name(punct_char)
+                    if left_space and (right_space == ''):
+                        orig = left_space + punct_char
+                        start_pos = punct_start_pos - len(left_space)
+                        subst = punct_char + ' '
+                        sub_type = 'reattach-to-left'
+                    elif left_space:
+                        orig = left_space + punct_char
+                        start_pos = punct_start_pos - len(left_space)
+                        subst = punct_char
+                        sub_type = 'attach-to-left'
+                    elif right_space == '':
+                        orig = punct_char
+                        start_pos = punct_start_pos
+                        subst = punct_char + ' '
+                        sub_type = 'detach-from-right'
+                    else:
+                        continue   # should not happen
+                    check_type = f"GreekRoom:Wildebeest:punctuation:space:{punct_name.lower()}:{sub_type}"
+                    span = self.simple_span(start_pos, orig)
+                    dyn_feedback_item = {"sntId": snt_id, "span": span, "orig": orig,
+                                         "check": check_type, "severity": 0.6,
+                                         "actionMenu": [{"substitute": subst, "confidence": 0.9}]}
+                    self.dyn_json_results.add(dyn_feedback_item)
+                    # sys.stderr.write(f'Punct-space: {json.dumps(dyn_feedback_item)}\n')
+
+    def dyn_checks(self):
+        if self.dyn_selector_match("GreekRoom:Wildebeest"):
+            if self.dyn_selector_match("GreekRoom:Wildebeest:encoding"):
+                self.dyn_encoding_check()
+            if self.dyn_selector_match("GreekRoom:Wildebeest:punctuation"):
+                if self.dyn_selector_match("GreekRoom:Wildebeest:punctuation:space"):
+                    self.dyn_punctuation_space_check()
+                if self.dyn_selector_match("GreekRoom:Wildebeest:punctuation:unexpected"):
+                    self.dyn_punctuation_unexpected_check()
+                if self.dyn_selector_match("GreekRoom:Wildebeest:punctuation:cluster"):
+                    self.dyn_punctuation_cluster_check()
+                if self.dyn_selector_match("GreekRoom:Wildebeest:punctuation:unpaired-delimiter"):
+                    self.dyn_paired_delimiter_check()
+            if self.dyn_selector_match("GreekRoom:Wildebeest:character:suspicious"):
+                self.dyn_suspicious_char_check()
+            if self.dyn_selector_match("GreekRoom:Wildebeest:character:rare"):
+                self.dyn_rare_char_check()
+            if self.dyn_selector_match("GreekRoom:Wildebeest:script"):
+                self.dyn_script_check()
+        self.dyn_json["result"] = self.dyn_json_results.listify(self.ref_id_list)
+
     def aggregate(self) -> None:
         """Aggregate raw counts and examples into result Wildebeest analysis structure."""
         # Collect info on letter scripts (e.g. LATIN, CYRILLIC), number scripts (e.g. ASCII_DIGIT, ARABIC_INDIC_DIGIT),
         #    other scripts (e.g. ASCII_PUNCTUATION, GENERAL_PUNCTUATION, SPACE)
         for char in sorted(self.character_count):
-            unicode_cat = self.unicode_category(char)
-            unicode_block = self.unicode_block(char)
-            unicode_script = self.unicode_script(unicode_block)
-            unicode_script = self.modified_unicode_script(unicode_cat, unicode_script)
+            unicode_cat = self.unicode_util.unicode_category(char)
+            unicode_block = self.unicode_util.unicode_block(char)
+            unicode_script = self.unicode_util.unicode_script(unicode_block, char)
+            unicode_script = self.unicode_util.modified_unicode_script(unicode_cat, unicode_script)
             if unicode_cat.startswith('L') \
                     and unicode_block not in ('SPACING_MODIFIER_LETTERS', 'MODIFIER_TONE_LETTERS'):
                 if unicode_script:
@@ -1134,7 +1438,7 @@ class WildebeestAnalysis:
                     self.script_examples_number[unicode_script] += char
             else:
                 if unicode_script:
-                    unicode_script = self.modified_unicode_script(unicode_cat, unicode_script)
+                    unicode_script = self.unicode_util.modified_unicode_script(unicode_cat, unicode_script)
                     count = self.character_count[char]
                     self.script_count_other[unicode_script] += count
                     self.script_examples_other[unicode_script] += char
@@ -1167,9 +1471,9 @@ class WildebeestAnalysis:
             count = self.character_count[char]
             code_point = ord(char)
             unicode_id = 'U+%04X' % code_point
-            unicode_name = self.unicode_name(char)
-            unicode_block = self.unicode_block(char)
-            # unicode_cat = self.unicode_category(char)
+            unicode_name = self.unicode_util.unicode_name(char)
+            unicode_block = self.unicode_util.unicode_block(char)
+            # unicode_cat = self.unicode_util.unicode_category(char)
             # if (unicode_cat.startswith('L') and (dominant_script_letter == 'LATIN' and re.match('[a-zA-Z]$', char))) \
             #         or (dominant_script_letter == 'ETHIOPIC' and char in '፡።፣፤፥፦') \
             #         or (dominant_script_letter == 'ARABIC' and char in '۔،؛؟') \
@@ -1202,55 +1506,14 @@ class WildebeestAnalysis:
             self.wildebeest.set_lv(token)
             count = self.token_count[token] or self.character_count[token]
             if regex.match(r'\pL\pM*$', token):
-                norm0 = token
-                norm1 = self.wildebeest.normalize_arabic_pres_form_characters(norm0)
-                norm2 = self.wildebeest.normalize_ligatures(norm1)
-                norm3 = self.wildebeest.normalize_hangul(norm2)
-                norm4 = self.wildebeest.repair_combining_modifiers_with_nukta(norm3)
-                norm5 = self.wildebeest.apply_combining_modifiers_compose(norm4)
-                norm6 = self.wildebeest.apply_combining_modifiers_decompose(norm5)
-                norm = norm6
-                if norm != token:
-                    count2 = self.token_count[norm] or self.character_count[norm]
-                    changes = []
-                    if norm1 != norm0:
-                        changes.append('arabic-presentation')
-                    if norm2 != norm1:
-                        changes.append('ligature')
-                    if norm3 != norm2:
-                        changes.append('hangul')
-                    if norm4 != norm3:
-                        changes.append('moved-nukta')
-                    if norm5 != norm4:
-                        changes.append('compose')
-                    if norm6 != norm5:
-                        changes.append('decompose')
-                    unicode_form = self.unicode_form(token)
-                    unicode_form2 = self.unicode_form(norm)
-                    if sorted(token) == sorted(norm):
-                        form_clause = ''
-                        form_clause2 = 'REORDERED, '
-                    elif sorted(set(token)) == sorted(set(norm)):
-                        form_clause = ''
-                        form_clause2 = 'REMOVED-DUPLICATE-DIACRITIC, '
-                    elif changes == ['arabic-presentation']:
-                        form_clause = ''
-                        form_clause2 = 'NORM-ARABIC-PRES-FORM, '
-                    elif changes == ['moved-nukta', 'compose']:
-                        form_clause = ''
-                        form_clause2 = 'REORDERED-AND-COMPOSED, '
-                    elif unicode_form == 'NFD' and unicode_form2 == 'NFC' and changes == ['compose']:
-                        form_clause = f'{unicode_form}, '
-                        form_clause2 = f'{unicode_form2}, '
-                    elif unicode_form is None and unicode_form2 in ['NFC', 'NFD'] \
-                            and (changes == ['compose'] or changes == ['decompose']):
-                        form_clause = ''
-                        form_clause2 = f'{unicode_form2}, '
-                    else:
-                        form_clause = f'{unicode_form}, '
-                        form_clause2 = f'{unicode_form2}, '
+                norm, norm_d = self.norm_char(token, False)
+                if (norm != token) and norm_d:
+                    norm_count = norm_d.get("norm_count")
+                    form_clause = norm_d.get("form-clause")
+                    form_clause2 = norm_d.get("form-clause2")
+                    changes = norm_d.get("changes")
                     self.analysis['non-canonical'][token] \
-                        = {'orig': token, 'norm': norm, 'orig-count': count, 'norm-count': count2,
+                        = {'orig': token, 'norm': norm, 'orig-count': count, 'norm-count': norm_count,
                            'orig-form': form_clause, 'norm-form': form_clause2, 'changes': changes}
             elif self.token_count[token] == 0:
                 pass
@@ -1287,8 +1550,7 @@ class WildebeestAnalysis:
                 script_dict = {}
                 for char in token:
                     if char.isalpha():
-                        unicode_block = self.unicode_block(char)
-                        unicode_script = self.unicode_script(unicode_block)
+                        unicode_script = self.unicode_util.char_unicode_script(char)
                         script_dict[unicode_script] = True
                 n_base_scripts = len(script_dict)
                 for script in ('SPACING_MODIFIER_LETTERS', 'MODIFIER_TONE_LETTERS'):
@@ -1312,7 +1574,7 @@ class WildebeestAnalysis:
                 if pattern_character_of_interest in orig_pattern:
                     key2 = f"TOKENS WITH {pattern_character_of_interest} " \
                            f"({'U+%04X' % ord(pattern_character_of_interest)} " \
-                           f"{self.unicode_name(pattern_character_of_interest)})"
+                           f"{self.unicode_util.unicode_name(pattern_character_of_interest)})"
                     pattern_count = self.pattern_count[orig_pattern]
                     self.analysis['pattern'][key2][orig_pattern] \
                         = {'pattern': self.repl_invisible_chars_in_pattern(pattern),
@@ -1350,7 +1612,7 @@ class WildebeestAnalysis:
                              '"”',  # ASCII QUOTATION MARK/RIGHT DOUBLE QUOTATION MARK
                              "'‘",  # ASCII APOSTROPHE/LEFT SINGLE QUOTATION MARK
                              "'’",  # ASCII APOSTROPHE/RIGHT SINGLE QUOTATION MARK
-                             "'ʼ",  # ASCII APOSTROPHE/MODIFIER LETTER APOSTROPHE
+                             "'ʼˈ",  # ASCII APOSTROPHE/MODIFIER LETTER APOSTROPHE/MODIFIER LETTER VERTICAL LINE
                              "'ꞌ",  # ASCII APOSTROPHE/LATIN SMALL LETTER SALTILLO
                              "'՛",  # ASCII APOSTROPHE/ARMENIAN emphasis sign
                              "‚‘",  # ASCII LOW/LEFT SINGLE QUOTATION MARK
@@ -1380,6 +1642,10 @@ class WildebeestAnalysis:
 
                             ]
         for char_conflict in char_conflict_set:
+            # Matching quotations such as ASCII LOW/LEFT DOUBLE QUOTATION MARK in Ukrainian should not be marked as conflict set
+            if (len(char_conflict) == 2) and (self.punct_analysis.get(('lr', char_conflict[0])) == char_conflict[1]):
+                # sys.stderr.write(f'MP skipping {char_conflict} conflict set\n')
+                continue
             char_list = []
             info_list = []
             count_info_list = []
@@ -1387,7 +1653,7 @@ class WildebeestAnalysis:
                 if count := self.character_count[char]:
                     unicode_int = ord(char)
                     unicode_id = 'U+%04X' % unicode_int
-                    unicode_name = self.unicode_name(char)
+                    unicode_name = self.unicode_util.unicode_name(char)
                     count_info_list.append(f'{char} {unicode_id} ({unicode_name}) count: {count}')
                     char_list.append(char)
                     info_list.append([char, unicode_id, unicode_name, count])
@@ -1424,7 +1690,7 @@ class WildebeestAnalysis:
             example_s, line_number_s = example[0], str(example[1])
             if line_number_s not in ex_l_dict[example_s]:
                 ex_l_dict[example_s].append(line_number_s)
-                if self.ref_id_dict and (ref_id := self.ref_id_dict[int(line_number_s)]):
+                if self.snt_index_to_ref_id and (ref_id := self.snt_index_to_ref_id[int(line_number_s)]):
                     ex_r_dict[example_s].append(ref_id)
                     ref_id_p = True
                 else:
@@ -1449,7 +1715,7 @@ class WildebeestAnalysis:
     @staticmethod
     def repl_invisible_chars_in_pattern(s: str):
         """for better human legibility"""
-        result = ''.join(list(map(lambda c: f'<U+{ord(c):04X}>'  # {self.unicode_name(c)}'
+        result = ''.join(list(map(lambda c: f'<U+{ord(c):04X}>'  # {self.unicode_util.unicode_name(c)}'
                  if (regex.match(r'(?:\pC|\pZ|\pM)', c) and (not c in ' \u00AD\u202F')) else c, s)))
         for old, new in (('\u00AD', '<SOFT HYPHEN>'),):
             result = result.replace(old, new)
@@ -1580,7 +1846,7 @@ class WildebeestAnalysis:
                     if (decomp_s := ud.decomposition(char)) \
                             and regex.match(r'[0-9A-Z]{4,}$', decomp_s) \
                             and (decomp_c := chr(int(f"0x{decomp_s}", 0))):
-                        decomp_name = self.unicode_name(decomp_c)
+                        decomp_name = self.unicode_util.unicode_name(decomp_c)
                         output_info += f", decomposition: {decomp_c} ({decomp_name})"
                     if self.string_contains_right_to_left_letters(output_info):
                         output_file.write(self.lrm)
@@ -1679,16 +1945,91 @@ class WildebeestAnalysis:
             result.append('Tatweel')
         return result
 
+    def add_corpus_snt(self, text: str, snt_id: str) -> None:
+        if snt_id and text:
+            self.snt_list.append(text)
+            self.ref_id_list.append(snt_id)
+            self.n_snt += 1
+            self.snt_index_to_ref_id[self.n_snt] = snt_id
+            self.ref_id_to_snt_index[snt_id] = self.n_snt
+            self.ref_id_to_text[snt_id] = text
+
+    def extract_json_input(self, args) -> int:
+        if isinstance(args.json, str):
+            try:
+                in_json = json.loads(args.json)
+            except json.JSONDecodeError as e:
+                sys.stderr.write(f'Invalid JSON input {e}\n{args.json}\n')
+                return 0
+        elif isinstance(args.json, dict):
+            in_json = args.json
+        else:
+            sys.stderr.write(f'Invalid JSON input type {args.json}\n')
+            return 0
+
+        if jsonrpc := in_json.get('jsonrpc'):
+            self.dyn_json['jsonrpc'] = jsonrpc
+        if json_id := in_json.get('id'):
+            self.dyn_json['id'] = json_id
+        if result_timestamp := datetime.datetime.now().replace(microsecond=0).isoformat():
+            self.dyn_json['resultTimestamp'] = result_timestamp
+        # sys.stderr.write(f'{args.jsonrpc} {args.json_id}\n')
+        if json_params := in_json.get('params'):
+            for json_param in json_params:
+                self.dyn_check_selectors = json_param.get('checks')
+                if self.dyn_check_selectors is None:
+                    self.dyn_check_selectors = json_param.get('selectors')
+                if json_corpus := json_param.get('corpus'):
+                    self.corpus_id = json_corpus.get('corpusId')
+                    self.corpus_name = json_corpus.get('corpusName')
+                    self.lang_code = json_corpus.get('langCode', self.lang_code)
+                    self.lang_name = json_corpus.get('langName')
+                    if self.lang_code and (self.dyn_json.get('langCode') is None):
+                        self.dyn_json['corpusLangCode'] = self.lang_code
+                    if corpus_body := json_corpus.get('body'):
+                        for check_snt in corpus_body:
+                            snt_id = check_snt.get('sntId')
+                            text = check_snt.get('text')
+                            self.add_corpus_snt(text, snt_id)
+                    elif corpus_filename := json_corpus.get('filename'):
+                        vref_filename = json_corpus.get('vref')
+                        vref_prefix_filter = json_corpus.get('vrefPrefixFilter')
+                        try:
+                            f_vref = open(vref_filename)
+                        except IOError:
+                            f_vref = None
+                        with open(corpus_filename) as f_in:
+                            for line in f_in:
+                                text = line.strip()
+                                snt_id = f_vref.readline().strip() if f_vref else f"Line{self.n_snt + 1}"
+                                if text == "<range>":
+                                    continue
+                                if vref_prefix_filter and not snt_id.startswith(vref_prefix_filter):
+                                    continue
+                                self.add_corpus_snt(text, snt_id)
+        self.dyn_json['result'] = []
+        self.dyn_json['version'] = defaultdict(str)
+        self.populate_version(self.dyn_json['version'])
+        self.dyn_json['skippedChecks'] = self.dyn_skipped_checks
+        return self.n_snt
+
     @staticmethod
-    def load_ref_ids(filename) -> dict:
+    def populate_version(version: dict | None = None) -> dict:
+        if version is None:
+            version = defaultdict(str)
+        version['GreekRoom'] = __greekRoomVersion__
+        version['GreekRoomFormat'] = __greekRoomFormatVersion__
+        version['GreekRoomWildebeest'] = __wildebeestVersion__
+        return version
+
+    @staticmethod
+    def load_ref_ids(snt_index_to_ref_id: dict, filename) -> None:
         """Load file mapping line numbers to sentence IDs."""
-        ref_id_dict = defaultdict(str)
         with open(filename, 'r', encoding='utf-8') as f:
             line_number = 0
             for line in f:
                 line_number += 1
-                ref_id_dict[line_number] = line.strip()
-        return ref_id_dict
+                snt_index_to_ref_id[line_number] = line.strip()
 
     def load_cross_snt_spans(self, filename) -> None:
         try:
@@ -1703,7 +2044,7 @@ class WildebeestAnalysis:
             sys.stderr.write(f'*** {type(err).__name__}: Could not load cross-snt info from {filename}\n{err}\n')
             return
         translation = d.get("translation")
-        corpus = d.get("corpus")
+        json_corpus = d.get("corpus")
         refresher_dict = defaultdict(list)
         cross_snt_span_dict = defaultdict(list)
         triple_nesting_dict = defaultdict(list)
@@ -1712,7 +2053,7 @@ class WildebeestAnalysis:
         cross_snt_span_list = d.get("cross-snt-spans", [])
         refresher_left_list = d.get("refresher-lefts", [])
         triple_nesting_list = d.get("triple-nesting", [])
-        ref_translation_elem = {'translation': translation, 'corpus': corpus, 'line-length': line_length,
+        ref_translation_elem = {'translation': translation, 'corpus': json_corpus, 'line-length': line_length,
                                 'refresher-dict': refresher_dict, 'cross-snt-span-dict': cross_snt_span_dict,
                                 'cross_snt_spans': cross_snt_span_list, 'char_count': char_count,
                                 'triple-dict': triple_nesting_dict}
@@ -1754,6 +2095,248 @@ class WildebeestAnalysis:
                     line_length[line_number] = line_len
                 prev_refresher_line_number = line_number
 
+    @staticmethod
+    def dyn_json_pretty_print(s: str) -> str:
+        s = regex.sub(r'({"sntId":)', r'\n  \1', s)
+        s = regex.sub(r'("check":)', r'\n     \1', s)
+        s = regex.sub(r'("scripts":)', r'\n       \1', s)
+        s = regex.sub(r'("actionMenu":)', r'\n     \1', s)
+        s = regex.sub(r'(?<=, )({"substitute":)', r'\n                    \1', s)
+        s = regex.sub(r'("version":)', r'\n \1', s)
+        s = regex.sub(r'("skippedChecks":)', r'\n \1', s)
+        return s
+
+    def verbalize_greek_room_check_id(self, check: str, _lang_code, sub_s: str | None = None) -> str | None:
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):detach-from-right', check):
+            return f"add missing space to the right of {m_check.group(1)}"
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):attach-to-left', check):
+            return f"remove spurious space on the left of {m_check.group(1)}"
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):reattach-to-left', check):
+            return f"remove spurious space on the left, and add missing space to the right of {m_check.group(1)}"
+        if regex.match(r'GreekRoom:Wildebeest:encoding:nukta-position', check):
+            return f"move the nukta to the correct position right after the main letter"
+        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open', check):
+            result = f"no matching close delimiter"
+            if close_delimiters := self.paired_delimiter_state['open-to-close-delimiters'][sub_s]:
+                result += ' such as: ' + ' '.join(close_delimiters)
+            return result
+        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:close', check):
+            result = f"no matching open delimiter"
+            if open_delimiters := self.paired_delimiter_state['close-to-open-delimiters'][sub_s]:
+                result += ' such as: ' +  ' '.join(open_delimiters)
+            return result
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:punctuation:repair:([^:]*):([^:]*)', check):
+            return f"replace {m_check.group(1)} by {m_check.group(2)}"
+        if check == 'GreekRoom:Wildebeest:punctuation:unexpected':
+            return f"unexpected punctuation"
+        if check == 'GreekRoom:Wildebeest:character:suspicious:C1_CONTROL':
+            return f"remove control character"
+        if check == 'GreekRoom:Wildebeest:character:suspicious:VARIATION_SELECTORS':
+            return f"remove variation selector"
+        return None
+
+    def verbalize_action_menu(self, action_menu: list, check: str, lang_code) -> str:
+        result = ""
+        index = 0
+        for menu_item in action_menu:
+            index += 1
+            substitute = menu_item.get('substitute')
+            if substitute is not None:
+                # sys.stderr.write(f"Verb subst {check} {menu_item} {substitute}\n")
+                check_verbalization = self.verbalize_greek_room_check_id(check, lang_code)
+                substitute_clause = f'''Replace by "{substitute}"''' if substitute else "Delete"
+                if check_verbalization:
+                        result += f'''  [{index}] {substitute_clause} ({check_verbalization})'''
+                else:
+                    result += f'''  [{index}] {substitute_clause}  ({simple_unicode_names(substitute, ',  ')})'''
+            else:
+                result += f'''  [{index}] {menu_item}'''
+        return result
+
+    @staticmethod
+    def dyn_wrap_text(s: str, in_delimiter: str, out_delimiter, limit: int) -> str:
+        delimiter_elems, start_positions, text_elems = general_util.findall3(in_delimiter, s)
+        result = text_elems[0]
+        current_line_length = len(result)
+        for delimiter_s, text_elem in zip(delimiter_elems, text_elems[1:]):
+            if current_line_length + len(delimiter_s) + len(text_elem) <= limit:
+                result += delimiter_s + text_elem
+                current_line_length += len(delimiter_s) + len(text_elem)
+            else:
+                result += out_delimiter + text_elem
+                current_line_length = len(out_delimiter) + len(text_elem)
+        return result
+
+    def html_markup_snt(self, snt: str, feedback_items: list, min_auto_correct: float) -> str:
+        pos2items = defaultdict(list)
+        for feedback_item in feedback_items:
+            span = feedback_item.get('span')
+            for start_pos, end_pos in span:
+                for pos in range(start_pos, end_pos):
+                    # sys.stderr.write(f"B {pos} {snt}\n")
+                    pos2items[pos].append(feedback_item)
+        result = ""
+        title_newline = "\n"
+        # title_newline = "&#10;&#10;"
+        start_pos, max_pos = 0, len(snt)
+        while start_pos < max_pos:
+            if local_feedback_items := pos2items[start_pos]:
+                end_pos = start_pos + 1
+                while (end_pos < max_pos) and (pos2items[end_pos] == local_feedback_items):
+                    end_pos += 1
+                sub_s = snt[start_pos:end_pos]
+                # sys.stderr.write(f"G {start_pos}-{end_pos} {snt}\n")
+                unicode_names = simple_unicode_names(sub_s, ',  ')
+                title = wb_pp.guard_html(f'''Original string: "{sub_s}"{title_newline}''', True)
+                if len(sub_s) == 1:
+                    name_clause = f"  • Character name: {unicode_names}  (at position {start_pos})"
+                else:
+                    name_clause = f"  • Character names ({len(sub_s)}): {unicode_names}  (starting at position {start_pos})"
+                wrapped_name_clause = self.dyn_wrap_text(name_clause, r', {2,}', f',{title_newline}&xnbsp;', 80)
+                title += wb_pp.guard_html(wrapped_name_clause + title_newline, True)
+                best_substitute, best_substitute_start, best_substitute_end, best_confidence = None, None, None, 0
+                for local_feedback_item in local_feedback_items:
+                    check = local_feedback_item.get("check")
+                    title += wb_pp.guard_html(f'''{'‾'*100}{title_newline}Check alert: {check}  {title_newline}''', True)
+                    if scripts := local_feedback_item.get('scripts'):
+                        title += wb_pp.guard_html(f'''  • Scripts: {", ".join(scripts)}{title_newline}''', True)
+                    if minority_script := local_feedback_item.get('minorityScript'):
+                        title += wb_pp.guard_html(f'''  • Minority script: {minority_script}{title_newline}''', True)
+                    if minority_script_letters := local_feedback_item.get('minorityScriptLetters'):
+                        title += wb_pp.guard_html(f'''  • Minority script letters: {", ".join(minority_script_letters)}{title_newline}''', True)
+                    if action_menu := local_feedback_item.get('actionMenu'):
+                        action_menu_pp = "  • Action menu:" + self.verbalize_action_menu(action_menu, check, self.lang_code)
+                        # sys.stderr.write(f'  action_menu_pp: {action_menu_pp}\n')
+                        wrapped_action_menu_pp = self.dyn_wrap_text(action_menu_pp, r' {2,}', f'{title_newline}&xnbsp;', 80)
+                        title += wb_pp.guard_html(f'''{wrapped_action_menu_pp}{title_newline}''', True)
+                        for menu_item in action_menu:
+                            substitute = menu_item.get('substitute')
+                            confidence = menu_item.get('confidence')
+                            if ((substitute is not None) and confidence and (confidence > best_confidence)
+                                    and (local_feedback_item.get('span') == [[start_pos, end_pos]])):
+                                best_substitute, best_substitute_start, best_substitute_end, best_confidence \
+                                    = substitute, start_pos, end_pos, confidence
+                    elif check_verbalization := self.verbalize_greek_room_check_id(check, self.lang_code, sub_s):
+                        verbalization_pp = "  • Help: " + check_verbalization
+                        wrapped_verbalization_pp = self.dyn_wrap_text(verbalization_pp, r' {2,}', f'{title_newline}&xnbsp;', 80)
+                        title += wb_pp.guard_html(f'''{wrapped_verbalization_pp}{title_newline}''', True)
+                if best_substitute == '':
+                    print_string = sub_s
+                    text_deco = "text-decoration:line-through;"
+                    color = "red"
+                else:
+                    print_string = best_substitute
+                    text_deco = ''
+                    color = '#008800'
+                if best_confidence >= min_auto_correct:
+                    if len(local_feedback_items) >= 2:
+                        markup = f'''<span style="color:blue;background-color:#DFDFFF;font-weight:bold;white-space: pre;{text_deco}" pbtitle="{title}">'''
+
+                    else:
+                        markup = f'''<span style="color:{color};background-color:#DFFFDF;font-weight:bold;white-space: pre;{text_deco}" pbtitle="{title}">'''
+                    markup += html_util.guard_html(print_string)
+                else:
+                    markup = f'''<span style="color:red;background-color:#FFDFDF;font-weight:bold;white-space: pre;" pbtitle="{title}">'''
+                    if sub_s in self.unicode_util.invisible_characters:  # e.g. ZERO WIDTH SPACE
+                        markup += '\u2009' + sub_s   # ADD THIN SPACE
+                    else:
+                        markup += html_util.guard_html(sub_s)
+                markup += '''</span>'''
+                result += markup
+                start_pos = end_pos
+            else:
+                result += html_util.guard_html(snt[start_pos])
+                start_pos += 1
+        return result
+
+    def write_corpus_info(self, out: io.TextIOWrapper) -> None:
+        out.write('<ul>\n')
+        if self.corpus_name:
+            if self.corpus_id:
+                out.write(f'''<li> Corpus: {self.corpus_name} &nbsp; <span style="color:#AAAAAA">(ID: {self.corpus_id})</span>\n''')
+            else:
+                out.write(f'''<li> Corpus: {self.corpus_name}\n''')
+        elif self.corpus_id:
+            out.write(f'''<li> Corpus ID: {self.corpus_id}\n''')
+        if self.lang_name:
+            if self.lang_code:
+                out.write(f'''<li> Language: {self.lang_name} &nbsp; <span style="color:#AAAAAA">(code: {self.lang_code})</span>\n''')
+            else:
+                out.write(f'''<li> Language: {self.lang_name}\n''')
+        elif self.lang_code:
+            out.write(f'''<li> Language code: {self.lang_code}\n''')
+        if self.auto_correct_threshold is not None:
+            out.write(f'''<li> Threshold for automatic correction: {self.auto_correct_threshold}\n''')
+        if total_count := self.dyn_json_results.n_issues:
+            n_snt_ids = len(self.dyn_json_results.snt_id_set)
+            suffix = "" if n_snt_ids == 1 else "s"
+            out.write(f'''<li> Total number of issues flagged: {total_count} &nbsp; <span style="color:#AAAAAA">(in {n_snt_ids} verse{suffix})</span>\n''')
+        if self.dyn_json['version']:
+            key_value_elements = map(lambda k: f"{k}: {self.dyn_json['version'][k]}", self.dyn_json['version'])
+            out.write(f'''<li> Software version: &nbsp; {" &nbsp; ".join(key_value_elements)}\n''')
+        out.write('</ul>\n')
+
+    def dyn_html_print_by_snt(self, out: io.TextIOWrapper) -> None:
+        out.write(html_util.html_head(f"Dynamic Wildebeest Visualization", datetime.datetime.now().strftime('%B %d, %Y at %H:%M'), "wb viz"))
+        self.write_corpus_info(out)
+        out.write('''    <table cellpadding="10">\n''')
+        for snt, snt_id in zip(self.snt_list, self.ref_id_list):
+            if feedback_items := self.dyn_json_results.results_by_snt_id[snt_id]:
+                snt_id_g = html_util.guard_html(snt_id).replace(' ', '&nbsp;')
+                marked_up_snt = self.html_markup_snt(snt, feedback_items, 0.3)
+                out.write(f"      <tr><td>{snt_id_g}</td><td>{marked_up_snt}</td>\n")
+        out.write("    </table>\n")
+        out.write(f"    {'<br>' * 6}\n")
+        html_util.print_html_foot(out)
+
+    def dyn_html_print_by_check(self, out: io.TextIOWrapper) -> None:
+        out.write(html_util.html_head(f"Dynamic Wildebeest Visualization (by check type)",
+                                      datetime.datetime.now().strftime('%B %d, %Y at %H:%M'), "wb viz"))
+        self.write_corpus_info(out)
+        out.write('''    <table cellpadding="10">\n''')
+        for check_id in sorted(self.dyn_json_results.results_by_check_id.keys()):
+            count = len(self.dyn_json_results.results_by_check_id[check_id])
+            count_s = "" if count == 1 else "s"
+            out.write(f'''      <tr><td colspan="2"><b>Check: {check_id}</b> ({count} instance{count_s})</td>\n''')
+            for snt_id in sorted(self.dyn_json_results.check_id_snt_ids[check_id], key=lambda x: self.ref_id_to_snt_index[x]):
+                if feedback_items := self.dyn_json_results.results_by_check_id_and_snt_id[(check_id, snt_id)]:
+                    snt = self.ref_id_to_text.get(snt_id, "???")
+                    snt_id_g = html_util.guard_html(snt_id).replace(' ', '&nbsp;')
+                    marked_up_snt = self.html_markup_snt(snt, feedback_items, 0.3)
+                    out.write(f"      <tr><td>{snt_id_g}</td><td>{marked_up_snt}</td>\n")
+        out.write("    </table>\n")
+        out.write(f"    {'<br>' * 6}\n")
+        html_util.print_html_foot(out)
+
+    def check_w_args(self, args: argparse.Namespace, text_corpus: corpus.TextCorpus | None = None) -> dict:
+        _n_snt = self.extract_json_input(args)
+        self.text_corpus = text_corpus or corpus.TextCorpus()
+        self.text_corpus.add_text_corpus(self.snt_list, self.ref_id_list)
+        self.dyn_checks()
+        return self.dyn_json
+
+
+def init_text_corpus() -> corpus.TextCorpus:
+    return corpus.TextCorpus()
+
+
+def check(json_check_request: dict, text_corpus: corpus.TextCorpus | None = None) -> dict:
+    lang_code = json_check_request['params'][0]['corpus']['langCode']
+    args = argparse.Namespace(json=json_check_request,
+                              lc=lang_code,
+                              max_pattern_lines=0,
+                              max_bad_pattern_lines=0,
+                              max_examples=0,
+                              max_examples_viz=0,
+                              max_cases=0,
+                              max_script_lines=0,
+                              max_non_canonical_lines=0,
+                              max_char_conflict_lines=0,
+                              max_notable_token_lines=0)
+    wb = WildebeestAnalysis(args)
+    return wb.check_w_args(args, text_corpus)
+
+
 def plural_noun_form(noun: str) -> str:
     """Quick and dirty plural form, e.g. 'baby' -> 'babies'"""
     if noun.endswith('y'):
@@ -1770,13 +2353,17 @@ def count_plus_noun(count: int, noun: str) -> str:
 def process_args(args) -> WildebeestAnalysis:
     """Perform Wildebeest analysis for 1 file, using argparse args."""
     wb = WildebeestAnalysis(args)
-    if args.ref_id_dict:
-        wb.ref_id_dict = args.ref_id_dict
-    wb.corpus = defaultdict(str)
+    scripts_repair = ScriptRepair(wb)
+    wb.script_repair = scripts_repair
+    if args.snt_index_to_ref_id:
+        wb.snt_index_to_ref_id = args.snt_index_to_ref_id
     wb.corpus_w_rtf_delimiter_adjustments = defaultdict(str)
-    wb.build_char_to_script_dict()
+    wb.auto_correct_threshold = args.auto_correct_threshold
+    args.total_bytes = None
+    if args.json:
+        _n_snt = wb.extract_json_input(args)
+        # sys.stderr.write(f'Extracted {n_snt} verses from JSON object.\n')
     if args.input is sys.stdin:
-        args.total_bytes = None
         args.input = io.TextIOWrapper(sys.stdin.buffer, encoding='utf-8', errors='surrogateescape')
         if not re.search('utf-8', sys.stdin.encoding, re.IGNORECASE):
             log.error(f"Bad STDIN encoding '{sys.stdin.encoding}' as opposed to 'utf-8'. "
@@ -1791,53 +2378,57 @@ def process_args(args) -> WildebeestAnalysis:
         wb.filename = inp_path
 
     for ref_cross_snt_span_file in args.ref_cross_snt_span_files:
-        print(f'Load ref {ref_cross_snt_span_file}')
+        if args.verbose:
+            sys.stderr.write(f'Load ref {ref_cross_snt_span_file}\n')
         wb.load_cross_snt_spans(ref_cross_snt_span_file)
-    if args.output is sys.stdout and not re.search('utf-8', sys.stdout.encoding, re.IGNORECASE):
+    if args.legacy_text_output is sys.stdout and not re.search('utf-8', sys.stdout.encoding, re.IGNORECASE):
         log.error(f"Error: Bad STDIN/STDOUT encoding '{sys.stdout.encoding}' as opposed to 'utf-8'. \
                         Suggestion: 'export PYTHONIOENCODING=UTF-8' or use use '--output FILENAME' option")
-    if args.input:
-        wb.collect_counts_and_examples_in_file(args.input,
+    if args.input or wb.snt_list or args.strings:
+        wb.collect_counts_and_examples_in_file(args,
                                                total_bytes=args.total_bytes,
                                                progress_bar=args.progress_bar)
-    elif args.strings:
-        line_number = 0
-        n_empty_lines = 0
-        for line in args.strings:
-            line_number += 1
-            if not re.match(r'\S', line):
-                n_empty_lines += 1
-            wb.collect_counts_and_examples_in_line(line, line_number)
-            wb.punct_analysis_in_line(line, line_number)
-        wb.analysis['n_lines'] = line_number
-        wb.analysis['n_empty_lines'] = n_empty_lines
-        wb.punct_analysis_at_end()
     else:  # nothing to process
-        log.warning('Called function process_with_args with neither args.input nor args.strings')
+        log.warning('Called function process_with_args with neither args.input nor args.snt_list nor args.strings')
     wb.aggregate()  # Aggregate raw counts and examples into analysis.
+    wb.text_corpus = corpus.TextCorpus(snt_list = wb.snt_list, snt_id_list = wb.ref_id_list)
+    wb.dyn_checks()
     wb.remove_empty_dicts()  # Remove empty dictionaries that were created to impose a specific order
     wb.sort_pattern_headings_in_analysis_pattern()
-    if args.json:
-        args.json.write(json.dumps(wb.analysis) + "\n")
+    if args.json_legacy_out:
+        args.json_legacy_out.write(json.dumps(wb.analysis) + "\n")
+    if args.json_out_filename:
+        args.json_out_filename.write(wb.dyn_json_pretty_print(json.dumps(wb.dyn_json) + "\n"))
+        n_snt = len(wb.snt_list)
+        n_issues = wb.dyn_json_results.n_issues
+        snt_kw = "verse" if n_snt == 1 else "verses"
+        issues_kw = "issue" if n_issues == 1 else "issues"
+        log.info(f'Dynamic Wildebeest identified {n_issues} {issues_kw} in {n_snt} {snt_kw}.')
+    if args.html_out_filename_by_snt_id:
+        wb.dyn_html_print_by_snt(args.html_out_filename_by_snt_id)
+        log.info(f"Wrote HTML viz to {general_util.full_filename(args.html_out_filename_by_snt_id)}")
+    if args.html_out_filename_by_check:
+        wb.dyn_html_print_by_check(args.html_out_filename_by_check)
+        log.info(f"Wrote HTML viz (by check) to {general_util.full_filename(args.html_out_filename_by_check)}")
     if args.summary or args.summary_file:
         summary = '; '.join(wb.summary_list_of_issues())
         if args.summary:
-            args.output.write(f"{args.file_id}: {summary}\n")
+            args.legacy_text_output.write(f"{args.file_id}: {summary}\n")
         if args.summary_file:
             with open(args.summary_file, 'w') as f_summary:
                 f_summary.write(f"{summary}\n")
-    elif args.output:
-        wb.pretty_print(args.output)
-    if args.output:
-        args.output.flush()
+    elif args.legacy_text_output:
+        wb.pretty_print(args.legacy_text_output)
+    if args.legacy_text_output:
+        args.legacy_text_output.flush()
     return wb
 
 
 def process(in_file: str | None = None,     # provide exactly one input: input filename, strings or string
             strings: list[str] | None = None,
             string: str | None = None,
-            pp_output: TextIO | None = None,    # output filename (for pretty-print)
-            json_output: TextIO | None = None,  # output filename (in json)
+            legacy_text_output: TextIO | None = None,    # output filename (for pretty-print)
+            json_legacy_out: TextIO | None = None,  # output filename (in json)
             lang_code: str | None = None,
             ref_cross_snt_span_files: list[str] = (),
             max_cases: int = 500,                  # max cases per block (e.g. number of characters in script)
@@ -1849,13 +2440,14 @@ def process(in_file: str | None = None,     # provide exactly one input: input f
             max_non_canonical_lines: int = 100,
             max_char_conflict_lines: int = 100,
             max_notable_token_lines: int = 1000,
-            # ref_id_dict is a dictionary mapping line_numbers/string_indexes (int, starting at 1) to snt IDs (str)
+            verbose: int = 0,
+            # snt_index_to_ref_id is a dictionary mapping line_numbers/string_indexes (int, starting at 1) to snt IDs (str)
             summary_file: Optional[str] = None,
-            ref_id_dict: Optional[dict] = None) -> WildebeestAnalysis:
+            snt_index_to_ref_id: Optional[dict] = None) -> WildebeestAnalysis:
     """Entry point when Wildebeest Analysis for non-CLI use; maps to CLI interface"""
     return process_args(argparse.Namespace(strings=[string] if string and not strings else strings,
                                            input=Path(in_file) if in_file else None,
-                                           output=pp_output, json=json_output,
+                                           legacy_text_output=legacy_text_output, json_legacy_out=json_legacy_out,
                                            lc=lang_code, max_cases=max_cases,
                                            ref_cross_snt_span_files=ref_cross_snt_span_files,
                                            max_examples=max_examples,
@@ -1867,23 +2459,31 @@ def process(in_file: str | None = None,     # provide exactly one input: input f
                                            max_char_conflict_lines=max_char_conflict_lines,
                                            max_notable_token_lines=max_notable_token_lines,
                                            summary=None, summary_file=summary_file,
-                                           progress_bar=None, ref_id_dict=ref_id_dict))
+                                           progress_bar=None, snt_index_to_ref_id=snt_index_to_ref_id,
+                                           verbose=verbose))
 
 
 def main():
     """Wrapper around Wildebeest analysis that takes care of argument parsing and prints change stats to STDERR."""
     # parse arguments
     parser = argparse.ArgumentParser(description='Analyzes a given text for a wide range of anomalies', prog="wb-ana")
+    parser.add_argument('-j', '--json', help='input dict, text or filename (alternative 1)')
     parser.add_argument('-i', '--input', type=Path,
-                        default=sys.stdin, metavar='INPUT-FILENAME', help='(default: STDIN)')
+                        default=None, metavar='INPUT-FILENAME', help='(alternative 2; default: None/STDIN)')
+    parser.add_argument('-o', '--json_out_filename', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+                        default=None, help='output JSON filename')
+    parser.add_argument('-H', '--html_out_filename_by_snt_id', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+                        default=None)
+    parser.add_argument('-C', '--html_out_filename_by_check', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+                        default=None)
     parser.add_argument('--batch', type=Path, default=None, metavar='BATCH_DIR',
                         help='Directory with batch of input files (BATCH_DIR/*.txt)')
     parser.add_argument('-s', '--summary', action='count', default=0, help='single summary line per file')
     parser.add_argument('--summary_file', type=Path, default=None, help='file with single summary line')
-    parser.add_argument('-o', '--output', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
-                        default=sys.stdout, metavar='OUTPUT-FILENAME', help='(default: STDOUT)')
-    parser.add_argument('-j', '--json', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
-                        default=None, metavar='JSON-OUTPUT-FILENAME', help='(default: None)')
+    parser.add_argument('-O', '--legacy_text_output', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+                        default=None, metavar='LEGACY-OUTPUT-FILENAME', help='(default: None/STDOUT)')
+    parser.add_argument('-J', '--json_legacy_out', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+                        default=None, metavar='JSON-LEGACY-OUTPUT-FILENAME', help='(default: None)')
     parser.add_argument('--html_output_filename', type=str, default=None)
     parser.add_argument('--html_example_dir', type=str, default=None)
     parser.add_argument('--file_id', type=str, default=None)
@@ -1905,27 +2505,49 @@ def main():
     parser.add_argument('--ref_cross_snt_span_files', type=Path, nargs='*', default=(),
                         help='optional; input; format: json; content: cross-sentence quotations, open quotation marks')
     parser.add_argument('--version', action='version',
-                        version=f'%(prog)s {__version__} last modified: {last_mod_date}')
-    parser.add_argument('--ref_id_dict', default=None, help=argparse.SUPPRESS)
+                        version=f'%(prog)s {__wildebeestVersion__} last modified: {wildebeest_last_mod_date}')
+    parser.add_argument('--snt_index_to_ref_id', default=None, help=argparse.SUPPRESS)
     parser.add_argument('--strings', default=None, help=argparse.SUPPRESS)
     parser.add_argument('--back_versification', type=str, default='vers/back_versification.json')
+    parser.add_argument('-a', '--auto_correct_threshold', type=float, default=None, help='value between 0.0 and1.0')
     args = parser.parse_args()
+
+    # legacy calls
+    if args.json and isinstance(args.json, str) and regex.search(f'scorecard/wildebeest\.json$', args.json):
+        args.json_legacy_out = io.StringIO(args.json)
+        args.json_legacy_out.name = args.json
+        args.json = None
+    if args.json_out_filename and isinstance(args.json_out_filename, str) and not regex.search(f'\.json$', args.json_out_filename):
+        args.legacy_text_output = args.out_filename
+        args.json_out_filename = None
+    # default input from stdin
+    if args.json is None and args.input is None and args.batch is None:
+        args.input = sys.stdin
+    # default output to stdout
+    if args.json_out_filename is None and args.json_legacy_out is None and args.legacy_text_output is None:
+        args.legacy_text_output = sys.stdout
+
     start_time = datetime.datetime.now()
     if args.verbose:
         log.info('Script: wb-analysis.py')
         log.info(f'Start: {start_time}')
         if args.input is not sys.stdin:
-            log.info(f'Input: {args.input.name}')
-        if args.output is not sys.stdout:
-            log.info(f'Output: {args.output.name}')
-    bv = BackVersification(args.back_versification)
-    if args.ref_id_file:
-        print(f'Load ref {args.ref_id_file}')
-        args.ref_id_dict = WildebeestAnalysis.load_ref_ids(args.ref_id_file)
+            log.info(f'Text input: {args.input.name}')
+        if args.json_out_filename and (args.json_out_filename is not sys.stdout):
+            log.info(f'JSON output: {args.out_filename.name}')
+        if args.json_legacy_out:
+            log.info(f'Legacy JSON output: {args.json_legacy_out.name}')
+        if args.legacy_text_output and (args.legacy_text_output is not sys.stdout):
+            log.info(f'Legacy text output: {args.legacy_text_output.name}')
+    bv = BackVersification(args.back_versification, False)
     if args.batch:
         directory_str = args.batch
         directory_path = Path(directory_str)
         args.batch = None
+        if args.ref_id_file:
+            sys.stderr.write(f'Load ref {args.ref_id_file}\n')
+            args.snt_index_to_ref_id = {}
+            WildebeestAnalysis.load_ref_ids(args.snt_index_to_ref_id, args.ref_id_file)
         files = list(Path(directory_path).glob('*.txt'))
         files.sort()
         n_files = 0
@@ -1941,6 +2563,8 @@ def main():
             log.info(f"Processed {count_plus_noun(n_files, 'file')}")
     else:
         wb_ana = process_args(args)
+        if args.ref_id_file:
+            wb_ana.load_ref_ids(wb_ana.snt_index_to_ref_id, args.ref_id_file)
         if args.html_output_filename:
             wb_pp.main_with_args(args, wb_ana)
     sys.stderr.write(bv.report_stats())
@@ -1949,6 +2573,11 @@ def main():
         log.info(f'End: {end_time}')
         elapsed_time = end_time - start_time
         log.info(f'Time: {elapsed_time}')
+
+
+def version():
+    return WildebeestAnalysis.populate_version()
+
 
 if __name__ == "__main__":
     main()

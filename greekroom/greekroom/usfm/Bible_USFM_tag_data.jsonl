@@ -45,7 +45,7 @@
 {"tag": "ili3", "exp": "introduction list item 3", "closing-p": false, "one-liner": true, "intro-p": true}
 {"tag": "im", "exp": "introduction margin", "closing-p": false, "one-liner": true, "intro-p": true}
 {"tag": "imi", "exp": "indented introduction margin paragraph", "exp-short": "indented intro margin para", "closing-p": false, "one-liner": true, "intro-p": true}
-{"tag": "imq", "exp": "introduction (margin) paragraph quoted text", "exp-short": "intro para quoted text", "closing-p": true, "one-liner": true, "intro-p": true}
+{"tag": "imq", "exp": "introduction (margin) paragraph quoted text", "exp-short": "intro para quoted text", "closing-p": false, "one-liner": true, "intro-p": true}
 {"tag": "imt1", "exp": "introduction major title 1", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
 {"tag": "imt2", "exp": "introduction major title 2", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
 {"tag": "imt3", "exp": "introduction major title 3", "closing-p": false, "one-liner": true, "heading-p": true, "intro-p": true}
@@ -134,7 +134,7 @@
 {"tag": "qa", "exp": "acrostic heading", "exp-long": "acrostic heading  (the first letters of each verse in poetry, which spell out a word, message, or the alphabet, e.g. the Hebrew alphabet in Psalm 119)", "closing-p": false, "one-liner": true, "heading-p": true}
 {"tag": "qac", "exp": "acrostic letter", "exp-long": "acrostic letter  (the first letter of a verse in poetry, which together with other acrostic letters spell out a word, message, or the alphabet, e.g. the Hebrew alphabet in Psalm 119)", "closing-p": true}
 {"tag": "qc", "exp": "centered poetic line", "closing-p": false, "one-liner": true}
-{"tag": "qd", "exp": "Hebrew director's note", "exp-long": "Hebrew director's musical performance note (at the end of the poetic section)", "closing-p": false, "one-liner": true}
+{"tag": "qd", "exp": "Hebrew director's note", "exp-long": "Hebrew director's musical performance note (at the end of the poetic section)", "closing-p": false, "one-liner": true, "entity-category-markup": true}
 {"tag": "qm1", "exp": "embedded poetry 1", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
 {"tag": "qm2", "exp": "embedded poetry 2", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
 {"tag": "qm3", "exp": "embedded poetry 3", "closing-p": false, "one-liner": true, "children": ["w", "f", "qs"], "can-have-entity-category-markup-children": true}
