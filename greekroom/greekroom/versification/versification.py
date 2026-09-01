@@ -113,6 +113,58 @@ class BibleStructure:
         return m and (int(m.group(1)) in self.psalms_with_descriptive_titles_not_in_org_schema)
 
 
+class VersificationChunk:
+    """This class holds data of versification info for a continuous chunk (e.g. GEN 31:55-GEN 32:33)"""
+
+    def __init__(self, mapped_verses_d: dict, versification: Versification, _bible: BibleStructure, _f_log: TextIO):
+        self.mapped_verses_d = mapped_verses_d
+        self.versification = versification
+        self.source_only_verse_ids = set()
+        self.target_only_verse_ids = set()
+        self.source_and_target_verse_ids = set()
+        for from_verse_id_entry in mapped_verses_d.keys():
+            book, chapter, from_verse, to_verse = versification.split_verse_id(from_verse_id_entry)
+            to_verse = to_verse or from_verse
+            for verse_number in range(from_verse, to_verse+1):
+                verse_id_entry = f"{book} {chapter}:{verse_number}"
+                self.source_only_verse_ids.add(verse_id_entry)
+        for from_verse_id_entry in mapped_verses_d.keys():
+            if to_verse_id_entry := mapped_verses_d.get(from_verse_id_entry):
+                book, chapter, from_verse, to_verse = versification.split_verse_id(to_verse_id_entry, True)
+                for verse_number in range(from_verse, to_verse + 1):
+                    verse_id_entry = f"{book} {chapter}:{verse_number}"
+                    if verse_id_entry in self.source_only_verse_ids:
+                        self.source_only_verse_ids.remove(verse_id_entry)
+                        self.source_and_target_verse_ids.add(verse_id_entry)
+                    elif verse_id_entry in self.source_and_target_verse_ids:
+                        pass
+                    else:
+                        self.target_only_verse_ids.add(verse_id_entry)
+
+    def __repr__(self):
+        result = f'VersChunk {self.mapped_verses_d}'
+        if self.source_only_verse_ids:
+            result += f'  SO: {self.source_only_verse_ids}'
+        if self.target_only_verse_ids:
+            result += f'  TO: {self.target_only_verse_ids}'
+        return result
+
+    @staticmethod
+    def same_chunk(versification, prev_source_verse_id: str, prev_target_verse_id: str,
+                   source_verse_id: str, _target_verse_id: str) -> bool:
+        book1s, chapter1s, from_verse1s, to_verse1s = versification.split_verse_id(prev_source_verse_id, True)
+        book1t, chapter1t, from_verse1t, to_verse1t = versification.split_verse_id(prev_target_verse_id, True)
+        book2s, chapter2s, from_verse2s, to_verse2s = versification.split_verse_id(source_verse_id, True)
+        # book2t, chapter2t, from_verse2t, to_verse2t = versification.split_verse_id(target_verse_id, True)
+        if (book1s == book2s) and (chapter1s == chapter2s) and (to_verse1s + 1 == from_verse2s):
+            return True
+        elif ((book1t == book2s) and (chapter1t == chapter2s)
+              and (to_verse1t >= from_verse2s) and (to_verse2s >= from_verse1t)):
+            return True
+        else:
+            return False
+
+
 class Versification:
     """This class holds data of versification mappings between a specific schema (e.g. 'eng') and 'org'.
     Standard versification schemas (see data/standard_mappings/*json), incl. the following types of mappings:
@@ -151,6 +203,8 @@ class Versification:
         self.target_verse_ids_to_be_monitored = ('PSA 86:1',)  # for testing
         self.n_max_verses_entries = 0
         self.n_mapped_verses_entries = 0
+        self.mapped_verses_d = {}
+        self.versification_chunks: List[VersificationChunk] = []
         with open(versification_filename) as f:
             data = json.load(f)
             if max_verses_d := data.get("maxVerses"):
@@ -173,12 +227,47 @@ class Versification:
                                         f'is not integer: {max_verse_s}\n')
             if mapped_verses_d := data.get("mappedVerses"):
                 self.add_mapped_verses(mapped_verses_d, bible, f_log)
+                self.mapped_verses_d = mapped_verses_d
+                last_key = None
+                verse_chunk = {}
+                verse_chunks = []
+                for from_verse in mapped_verses_d.keys():
+                    if last_key and not VersificationChunk.same_chunk(self, last_key, mapped_verses_d[last_key],
+                                                                      from_verse, mapped_verses_d[from_verse]):
+                        verse_chunks.append(verse_chunk)
+                        verse_chunk = {}
+                    verse_chunk[from_verse] = mapped_verses_d[from_verse]
+                    last_key = from_verse
+                if verse_chunk:
+                    verse_chunks.append(verse_chunk)
+                for verse_chunk in verse_chunks:
+                    vc = VersificationChunk(verse_chunk, self, bible, f_log)
+                    self.versification_chunks.append(vc)
+                if self.schema == 'eng':
+                    for vc in self.versification_chunks:
+                        vc_s = repr(vc)
+                        sys.stderr.write(f' * {vc_s}\n')
+                        if 'PSA' in vc_s:
+                            break
         if self.n_max_verses_entries == 0:
             f_log.write(f'  ** Error: Did not find "maxVerses" in {versification_filename}\n')
         if self.n_mapped_verses_entries == 0:
             f_log.write(f'  ** Error: Did not find "mappedVerses" in {versification_filename}\n')
 
-    def add_mapped_verses(self, mapped_verses_d: dict, bible: BibleStructure, f_log: TextIO):
+    def del_mapped_verses(self, unmapped_verses: List[str], _bible: BibleStructure, _f_log: TextIO,
+                          _is_supplementary: bool = False):
+        for from_verse_id_entry in unmapped_verses:
+            book1, chapter1, from_verse1, to_verse1 = self.split_verse_id(from_verse_id_entry)
+            if isinstance(to_verse1, int) and (from_verse1 < to_verse1):
+                for i in range(to_verse1 - from_verse1 + 1):
+                    verse_id1 = f"{book1} {chapter1}:{from_verse1 + i}"
+                    self.del_mapping(verse_id1)
+            else:
+                verse_id1 = f"{book1} {chapter1}:{from_verse1}"
+                self.del_mapping(verse_id1)
+
+    def add_mapped_verses(self, mapped_verses_d: dict, bible: BibleStructure, f_log: TextIO,
+                          is_supplementary: bool = False):
         self.n_mapped_verses_entries += 1
         schema = self.schema
         for from_verse_id_entry in mapped_verses_d.keys():
@@ -186,7 +275,16 @@ class Versification:
             to_verse_id_entry = mapped_verses_d[from_verse_id_entry]
             book1, chapter1, from_verse1, to_verse1 = self.split_verse_id(from_verse_id_entry)
             book2, chapter2, from_verse2, to_verse2 = self.split_verse_id(to_verse_id_entry)
-            if book1 and book2:
+            if book1 and (to_verse_id_entry is None) and isinstance(from_verse1, int):
+                # delete mapping
+                if isinstance(to_verse1, int) and (from_verse1 < to_verse1):
+                    for i in range(to_verse1 - from_verse1 + 1):
+                        verse_id1 = f"{book1} {chapter1}:{from_verse1 + i}"
+                        self.del_mapping(verse_id1)
+                else:
+                    verse_id1 = f"{book1} {chapter1}:{from_verse1}"
+                    self.del_mapping(verse_id1)
+            elif book1 and book2:
                 # range of equal length on both sides (n-to-n mapping)
                 if (isinstance(to_verse1, int) and isinstance(to_verse2, int)
                         and (from_verse1 < to_verse1) and (from_verse2 < to_verse2)
@@ -194,10 +292,10 @@ class Versification:
                     for i in range(to_verse1 - from_verse1 + 1):
                         verse_id1 = f"{book1} {chapter1}:{from_verse1+i}"
                         verse_id2 = f"{book2} {chapter2}:{from_verse2+i}"
-                        self.add_mapping(verse_id1, verse_id2, bible)
+                        self.add_mapping(verse_id1, verse_id2, bible, False, is_supplementary)
                 # 1-to-1 mapping
                 elif (to_verse1 is None) and (to_verse2 is None):
-                    self.add_mapping(from_verse_id_entry, to_verse_id_entry, bible)
+                    self.add_mapping(from_verse_id_entry, to_verse_id_entry, bible, False, is_supplementary)
                 # merge
                 elif isinstance(to_verse1, int) and (from_verse1 < to_verse1) and (to_verse2 is None):
                     self.add_merge_range(book1, chapter1, from_verse1, to_verse1, to_verse_id_entry)
@@ -226,7 +324,8 @@ class Versification:
                             reported_error = True
                     if not reported_error:
                         f_log.write(f'{ec} bad mapping: {from_verse_id_entry} -> {to_verse_id_entry}\n')
-            elif ((',' in from_verse_id_entry) and (source_verse_ids := from_verse_id_entry.split(','))
+            elif ((',' in from_verse_id_entry)
+                    and (source_verse_ids := from_verse_id_entry.split(','))
                     and all([self.valid_verse_id(source_verse_id, bible)
                              for source_verse_id in source_verse_ids])
                     and self.valid_verse_id(to_verse_id_entry, bible)):
@@ -240,18 +339,25 @@ class Versification:
                     f_log.write(f'{ec} unrecognized mapping target "{to_verse_id_entry}"\n')
 
     @staticmethod
-    def split_verse_id(verse_id: str) -> Tuple[str | None, int | None, int | str | None, int | None]:
-        if (m := (regex.match(r'(\S+) (\d+):(\d+)-(\d+)$', verse_id)
-                  or regex.match(r'(\S+)\s+(\d+):(\d+)([a-z]?)$', verse_id))):
+    def split_verse_id(verse_id: str | None, to_int: bool = False) \
+            -> Tuple[str | None, int | None, int | str | None, int | None]:
+        if verse_id is None:
+            return None, None, None, None
+        elif (m := (regex.match(r'(\S+) (\d+):(\d+)-(\d+)$', verse_id)
+                    or regex.match(r'(\S+)\s+(\d+):(\d+)([a-z]?)$', verse_id))):
             book, chapter1_s, from_verse_s, last_element = m.group(1, 2, 3, 4)
             chapter_number, from_verse_number = int(chapter1_s), int(from_verse_s)
             if regex.match(r'\d+$', last_element):
                 to_verse_number = int(last_element)
+            elif to_int:
+                to_verse_number = from_verse_number
             elif regex.match(r'[a-z]$', last_element):
                 from_verse_number = f"{from_verse_s}{last_element}"
                 to_verse_number = None
             else:
                 to_verse_number = None
+            if to_int and from_verse_number and (to_verse_number is None):
+                to_verse_number = from_verse_number
             return book, chapter_number, from_verse_number, to_verse_number
         else:
             return None, None, None, None
@@ -269,19 +375,40 @@ class Versification:
             return
         self.errors[f"invalid-mapping-{side}s"].append(verse_id)
 
-    def add_mapping(self, verse_id1: str, verse_id2: str, bible: BibleStructure, verbose: bool = False):
+    def del_mapping(self, verse_id1: str, verse_id2: str | None = None, verbose_schema: str | None = None):
+        verse_id2 = verse_id2 or self.verse_id_mapping_to_org.get(verse_id1)
+        if self.verse_id_mapping_to_org.get(verse_id1):
+            del self.verse_id_mapping_to_org[verse_id1]
+            del_mapping_s = f'{verse_id1}'
+            self.n_mappings -= 1
+            if verse_id2 and self.verse_id_mapping_from_org.get(verse_id2):
+                del self.verse_id_mapping_from_org[verse_id2]
+                del_mapping_s += f' -> {verse_id2}'
+            if self.schema == verbose_schema:
+                sys.stderr.write(f'{self.schema} del link {del_mapping_s}\n')
+
+    def add_mapping(self, verse_id1: str, verse_id2: str, bible: BibleStructure, verbose: bool = False,
+                    is_supplementary: bool = False):
         verse_id1_valid = self.valid_verse_id(verse_id1, bible)
         verse_id2_valid = Versification.org.valid_verse_id(verse_id2, bible)
-        if verse_id1_valid and verse_id2_valid:
-            if self.verse_id_mapping_to_org.get(verse_id1):
+        if verse_id2_valid:
+            if verse_id1_valid and (verse_id1 == verse_id2) and is_supplementary:
+                if self.verse_id_mapping_to_org.get(verse_id1):
+                    _old_verse_id2 = self.verse_id_mapping_to_org[verse_id1]
+                    del self.verse_id_mapping_to_org[verse_id1]
+                    self.n_mappings -= 1
+                    # sys.stderr.write(f"Deleted map {verse_id1} -> {old_verse_id2}\n")
+                if self.verse_id_mapping_from_org.get(verse_id2):
+                    del self.verse_id_mapping_from_org[verse_id2]
+            elif self.verse_id_mapping_to_org.get(verse_id1):
                 self.errors["duplicate-sources"].append(verse_id1)
             else:
                 self.verse_id_mapping_to_org[verse_id1] = verse_id2
                 self.verse_id_mapping_from_org[verse_id2] = verse_id1
                 self.n_mappings += 1
         else:
-            self.register_any_mapping_error(verse_id1, verse_id1_valid, "source", bible, verbose)
             self.register_any_mapping_error(verse_id2, verse_id2_valid, "target", bible, verbose)
+        self.register_any_mapping_error(verse_id1, verse_id1_valid, "source", bible, verbose)
 
     def add_merge_range(self, book: str, chapter: int, from_verse: int, to_verse: int, merged_verse_id: str):
         source_verse_ids = []
@@ -408,13 +535,16 @@ class Versification:
         for schema in bible.standard_versification_schemas.keys():
             filename = f"{standard_mapping_dir}/{schema}.json"
             f_log.write(f"Loading versification from {filename} ...\n")
+            # sys.stderr.write(f"Loading versification from {filename} ...\n")
             v = Versification(filename, schema, bible, f_log)
             if supplementary_mapping_filename:
                 with open(supplementary_mapping_filename) as f:
                     if file_content := f.read():
                         if file_d := json.loads(file_content):
                             if mapped_verses_d := file_d.get("mappedVerses"):
-                                v.add_mapped_verses(mapped_verses_d, bible, f_log)
+                                v.add_mapped_verses(mapped_verses_d, bible, f_log, True)
+                            if unmapped_verses := file_d.get("unmappedVerses"):
+                                v.del_mapped_verses(unmapped_verses, bible, f_log, True)
             v.check_mappings(bible)
             v.report_issues(f_log)
             f_log.write(f"  Loaded {v.n_books} books; {v.n_chapters:,d} chapters; {v.n_verses:,d} verses; "
@@ -670,7 +800,7 @@ class VersifiedCorpus:
 
 class BackVersification:
     """This class supports scripts to back-versify verse IDs from 'org' to what the user submitted."""
-    def __init__(self, filename: str | None):
+    def __init__(self, filename: str | None = None, verbose: bool = True):
         self.d = None
         self.log_d = defaultdict(int)
         if filename:
@@ -678,12 +808,13 @@ class BackVersification:
                 with open(filename) as f:
                     if dict_s := f.read():
                         self.d = json.loads(dict_s)
-                        sys.stderr.write(f"Loaded {len(self.d):,d} back-versification entries from {filename}\n")
+                        if self.d:
+                            sys.stderr.write(f"Loaded {len(self.d):,d} back-versification entries from {filename}\n")
                     else:
                         sys.stderr.write(f"Could not read from {filename}\n")
-            else:
-                sys.stderr.write(f"Could not find back-versification file {filename}\n")
-        else:
+            elif verbose:
+                    sys.stderr.write(f"Could not find back-versification file {filename}\n")
+        elif verbose:
             sys.stderr.write(f"No file specified for back-versification.\n")
 
     def report_stats(self, calling_script: str | None = None, max_n_examples: int = 10) -> str:

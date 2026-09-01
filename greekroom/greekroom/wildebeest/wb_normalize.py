@@ -1617,6 +1617,7 @@ class Wildebeest:
                 self.lv = self.lv | char_type_vector
 
     def update_lv(self, s: str) -> None:
+        sys.stderr.write(f'UPDATE_LV {s}\n')
         for char in s:
             char_type_vector = self.char_type_vector_dict.get(char, 0)
             if char_type_vector:

@@ -40,7 +40,7 @@ def html_head(title: str, date: str, meta_title: str) -> str:
                 padding: 5px 10px 5px 10px;
                 color: #000;
                 font-weight: normal;
-                white-space: wrap;
+                white-space: pre;
                 -moz-border-radius: 5px;
                 -webkit-border-radius: 5px;
                 border-radius: 5px;
@@ -55,6 +55,30 @@ def html_head(title: str, date: str, meta_title: str) -> str:
           [patitle] {position: relative; }
           [patitle] {word-break: keep-all; }
           [patitle] {line-break: strict; }
+          [pbtitle]:hover:after {opacity: 1; transition: all 0.05s ease 0.1s; visibility: visible;}
+          [pbtitle]:after {
+            content: attr(pbtitle);
+            position: absolute;
+            top: 1.4em;
+            left: -9px;
+            padding: 5px 10px 5px 10px;
+            color: #000;
+            font-weight: normal;
+            white-space: pre;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            border-radius: 5px;
+            -moz-box-shadow: 0px 0px 4px #222;
+            -webkit-box-shadow: 0px 0px 4px #222;
+            box-shadow: 0px 0px 4px #222;
+            font-size: 100%;
+            background-color: #E0E7FF;
+            opacity: 0;
+            z-index: 99999;
+            visibility: hidden;}
+          [pbtitle] {position: relative; }
+          [pbtitle] {word-break: keep-all; }
+          [pbtitle] {line-break: strict; }
         </style>
     </head>
     <body bgcolor="#FFFFEE">
@@ -74,8 +98,12 @@ def html_head(title: str, date: str, meta_title: str) -> str:
 """
 
 
-def print_html_foot(f_html) -> None:
-    f_html.write('''
+def html_foot() -> str:
+    return '''
   </body>
 </html>
-''')
+'''
+
+
+def print_html_foot(f_html) -> None:
+    f_html.write(html_foot())

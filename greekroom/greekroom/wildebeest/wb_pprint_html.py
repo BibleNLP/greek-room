@@ -16,10 +16,9 @@ import regex
 import sys
 from typing import Optional
 import unicodedata as ud
-from utilities import ScriptDirection
 import wb_analysis as wb_ana
-from ..versification.versification import BackVersification
-from ..gr_utilities import general_util
+from greekroom.versification.versification import BackVersification
+from greekroom.gr_utilities import general_util, script_direction
 
 
 js_functions = """
@@ -163,7 +162,7 @@ def html_head(title: str, date: str, meta_title: str) -> str:
             padding: 5px 10px 5px 10px;
             color: #000;
             font-weight: normal;
-            white-space: wrap;
+            white-space: pre;
             -moz-border-radius: 5px;
             -webkit-border-radius: 5px;
             border-radius: 5px;
@@ -187,7 +186,7 @@ def html_head(title: str, date: str, meta_title: str) -> str:
             padding: 5px 10px 5px 10px;
             color: #000;
             font-weight: normal;
-            white-space: wrap;
+            white-space: pre;
             -moz-border-radius: 5px;
             -webkit-border-radius: 5px;
             border-radius: 5px;
@@ -362,18 +361,18 @@ def highlight_examples_in_corpus(wb: wb_ana.WildebeestAnalysis, examples: list, 
                 except IndexError:
                     column_position = None
             if not line_dict[line_number]:
-                if wb.ref_id_dict:
-                    ref_id = wb.ref_id_dict.get(line_number, None)
+                if wb.snt_index_to_ref_id:
+                    ref_id = wb.snt_index_to_ref_id.get(line_number, None)
                     bv_ref_id = bv.mh(ref_id)
                     ref_id_clause = '' if ref_id is None else bv_ref_id
                 else:
                     ref_id = line_number
                     ref_id_clause = ''
-                if wb.corpus:
+                if wb.wb_corpus:
                     if prev_printed_dict[ref_id]:
                         continue
-                    if line := wb.corpus.get(ref_id).rstrip():
-                        line_rtl = ScriptDirection.string_is_right_to_left(line)
+                    if line := wb.wb_corpus.get(ref_id).rstrip():
+                        line_rtl = script_direction.ScriptDirection.string_is_right_to_left(line)
                         if line_rtl:
                             if not wb.corpus_w_rtf_delimiter_adjustments.get(ref_id):
                                 if wb.script_direction.text_contains_switchable_chars(line):
@@ -417,7 +416,7 @@ def format_examples(wb: wb_ana.WildebeestAnalysis, examples: list, s: str, bv: B
         example_s, line_number_s = example[0], str(example[1])
         if line_number_s not in ex_l_dict[example_s]:
             ex_l_dict[example_s].append(line_number_s)
-            if wb.ref_id_dict and (ref_id := wb.ref_id_dict[int(line_number_s)]):
+            if wb.snt_index_to_ref_id and (ref_id := wb.snt_index_to_ref_id[int(line_number_s)]):
                 bv_ref_id = bv.mh(ref_id)
                 ex_r_dict[example_s].append(bv_ref_id)
                 ref_id_p = True
@@ -450,11 +449,20 @@ def guard_html(s: str, p_title: bool = False) -> str:
     s = re.sub('>', '&gt;', s)
     s = re.sub('"', '&quot;', s)
     if p_title:
-        s = s.replace('&amp;#xA;', '&#xA;')
+        s = s.replace('&amp;#xA;', r'&#xA;')
+        s = s.replace('&amp;#10;', r'&#10;')
+        s = s.replace('&amp;#13;', r'&#13;')
         # noinspection SpellCheckingInspection
+        s = s.replace('&amp;hline;', '_'*50)
         s = s.replace('&amp;nbsp;', '&nbsp;')
         s = s.replace(' ', '&nbsp;')    # non-breakable space
         s = regex.sub('(&nbsp;){2,}', ' ', s)  # unless there are multiple spaces
+        # noinspection SpellCheckingInspection
+        s = s.replace('&amp;xxxxxxxnbsp;', '&nbsp;'*200)
+        # noinspection SpellCheckingInspection
+        s = s.replace('&amp;xxxxxxnbsp;', '&nbsp;'*150)
+        # noinspection SpellCheckingInspection
+        s = s.replace('&amp;xxxxxnbsp;', '&nbsp;'*100)
         # noinspection SpellCheckingInspection
         s = s.replace('&amp;xxxnbsp;', '&nbsp;'*30)
         # noinspection SpellCheckingInspection
@@ -463,6 +471,8 @@ def guard_html(s: str, p_title: bool = False) -> str:
         s = s.replace('&amp;xnbsp;', '&nbsp;'*10)
         s = s.replace('-', '&#x2011;')   # non-breakable hyphen
         s = s.replace('&#xA;', ' ')
+        # s = s.replace('‾‾‾ ', '‾‾‾ &#xA;\n ')
+        # s = s.replace(' •', ' &#xA;\n •')
     return s
 
 
@@ -972,13 +982,15 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
 
     # adjust args from wb_analysis to wb_pprint_html
     if (not hasattr(args, "input_filename")) and hasattr(args, "input"):
-        args.input_filename = args.input.name
+        args.input_filename = args.input.name if args.input else None
     if (not hasattr(args, "snt_id_filename")) and hasattr(args, "ref_id_file"):
         args.snt_id_filename = args.ref_id_file
     if (not hasattr(args, "output_filename")) and hasattr(args, "html_output_filename"):
         args.output_filename = args.html_output_filename
     if (not hasattr(args, "example_dir")) and hasattr(args, "html_example_dir"):
         args.example_dir = args.html_example_dir
+    if not hasattr(args, "legacy_text_output"):
+        args.legacy_text_output = None
     if not hasattr(args, "out_cross_snt_span_file"):
         args.out_cross_snt_span_file = None
     if not hasattr(args, "example_root_dir"):
@@ -1020,7 +1032,7 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
     max_char_conflict_lines = get_form_value(form, 'max_char_conflict_lines') or args.max_char_conflict_lines
     max_notable_token_lines = get_form_value(form, 'max_notable_token_lines') or args.max_notable_token_lines
     ref_cross_snt_span_files = get_form_value(form, 'ref_cross_snt_span_files') or args.ref_cross_snt_span_files
-    bv = BackVersification(args.back_versification)
+    bv = BackVersification(args.back_versification, False)
 
     if args.batch and args.example_dir:
         main_batch_print_html(args.batch, args.example_dir, args.title, args.prefix, args.no_cache,
@@ -1033,7 +1045,7 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
             for line in f_snt_id:
                 line_number += 1
                 snt_id_dict[line_number] = line.strip()
-    else:
+    elif args.input:
         sys.stderr.write('No argument for snt_id_filename ("-s")\n')
 
     if output_filename and os.path.isfile(output_filename) and os.access(output_filename, os.R_OK) \
@@ -1070,7 +1082,7 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
     if wb is None:
         wb = wb_ana.process(in_file=input_filename,
                             lang_code=args.lc,
-                            ref_id_dict=snt_id_dict,
+                            snt_index_to_ref_id=snt_id_dict,
                             ref_cross_snt_span_files=ref_cross_snt_span_files,
                             summary_file=summary_file,
                             max_cases=max_cases,
@@ -1081,8 +1093,9 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
                             max_script_lines=max_script_lines,
                             max_non_canonical_lines=max_non_canonical_lines,
                             max_char_conflict_lines=max_char_conflict_lines,
-                            max_notable_token_lines=max_notable_token_lines)
-    wb.ref_id_dict = snt_id_dict   # wb.load_ref_ids(args.snt_id_filename)
+                            max_notable_token_lines=max_notable_token_lines,
+                            verbose=args.verbose)
+    wb.snt_index_to_ref_id = snt_id_dict   # wb.load_ref_ids(args.snt_id_filename)
     sys.stderr.write(bv.report_stats())
 
     for output in outputs:
