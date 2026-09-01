@@ -93,7 +93,7 @@ For examples 1 and 2:
 
 ```python 
 import wildebeest.wb_analysis as wb_ana
-check_request = {"jsonrpc": "2.0",
+check_request_2 = {"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
   "params": [{"checks": ["GreekRoom:Wildebeest"],
@@ -103,30 +103,41 @@ check_request = {"jsonrpc": "2.0",
                                   {"sntId": "NUM 1:21", "text": "those listed of the tribe of Reuben were 46,500."},
                                   {"sntId": "NUM 1:23", "text": "those listed of the tribe of Simeon were 59.300,. डे़|"}
                                  ]}}]}
-check_response = wb_ana.check(check_request)
+check_response_2 = wb_ana.check(check_request_2)
+```
 
-# Returns versions for Wildebeest, Greek Room in general etc.
+##### Return versions for Wildebeest, Greek Room in general etc.
+```python
 version_dict = wb_ana.version()
+```
 
-# Initialize corpus with zero or more of the following.
-# A corpus initialization could be for the whole Bible, of in chunks such as a sequence of books (with same corpusId and langCode).
-# For Wildebeest, the corpus statistics will support identifying characters that are rare/unusual/suspicious.
-# For spell checking, the corpus statistics will be even more important.
-# This initialization is typically done before Greek Room corpus checks.
-# The initialization might take a little longer than a check (since it includes the available corpus, not just a chapter or so),
-# but it needs to be called only once per session for the whole corpus.
-# Corpus statistics are automatically updated by Greek Room checks, but will benefit from any corpus updates (using corpus_init) after editing changes.
-# If CorpusInit calls have the same SntId, only the last one be used for the corpus statistics. 
-init_request = {"jsonrpc": "2.0",
+* Initialize corpus with zero or more of the following, with no checks.
+* A corpus initialization could be for the whole Bible, of in chunks such as a sequence of books (with same corpusId and langCode).
+* For Wildebeest, the corpus statistics will support identifying characters that are rare/unusual/suspicious.
+* For spell checking, the corpus statistics will be even more important.
+* This initialization is typically done before Greek Room corpus checks.
+* The initialization might take a little longer than a check (since it includes the available corpus, not just a chapter or so),
+but it needs to be called only once per session for the whole corpus.
+* Corpus statistics are automatically updated by Greek Room checks, but will benefit from any corpus updates (using corpus_init) after editing changes.
+* If CorpusInit calls have the same SntId, only the last one be used for the corpus statistics. 
+
+#### Example with state (in the form of text_corpus): corpus initialization (with no checks), and actual check
+```python
+init_request_1 = {"jsonrpc": "2.0",
   "id": "eng-init-03",
-  "method": "CorpusInit",
-  "params": [{"corpus": {"langCode": "eng",  "corpusId": "eng-bible-v01",
+  "method": "BibleTranslationCheck",
+  "params": [{"checks": [],
+              "corpus": {"langCode": "eng",  "corpusId": "eng-bible-v01",
                          "body": [{"sntId": "GEN 1:1", "text": "In in the beginning,God created the heavens and the earth."},
                                   {"sntId": "GEN 1:2", "text": "Now the earth was formless and empty, darkness was over the surface of the deep, and the Spirit of God was hovering over the waters."},
                                   {"sntId": "GEN 1:3", "text": "And God said , `“Let there be light ,аnd there was light."}
                                  ]}}]}
-cprops = wb_ana.corpus_init(init_request)
+
+text_corpus = wb_ana.init_text_corpus()
+check_response_1 = wb_ana.check(init_request_1, text_corpus)
+check_response_2 = wb_ana.check(check_request_2, text_corpus)
 ```
+After the two checks (one initialization only, one real check), the text_corpus will cover 5 sentences (from both check calls).
 
 ###  Corpus props
 
