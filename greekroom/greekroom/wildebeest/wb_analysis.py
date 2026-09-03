@@ -23,9 +23,7 @@ import sys
 from tqdm.auto import tqdm
 from typing import IO, Optional, TextIO, Tuple, List
 import unicodedata as ud
-if 'wb_pp' not in globals():
-    import greekroom.wildebeest.wb_pprint_html as wb_pp
-    sys.stderr.write(f"wb_pp imported under NAME {__name__}\n")
+import greekroom.wildebeest.wb_pprint_html as wb_pp
 # from utilities import ScriptDirection
 from greekroom.gr_utilities import general_util, html_util, script_direction, corpus
 from greekroom import __version__ as __greekRoomVersion__

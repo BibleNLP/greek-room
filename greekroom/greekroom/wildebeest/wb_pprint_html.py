@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # #!/Users/ulf2/anaconda3/envs/NLP_3_12/bin/python
 
+from __future__ import annotations
 import argparse
 # try:
 #     import cgi
