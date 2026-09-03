@@ -61,7 +61,6 @@ def init_text_corpus() -> corpus.TextCorpus:
 
 def check(json_check_request: dict, text_corpus: corpus.TextCorpus | None = None) -> dict:
     lang_code = json_check_request['params'][0]['corpus']['langCode']
-    sys.stderr.write(f"Process args {lang_code}\n")
     args = argparse.Namespace(json=json_check_request,
                               lc=lang_code)
     wb_a.add_missing_default_argparse_args(args)
