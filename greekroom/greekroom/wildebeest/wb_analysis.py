@@ -23,8 +23,7 @@ import sys
 from tqdm.auto import tqdm
 from typing import IO, Optional, TextIO, Tuple, List
 import unicodedata as ud
-if __name__ == "__main__":
-    import greekroom.wildebeest.wb_pprint_html as wb_pp
+import greekroom.wildebeest.wb_pprint_html as wb_pp
 # from utilities import ScriptDirection
 from greekroom.gr_utilities import general_util, html_util, script_direction, corpus
 from greekroom import __version__ as __greekRoomVersion__
@@ -2323,16 +2322,8 @@ def init_text_corpus() -> corpus.TextCorpus:
 def check(json_check_request: dict, text_corpus: corpus.TextCorpus | None = None) -> dict:
     lang_code = json_check_request['params'][0]['corpus']['langCode']
     args = argparse.Namespace(json=json_check_request,
-                              lc=lang_code,
-                              max_pattern_lines=0,
-                              max_bad_pattern_lines=0,
-                              max_examples=0,
-                              max_examples_viz=0,
-                              max_cases=0,
-                              max_script_lines=0,
-                              max_non_canonical_lines=0,
-                              max_char_conflict_lines=0,
-                              max_notable_token_lines=0)
+                              lc=lang_code)
+    add_missing_default_argparse_args(args)
     wb = WildebeestAnalysis(args)
     return wb.check_w_args(args, text_corpus)
 
@@ -2461,6 +2452,62 @@ def process(in_file: str | None = None,     # provide exactly one input: input f
                                            summary=None, summary_file=summary_file,
                                            progress_bar=None, snt_index_to_ref_id=snt_index_to_ref_id,
                                            verbose=verbose))
+
+
+def add_missing_default_argparse_args(args: argparse.Namespace) -> None:
+    _efault_values = (('max_pattern_lines', 0),
+                      ('max_bad_pattern_lines', 0),
+                      ('max_examples', 0),
+                      ('max_examples_viz', 0),
+                      ('max_cases', 0),
+                      ('max_script_lines', 0),
+                      ('max_non_canonical_lines', 0),
+                      ('max_char_conflict_lines', 0),
+                      ('max_notable_token_lines', 0),
+                      ('summary', 0),
+                      ('input', None),
+                      ('legacy_text_output', None),
+                      ('snt_index_to_ref_id', None),
+                      ('json_legacy_out', None),
+                      ('summary_file', None),
+                      ('progress_bar', False),
+                      ('ref_cross_snt_span_files', ()))
+    d = vars(args)
+    if 'max_pattern_lines' not in d.keys():
+        args.max_pattern_lines = 0
+    if 'max_bad_pattern_lines' not in d.keys():
+        args.max_bad_pattern_lines = 0
+    if 'max_examples' not in d.keys():
+        args.max_examples = 0
+    if 'max_examples_viz' not in d.keys():
+        args.max_examples_viz = 0
+    if 'max_cases' not in d.keys():
+        args.max_cases = 0
+    if 'max_script_lines' not in d.keys():
+        args.max_script_lines = 0
+    if 'max_non_canonical_lines' not in d.keys():
+        args.max_non_canonical_lines = 0
+    if 'max_char_conflict_lines' not in d.keys():
+        args.max_char_conflict_lines = 0
+    if 'max_notable_token_lines' not in d.keys():
+        args.max_notable_token_lines = 0
+    if 'summary' not in d.keys():
+        args.summary = 0
+    if 'input' not in d.keys():
+        args.input = None
+    if 'legacy_text_output' not in d.keys():
+        args.legacy_text_output = None
+    if 'snt_index_to_ref_id' not in d.keys():
+        args.snt_index_to_ref_id = None
+    if 'json_legacy_out' not in d.keys():
+        args.json_legacy_out = None
+    if 'summary_file' not in d.keys():
+        args.summary_file = None
+    if 'progress_bar' not in d.keys():
+        args.progress_bar = False
+    if 'ref_cross_snt_span_files' not in d.keys():
+        args.ref_cross_snt_span_files = ()
+    # HERE Surely the above can be done more elegantly
 
 
 def main():

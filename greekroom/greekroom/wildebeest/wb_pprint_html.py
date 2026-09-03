@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # #!/Users/ulf2/anaconda3/envs/NLP_3_12/bin/python
 
+from __future__ import annotations
 import argparse
 # try:
 #     import cgi
@@ -16,7 +17,7 @@ import regex
 import sys
 from typing import Optional
 import unicodedata as ud
-import wb_analysis as wb_ana
+import greekroom.wildebeest.wb_analysis as wb_a
 from greekroom.versification.versification import BackVersification
 from greekroom.gr_utilities import general_util, script_direction
 
@@ -331,7 +332,7 @@ def example_sort_key(example) -> int:
         return 0
 
 
-def highlight_examples_in_corpus(wb: wb_ana.WildebeestAnalysis, examples: list, s: str, bv: BackVersification,
+def highlight_examples_in_corpus(wb: wb_a.WildebeestAnalysis, examples: list, s: str, bv: BackVersification,
                                  output_filename=None, regex_p=False, regex_descr=None,
                                  filename_base_core='', full_token_only_p=False,
                                  args: argparse.Namespace | None = None) -> None:
@@ -405,7 +406,7 @@ def highlight_examples_in_corpus(wb: wb_ana.WildebeestAnalysis, examples: list, 
         f.write(html_foot())
 
 
-def format_examples(wb: wb_ana.WildebeestAnalysis, examples: list, s: str, bv: BackVersification) -> str:
+def format_examples(wb: wb_a.WildebeestAnalysis, examples: list, s: str, bv: BackVersification) -> str:
     """Group examples in pretty format string"""
     max_display_len = wb.max_n_viz_examples
     display_len = 0
@@ -490,7 +491,7 @@ def g(s: str) -> str:
         return result
 
 
-def pretty_print_to_html_string(wb: wb_ana.WildebeestAnalysis, example_dir: str,
+def pretty_print_to_html_string(wb: wb_a.WildebeestAnalysis, example_dir: str,
                                 bv: BackVersification, args: argparse.Namespace | None = None) -> str:
     """Output Wildebeest analysis in human-readable format."""
     example_file_index = 0
@@ -548,11 +549,11 @@ def pretty_print_to_html_string(wb: wb_ana.WildebeestAnalysis, example_dir: str,
     n_lines = wb.analysis['n_lines']
     n_empty_lines = wb.analysis['n_empty_lines']
     n_non_empty_lines = n_lines - n_empty_lines
-    result += f"  <li> File size: {wb_ana.count_plus_noun(n_lines, 'line')}"
+    result += f"  <li> File size: {wb_a.count_plus_noun(n_lines, 'line')}"
     if wb.analysis['n_empty_lines']:
-        result += f" ({wb_ana.count_plus_noun(n_non_empty_lines, 'non-empty line')}," \
-                  f" {wb_ana.count_plus_noun(n_empty_lines, 'empty line')})"
-    result += f", {wb_ana.count_plus_noun(wb.analysis['n_characters'], 'character')}\n"
+        result += f" ({wb_a.count_plus_noun(n_non_empty_lines, 'non-empty line')}," \
+                  f" {wb_a.count_plus_noun(n_empty_lines, 'empty line')})"
+    result += f", {wb_a.count_plus_noun(wb.analysis['n_characters'], 'character')}\n"
     # result += "  <li> <div id='status' name='status'>DEFAULT</div>\n"
     # result += f"  <li> <div title='Test click'" \
     #           f" style='color:#0000FF;text-decoration:underline;'" \
@@ -567,7 +568,7 @@ def pretty_print_to_html_string(wb: wb_ana.WildebeestAnalysis, example_dir: str,
             count = letter_script_dict.get('count', 0)
             if count == 0:
                 continue
-            result += f"    <li> {unicode_script} ({wb_ana.count_plus_noun(count, 'instance')})"
+            result += f"    <li> {unicode_script} ({wb_a.count_plus_noun(count, 'instance')})"
             if ((unicode_script not in ('C0_CONTROL', 'C1_CONTROL', 'SPACE', 'ZERO_WIDTH', 'DIRECTIONAL',
                                         'VARIATION_SELECTORS', 'LOW_SURROGATES'))
                     and (ex_s := letter_script_dict.get('ex', None))):
@@ -977,7 +978,7 @@ def main():
     main_with_args(args, None)
 
 
-def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
+def main_with_args(args, wb: wb_a.WildebeestAnalysis | None) -> None:
     date = datetime.datetime.now().strftime('%B %-d, %Y at %-H:%M')
 
     # adjust args from wb_analysis to wb_pprint_html
@@ -1080,21 +1081,21 @@ def main_with_args(args, wb: wb_ana.WildebeestAnalysis | None) -> None:
     print_text_to_outputs(html_head(f'Wildebeest analysis for: &nbsp; {input_file_basename}',
                                     date, meta_title), outputs)
     if wb is None:
-        wb = wb_ana.process(in_file=input_filename,
-                            lang_code=args.lc,
-                            snt_index_to_ref_id=snt_id_dict,
-                            ref_cross_snt_span_files=ref_cross_snt_span_files,
-                            summary_file=summary_file,
-                            max_cases=max_cases,
-                            max_examples=max_examples,
-                            max_examples_viz=max_examples_viz,
-                            max_pattern_lines=max_pattern_lines,
-                            max_bad_pattern_lines=max_bad_pattern_lines,
-                            max_script_lines=max_script_lines,
-                            max_non_canonical_lines=max_non_canonical_lines,
-                            max_char_conflict_lines=max_char_conflict_lines,
-                            max_notable_token_lines=max_notable_token_lines,
-                            verbose=args.verbose)
+        wb = wb_a.process(in_file=input_filename,
+                          lang_code=args.lc,
+                          snt_index_to_ref_id=snt_id_dict,
+                          ref_cross_snt_span_files=ref_cross_snt_span_files,
+                          summary_file=summary_file,
+                          max_cases=max_cases,
+                          max_examples=max_examples,
+                          max_examples_viz=max_examples_viz,
+                          max_pattern_lines=max_pattern_lines,
+                          max_bad_pattern_lines=max_bad_pattern_lines,
+                          max_script_lines=max_script_lines,
+                          max_non_canonical_lines=max_non_canonical_lines,
+                          max_char_conflict_lines=max_char_conflict_lines,
+                          max_notable_token_lines=max_notable_token_lines,
+                          verbose=args.verbose)
     wb.snt_index_to_ref_id = snt_id_dict   # wb.load_ref_ids(args.snt_id_filename)
     sys.stderr.write(bv.report_stats())
 
