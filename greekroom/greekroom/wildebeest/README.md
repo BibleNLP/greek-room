@@ -92,7 +92,7 @@ For examples 1 and 2:
 ### Using *Wildebeest* inside Python
 
 ```python 
-import wildebeest.wb_check as wb
+import greekroom.wildebeest.wb_check as wb
 check_request_2 = {"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
