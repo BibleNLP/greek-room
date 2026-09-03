@@ -9,7 +9,7 @@ This document focuses on the interface that supports external editors such as Fl
 
 Example 1 (simple, with 10 issues in 3 of the 4 verses)
 ```bash
-wb_analysis.py -j '{"jsonrpc": "2.0",
+wb_check.py -j '{"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
   "params": [{"checks": ["GreekRoom:Wildebeest"],
@@ -23,7 +23,7 @@ wb_analysis.py -j '{"jsonrpc": "2.0",
 
 Example 2 (same corpus body, but more fields)
 ```bash
-wb_analysis.py -j '{"jsonrpc": "2.0",
+wb_check.py -j '{"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
   "params": [{"checks": ["GreekRoom:Wildebeest"],
@@ -92,7 +92,7 @@ For examples 1 and 2:
 ### Using *Wildebeest* inside Python
 
 ```python 
-import wildebeest.wb_analysis as wb_ana
+import wildebeest.wb_check as wb
 check_request_2 = {"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
@@ -103,12 +103,12 @@ check_request_2 = {"jsonrpc": "2.0",
                                   {"sntId": "NUM 1:21", "text": "those listed of the tribe of Reuben were 46,500."},
                                   {"sntId": "NUM 1:23", "text": "those listed of the tribe of Simeon were 59.300,. डे़|"}
                                  ]}}]}
-check_response_2 = wb_ana.check(check_request_2)
+check_response_2 = wb.check(check_request_2)
 ```
 
 ##### Return versions for Wildebeest, Greek Room in general etc.
 ```python
-version_dict = wb_ana.version()
+version_dict = wb.version()
 ```
 
 * Initialize corpus with zero or more of the following, with no checks.
@@ -133,9 +133,9 @@ init_request_1 = {"jsonrpc": "2.0",
                                   {"sntId": "GEN 1:3", "text": "And God said , `“Let there be light ,аnd there was light."}
                                  ]}}]}
 
-text_corpus = wb_ana.init_text_corpus()
-check_response_1 = wb_ana.check(init_request_1, text_corpus)
-check_response_2 = wb_ana.check(check_request_2, text_corpus)
+text_corpus = wb.init_text_corpus()
+check_response_1 = wb.check(init_request_1, text_corpus)
+check_response_2 = wb.check(check_request_2, text_corpus)
 ```
 After the two checks (one initialization only, one real check), the text_corpus will cover 5 sentences (from both check calls).
 
