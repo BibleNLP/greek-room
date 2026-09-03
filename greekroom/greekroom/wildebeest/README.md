@@ -92,7 +92,7 @@ For examples 1 and 2:
 ### Using *Wildebeest* inside Python
 
 ```python 
-import greekroom.wildebeest.wb_check as wb
+import greekroom.wildebeest.wb_check as wb_c
 check_request_2 = {"jsonrpc": "2.0",
   "id": "eng-test-02",
   "method": "BibleTranslationCheck",
@@ -103,12 +103,12 @@ check_request_2 = {"jsonrpc": "2.0",
                                   {"sntId": "NUM 1:21", "text": "those listed of the tribe of Reuben were 46,500."},
                                   {"sntId": "NUM 1:23", "text": "those listed of the tribe of Simeon were 59.300,. डे़|"}
                                  ]}}]}
-check_response_2 = wb.check(check_request_2)
+check_response_2 = wb_c.check(check_request_2)
 ```
 
 ##### Return versions for Wildebeest, Greek Room in general etc.
 ```python
-version_dict = wb.version()
+version_dict = wb_c.version()
 ```
 
 * Initialize corpus with zero or more of the following, with no checks.
@@ -133,9 +133,9 @@ init_request_1 = {"jsonrpc": "2.0",
                                   {"sntId": "GEN 1:3", "text": "And God said , `“Let there be light ,аnd there was light."}
                                  ]}}]}
 
-text_corpus = wb.init_text_corpus()
-check_response_1 = wb.check(init_request_1, text_corpus)
-check_response_2 = wb.check(check_request_2, text_corpus)
+text_corpus = wb_c.init_text_corpus()
+check_response_1 = wb_c.check(init_request_1, text_corpus)
+check_response_2 = wb_c.check(check_request_2, text_corpus)
 ```
 After the two checks (one initialization only, one real check), the text_corpus will cover 5 sentences (from both check calls).
 
