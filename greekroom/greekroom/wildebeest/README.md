@@ -36,7 +36,7 @@ wb_check.py -j '{"jsonrpc": "2.0",
               "referenceCorpora": [
                         {"langCode": "deu", "langName": "German",
                          "body": [{"sntId": "GEN 1:1", "text": "Am Anfang schuf Gott Himmel und Erde."}]}]
-             }]}' -o out2.json -O out1.txt --html_output_filename out1.html -H out2.html -C out2c.html -a 0.3
+             }]}' -o out2.json -H out2.html -C out2c.html -a 0.3
 
 ```
 ##### Notes
