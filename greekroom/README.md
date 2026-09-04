@@ -4,6 +4,7 @@ _greekroom_ is a suite of tools to support Biblical natural language processing 
 
 <!--
 [![image alt >](http://img.shields.io/pypi/v/greekroom.svg)](https://pypi.python.org/pypi/greekroom/)
+-->
 
 ### Installation
 
@@ -14,10 +15,9 @@ or
 ```bash
 git clone https://github.com/BibleNLP/greek-room.git
 ```
--->
 
 When using the GitHub version, we recommend that your PYTHONPATH includes the outer *greekroom* directory, i.e. the one that includes this README.md;
-additionally you might want to include in PATH the Greek Room's executable directories such as greekroom/greekroom/gr_utilities:greekroom/greekroom/owl .
+additionally you might want to include in PATH the Greek Room's executable directories such as <tt>greekroom/greekroom/gr_utilities:greekroom/greekroom/gr_utilities:greekroom/greekroom/owl</tt> .
 
 
 ## gr_utilities
