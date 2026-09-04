@@ -50,5 +50,5 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "greekroom"
 module-root = ""
-source-exclude = ["greekroom/ualign", "greekroom/wildebeest/test2]
+source-exclude = ["greekroom/ualign", "greekroom/wildebeest/test2"]
 
