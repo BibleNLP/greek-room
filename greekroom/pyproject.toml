@@ -1,6 +1,6 @@
 [project]
 name = "greekroom"
-version = "0.1.1"
+version = "0.1.3"
 description = "The Greek Room will be a suite of tools supporting Biblical natural language processing."
 readme = "README.md"
 authors = [
@@ -50,5 +50,5 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "greekroom"
 module-root = ""
-source-exclude = ["greekroom/ualign"]
+source-exclude = ["greekroom/ualign", "greekroom/wildebeest/test2]
 
