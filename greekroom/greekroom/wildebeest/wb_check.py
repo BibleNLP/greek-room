@@ -25,7 +25,7 @@ log.basicConfig(level=log.INFO)
 def main():
     """Wrapper around Wildebeest analysis"""
     # parse arguments
-    parser = argparse.ArgumentParser(description='Analyzes a given text for a wide range of anomalies', prog="wb-ana")
+    parser = argparse.ArgumentParser(description='Analyzes a given text for a wide range of anomalies', prog="gr-wb-check")
     parser.add_argument('-j', '--json', type=str, help='input json')
     parser.add_argument('-a', '--auto_correct_threshold', type=float, default=None,
                         help='value between 0.0 and 1.0; higher = more reliable')
