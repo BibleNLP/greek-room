@@ -858,7 +858,7 @@ class WildebeestAnalysis:
             line_w_rtf_delimiter_adjustments = None
             stats['line_number'] += 1
             line_number = stats['line_number']
-            if not re.match('\S', line):
+            if not regex.match(r'\S', line):
                 stats['n_empty_lines'] += 1
             self.collect_counts_and_examples_in_line(line, line_number)
             ref_id = self.snt_id(line_number)
