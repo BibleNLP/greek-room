@@ -46,8 +46,6 @@ wb_check.py -j '{"jsonrpc": "2.0",
 * Option -a/--auto_correct_threshold sets the auto-repair threshold in the HTML outputs. 0.3 is very aggressive; 0.9 is conservative. With the default value, *None*, **no** auto corrections will be made.
 * Option -H is for HTML output sorted by verse.
 * Option -C is for HTML output sorted by Wildebeest check type.
-* Legacy option -O is for plain text output.
-* Legacy option --html_output_filename is for traditional HTML output.
 * Reference corpora are important for other checks such as spell-checking.
 * langName/corpusId/corpusName are used in HTML output for the human readers' benefit.
 
