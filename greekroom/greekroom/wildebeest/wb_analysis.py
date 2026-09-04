@@ -941,18 +941,18 @@ class WildebeestAnalysis:
                              f"'{self.repl_invisible_chars_in_pattern(bad_substring)}'\n")
         if regex.match(
                 #  \u202f is narrow space
-                f'([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"])[.።]?)?([\)\]])?$',
+                '([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"])[.።]?)?([\\)\\]])?$',
                 pattern):
             ass_class = '+'
         elif regex.match(
-                f'([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?[\)\]]((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
+                '([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?[\\)\\]]((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
                 pattern):
             ass_class = '+'
         elif regex.match(
-                f'([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)[\)\]]([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
+                '([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)[\\)\\]]([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
                 pattern):
             ass_class = '+'
-        elif regex.match(f'([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]‘|“[ \u202f]‘[ \u202f]“|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([”’»›⌟"])?([\)\]])?([।॥.።։,፣;፤!?:፦،؛؟۔])?$',
+        elif regex.match('([\\(\\[])?([“‘‚„«‹⌞]|“‘|“[ \u202f]‘|“[ \u202f]‘[ \u202f]“|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([”’»›⌟"])?([\\)\\]])?([।॥.።։,፣;፤!?:፦،؛؟۔])?$',
                        pattern):
             ass_class = '+'
         elif regex.search(r'^Word(ʼWord)+$', pattern):  # ʼ (U+02BC MODIFIER LETTER APOSTROPHE)
@@ -2560,11 +2560,11 @@ def main():
     args = parser.parse_args()
 
     # legacy calls
-    if args.json and isinstance(args.json, str) and regex.search(f'scorecard/wildebeest\.json$', args.json):
+    if args.json and isinstance(args.json, str) and regex.search(r'scorecard/wildebeest\.json$', args.json):
         args.json_legacy_out = io.StringIO(args.json)
         args.json_legacy_out.name = args.json
         args.json = None
-    if args.json_out_filename and isinstance(args.json_out_filename, str) and not regex.search(f'\.json$', args.json_out_filename):
+    if args.json_out_filename and isinstance(args.json_out_filename, str) and not regex.search(r'\.json$', args.json_out_filename):
         args.legacy_text_output = args.out_filename
         args.json_out_filename = None
     # default input from stdin
