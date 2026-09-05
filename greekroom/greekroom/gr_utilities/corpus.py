@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from collections import defaultdict
-import sys
+# import sys
 import re
 import regex
 # from typing import IO, TextIO, Tuple, List
@@ -24,73 +24,73 @@ class UnicodeUtilities:
                                      '\u200F',   # RIGHT-TO-LEFT MARK
                                      '\u200F',   # RIGHT-TO-LEFT MARK
                                      '\uFEFF'}   # ZERO WIDTH NO-BREAK SPACE/BYTE ORDER MARK
-        self.char_to_name_dict = {
-            '\0': 'NULL',
-            '': 'START OF HEADING',
-            '': 'START OF TEXT',
-            '': 'END OF TEXT',
-            '': 'END OF TRANSMISSION',
-            '': 'ENQUIRY',
-            '': 'ACKNOWLEDGE',
-            '': 'BELL',
-            '': 'BACKSPACE',
-            '\t': 'TAB',
-            '\n': 'LINE FEED',
-            '\x0B': 'LINE TABULATION',
-            '\x0C': 'FORM FEED',
-            '\r': 'CARRIAGE RETURN',
-            '': 'SHIFT OUT',
-            '': 'SHIFT IN',
-            '': 'DATA LINK ESCAPE',
-            '': 'DEVICE CONTROL ONE',
-            '': 'DEVICE CONTROL TWO',
-            '': 'DEVICE CONTROL THREE',
-            '': 'DEVICE CONTROL FOUR',
-            '': 'NEGATIVE ACKNOWLEDGE',
-            '': 'SYNCHRONOUS IDLE',
-            '': 'END OF TRANSMISSION BLOCK',
-            '': 'CANCEL',
-            '': 'END OF MEDIUM',
-            '': 'SUBSTITUTE',
-            '': 'ESCAPE',
-            '': 'INFORMATION SEPARATOR FOUR',
-            '': 'INFORMATION SEPARATOR THREE',
-            '': 'INFORMATION SEPARATOR TWO',
-            '':  'INFORMATION SEPARATOR ONE',
-            '': 'DELETE',
-            '':   'PADDING CHARACTER (W1252: Euro Sign)',
-            '': 'HIGH OCTET PRESET',
-            '': 'BREAK PERMITTED HERE (W1252: Single Low-9 Quotation Mark)',
-            '': 'NO BREAK HERE (W1252: Latin Small Letter F With Hook)',
-            '': 'INDEX (W1252: Double Low-9 Quotation Mark)',
-            '': 'NEXT LINE (W1252: Horizontal Ellipsis)',
-            '': 'START OF SELECTED AREA (W1252: Dagger)',
-            '': 'END OF SELECTED AREA (W1252: Double Dagger)',
-            '': 'CHARACTER TABULATION SET (W1252: Modifier Letter Circumflex Accent)',
-            '': 'CHARACTER TABULATION WITH JUSTIFICATION (W1252: Per Mille Sign)',
-            '': 'LINE TABULATION SET (W1252: Latin Capital Letter S With Caron)',
-            '': 'PARTIAL LINE FORWARD (W1252: Single Left-Pointing Angle Quotation Mark)',
-            '': 'PARTIAL LINE BACKWARD (W1252: Latin Capital Ligature OE)',
-            '': 'REVERSE LINE FEED',
-            '': 'SINGLE SHIFT TWO (W1252: Latin Capital Letter Z With Caron)',
-            '': 'SINGLE SHIFT THREE',
-            '': 'DEVICE CONTROL STRING',
-            '': 'PRIVATE USE ONE (W1252: Left Single Quotation Mark)',
-            '': 'PRIVATE USE TWO (W1252: Right Single Quotation Mark)',
-            '': 'SET TRANSMIT STATE (W1252: Left Double Quotation Mark)',
-            '': 'CANCEL CHARACTER (W1252: Right Double Quotation Mark)',
-            '': 'MESSAGE WAITING (W1252: Bullet)',
-            '': 'START OF GUARDED AREA (W1252: En Dash)',
-            '': 'END OF GUARDED AREA (W1252: Em Dash)',
-            '': 'START OF STRING (W1252: Small Tilde)',
-            '': 'SINGLE GRAPHIC CHARACTER INTRODUCER (W1252: Trade Mark Sign)',
-            '': 'SINGLE CHARACTER INTRODUCER (W1252: Latin Small Letter S With Caron)',
-            '': 'CONTROL SEQUENCE INTRODUCER (W1252: Single Right-Pointing Angle Quotation Mark)',
-            '': 'STRING TERMINATOR (W1252: Latin Small Ligature OE)',
-            '': 'OPERATING SYSTEM COMMAND',
-            '': 'PRIVACY MESSAGE (W1252: Latin Small Letter Z With Caron)',
-            '': 'APPLICATION PROGRAM COMMAND (W1252: Latin Capital Letter Y With Diaeresis)',
-            '﻿': 'ZERO WIDTH NO-BREAK SPACE (BYTE ORDER MARK)'
+        self.ord_to_char_name_dict = {
+            0x0000: 'NULL',
+            0x0001: 'START OF HEADING',
+            0x0002: 'START OF TEXT',
+            0x0003: 'END OF TEXT',
+            0x0004: 'END OF TRANSMISSION',
+            0x0005: 'ENQUIRY',
+            0x0006: 'ACKNOWLEDGE',
+            0x0007: 'BELL',
+            0x0008: 'BACKSPACE',
+            0x0009: 'TAB',
+            0x000A: 'LINE FEED',
+            0x000B: 'LINE TABULATION',
+            0x000C: 'FORM FEED',
+            0x000D: 'CARRIAGE RETURN',
+            0x000E: 'SHIFT OUT',
+            0x000F: 'SHIFT IN',
+            0x0010: 'DATA LINK ESCAPE',
+            0x0011: 'DEVICE CONTROL ONE',
+            0x0012: 'DEVICE CONTROL TWO',
+            0x0013: 'DEVICE CONTROL THREE',
+            0x0014: 'DEVICE CONTROL FOUR',
+            0x0015: 'NEGATIVE ACKNOWLEDGE',
+            0x0016: 'SYNCHRONOUS IDLE',
+            0x0017: 'END OF TRANSMISSION BLOCK',
+            0x0018: 'CANCEL',
+            0x0019: 'END OF MEDIUM',
+            0x001A: 'SUBSTITUTE',
+            0x001B: 'ESCAPE',
+            0x001C: 'INFORMATION SEPARATOR FOUR',
+            0x001D: 'INFORMATION SEPARATOR THREE',
+            0x001E: 'INFORMATION SEPARATOR TWO',
+            0x001F: 'INFORMATION SEPARATOR ONE',
+            0x007F: 'DELETE',
+            0x0080: 'PADDING CHARACTER (W1252: Euro Sign)',
+            0x0081: 'HIGH OCTET PRESET',
+            0x0082: 'BREAK PERMITTED HERE (W1252: Single Low-9 Quotation Mark)',
+            0x0083: 'NO BREAK HERE (W1252: Latin Small Letter F With Hook)',
+            0x0084: 'INDEX (W1252: Double Low-9 Quotation Mark)',
+            0x0085: 'NEXT LINE (W1252: Horizontal Ellipsis)',
+            0x0086: 'START OF SELECTED AREA (W1252: Dagger)',
+            0x0087: 'END OF SELECTED AREA (W1252: Double Dagger)',
+            0x0088: 'CHARACTER TABULATION SET (W1252: Modifier Letter Circumflex Accent)',
+            0x0089: 'CHARACTER TABULATION WITH JUSTIFICATION (W1252: Per Mille Sign)',
+            0x008A: 'LINE TABULATION SET (W1252: Latin Capital Letter S With Caron)',
+            0x008B: 'PARTIAL LINE FORWARD (W1252: Single Left-Pointing Angle Quotation Mark)',
+            0x008C: 'PARTIAL LINE BACKWARD (W1252: Latin Capital Ligature OE)',
+            0x008D: 'REVERSE LINE FEED',
+            0x008E: 'SINGLE SHIFT TWO (W1252: Latin Capital Letter Z With Caron)',
+            0x008F: 'SINGLE SHIFT THREE',
+            0x0090: 'DEVICE CONTROL STRING',
+            0x0091: 'PRIVATE USE ONE (W1252: Left Single Quotation Mark)',
+            0x0092: 'PRIVATE USE TWO (W1252: Right Single Quotation Mark)',
+            0x0093: 'SET TRANSMIT STATE (W1252: Left Double Quotation Mark)',
+            0x0094: 'CANCEL CHARACTER (W1252: Right Double Quotation Mark)',
+            0x0095: 'MESSAGE WAITING (W1252: Bullet)',
+            0x0096: 'START OF GUARDED AREA (W1252: En Dash)',
+            0x0097: 'END OF GUARDED AREA (W1252: Em Dash)',
+            0x0098: 'START OF STRING (W1252: Small Tilde)',
+            0x0099: 'SINGLE GRAPHIC CHARACTER INTRODUCER (W1252: Trade Mark Sign)',
+            0x009A: 'SINGLE CHARACTER INTRODUCER (W1252: Latin Small Letter S With Caron)',
+            0x009B: 'CONTROL SEQUENCE INTRODUCER (W1252: Single Right-Pointing Angle Quotation Mark)',
+            0x009C: 'STRING TERMINATOR (W1252: Latin Small Ligature OE)',
+            0x009D: 'OPERATING SYSTEM COMMAND',
+            0x009E: 'PRIVACY MESSAGE (W1252: Latin Small Letter Z With Caron)',
+            0x009F: 'APPLICATION PROGRAM COMMAND (W1252: Latin Capital Letter Y With Diaeresis)',
+            0xFEFF: 'ZERO WIDTH NO-BREAK SPACE (BYTE ORDER MARK)'
         }
         self.char_to_block_dict = defaultdict(str)
         self.unicode_block_to_script_dict = defaultdict(str)
@@ -98,6 +98,8 @@ class UnicodeUtilities:
         self.char_script_dict = {}
         self.build_char_to_script_dict()
 
+    def ctrl_char_to_name(self, char: str) -> str:
+        return self.ord_to_char_name_dict.get(ord(char))
 
     def set_new_char_to_block_dict_entry(self, c: str | int, block_name: str):
         """Set block_name for given character. Do not overwrite any previous value."""
@@ -199,7 +201,7 @@ class UnicodeUtilities:
         """Safe version of character to Unicode name,
         which also includes locally defined names, e.g. for control characters.
         Example: 'a' -> 'LATIN SMALL LETTER A'"""
-        if unicode_name := self.char_to_name_dict.get(char):
+        if unicode_name := self.ctrl_char_to_name(char):
             return unicode_name
         try:
             unicode_name = ud.name(char)
