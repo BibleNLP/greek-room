@@ -10,6 +10,8 @@ __description__ = '''The Wildebeest scripts investigate, repair and normalize a 
 at the character level, e.g. encoding errors, normalization of characters into their canonical form,
 mapping digits and some punctuation to ASCII, deletion of some non-printable characters.'''
 last_mod_date = 'September 05, 2026'
-from . import wb_normalize, wb_analysis, wb_check
+from . import wb_normalize
+from . import wb_analysis
+from . import wb_check
 # from . import utilities
 __all__ = [wb_normalize, wb_analysis, wb_check]
