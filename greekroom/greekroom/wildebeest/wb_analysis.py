@@ -62,9 +62,11 @@ def control_character_name(char: str) -> str | None:
         return f'control character {control_character_dict[char]}'
     hex_code = f"U+{ord(char):04X}"
     if char <= '\x1F':            # Unicode block C0
-        return f"control character {hex_code}"
+        unicode_name = corpus.UnicodeUtilities().ctrl_char_to_name(char)
+        return f"control character {hex_code} = {unicode_name}"
     elif '\x80' <= char <= '\x9F':  # Unicode block C1
-        return f"control character {hex_code}"
+        unicode_name = corpus.UnicodeUtilities().ctrl_char_to_name(char)
+        return f"control character {hex_code} = {unicode_name}"
     else:
         return None
 
