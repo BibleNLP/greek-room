@@ -24,195 +24,7 @@ additionally you might want to include in PATH the Greek Room's executable direc
 </details>
 
 
-## gr_utilities
-_gr_utilities_ is a set of Greek Room utilities.
-
-<details>
-<summary> <b>gr-wb-file-props</b>
-A CLI Python script to analyze file properties such as script direction, quotations.</summary>
-
-```
-usage: gr-wb-file-props [-h]
-           [-i INPUT_FILENAME]
-           [-s INPUT_STRING]
-           [-j JSON_OUT_FILENAME]
-           [-o HTML_OUT_FILENAME]
-           [--lang_code LANG_CODE]
-           [--lang_name LANG_NAME]
-
-options:
-  -h, --help            show this help message and exit
-  -i INPUT_FILENAME, --input_filename INPUT_FILENAME
-  -s INPUT_STRING, --input_string INPUT_STRING
-  -j JSON_OUT_FILENAME, --json_out_filename JSON_OUT_FILENAME
-  -o HTML_OUT_FILENAME, --html_out_filename HTML_OUT_FILENAME
-  --lang_code LANG_CODE
-  --lang_name LANG_NAME
-```
-Notes:
-* Typically, either an INPUT_FILENAME or an INPUT_STRING is provided (but not both).
-* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
-
-Sample calls
-```
-gr-wb-file-props -h
-gr-wb-file-props -s """She asked: “Whatʼs a ‘PyPi’?”
-He replied: “I don't know.”""" -j test.json
-cat test.json
-
-```
-</details>
-
-<details>
-<summary> <b>gr_utilities.wb_file_props.script_punct</b>
-A Python function to analyze file properties such as script direction, quotations.</summary>
-
-```python
-import json
-from greekroom.gr_utilities import wb_file_props
-
-## Apply script to string
-text = """She asked: “Whatʼs a ‘PyPi’?”
-He replied: “I don't know.”"""
-result_dict = wb_file_props.script_punct(None, text, "eng", "English")
-print(result_dict)
-
-## Apply script to file content
-# Write text to file
-filename = "test.txt"
-with open(filename, "w") as f_out:
-    f_out.write(text)
-
-# Apply script
-result_dict2 = wb_file_props.script_punct(filename)
-# Print result as JSON string
-print(json.dumps(result_dict2))
-# Write result to HTML file
-html_output = "test.html"
-with open(html_output, "w") as f_html:
-    wb_file_props.print_to_html(result_dict2, f_html)
-
-```
-</details>
-
-## owl
-_owl_ is a battery of smaller Bible Translation checks.
-
-<details>
-<summary> <b>gr-repeated-words</b>
-A CLI Python script to check a file for repeated words, e.g. "the the".</summary>
-
-```
-usage: gr-repeated-words [-h]
-                         [-j JSON]
-                         [-i IN_FILENAME]
-                         [-r REF_FILENAME]
-                         [-o OUT_FILENAME]
-                         [--html HTML]
-                         [--project_name PROJECT_NAME]
-                         [--lang_code LANGUAGE-CODE]
-                         [--lang_name LANG_NAME]
-                         [--message_id MESSAGE_ID]
-                         [-d DATA_FILENAMES]
-                         [--verbose]
-
-options:
-  -h, --help            show this help message and exit
-  -j JSON, --json JSON  input (alternative 1)
-  -i IN_FILENAME, --in_filename IN_FILENAME
-                        text file (alternative 2)
-  -r REF_FILENAME, --ref_filename REF_FILENAME
-                        ref file (alt. 2)
-  -o OUT_FILENAME, --out_filename OUT_FILENAME
-                        output JSON filename
-  --html HTML           output HTML filename
-  --project_name PROJECT_NAME
-                        full name of Bible translation project
-  --lang_code LANGUAGE-CODE
-                        ISO 639-3, e.g. 'fas' for Persian
-  --lang_name LANG_NAME
-  --message_id MESSAGE_ID
-  -d DATA_FILENAMES, --data_filenames DATA_FILENAMES
-  --verbose
-```
-Notes:
-* Typically, either a JSON INPUT_FILENAME or a JSON INPUT_STRING is provided (but not both).
-* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
-
-
-Sample calls
-```
-gr-repeated-words -h
-gr-repeated-words -j '{"jsonrpc": "2.0",
- "id": "eng-sample-01",
- "method": "BibleTranslationCheck",
- "params": [{"lang-code": "eng", "lang-name": "English",
-             "project-id": "eng-sample",
-             "project-name": "English Bible",
-             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
-             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}' -o test.json
-cat test.json
-```
-</details>
-
-<details>
-<summary> <b>owl.repeated_words.check_mcp</b>
-A Python function to check a file for repeated words, e.g. "the the".</summary>
-
-```python
-import json
-from greekroom.owl import repeated_words
-
-task_s = '''{"jsonrpc": "2.0",
- "id": "eng-sample-01",
- "method": "BibleTranslationCheck",
- "params": [{"lang-code": "eng", "lang-name": "English",
-             "project-id": "eng-sample",
-             "project-name": "English Bible",
-             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
-             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
-
-# load_data_filename() loads <i>legitimate_duplicates.jsonl</i> (see below); call this function only once, even for multiple checks.
-data_filename_dict = repeated_words.load_data_filename()
-corpus = repeated_words.new_corpus("eng-sample-01")
-mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
-print(json.dumps(mcp_d))
-print(misc_data_dict)
-print(check_corpus_list)
-
-# print to HTML file
-feedback = repeated_words.get_feedback(mcp_d, 'GreekRoom', 'RepeatedWords')
-corpus = repeated_words.update_corpus_if_empty(corpus, check_corpus_list)
-repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng", "English", "English Bible")
-# result will be in test.html
-
-```
-</details>
-
-<details>
-<summary> <b>legitimate_duplicates.jsonl</b>
-Data files describing legitimate repeated words.</summary>
-
-Samples:
-
-```
-{"lang-code": "eng", "text": "truly, truly"}
-{"lang-code": "eng", "text": "her her", "snt-ids": ["HOS 2:17", "EST 2:9", "JDT 10:4"], "context-examples": ["give her her vineyards", "gave her her things for purification"]}
-{"lang-code": "grc", "text": "ἀμὴν ἀμὴν", "rom": "amen amen", "gloss": {"eng": "truly truly [I say to you]"}}
-
-{"lang-code": "hin", "text": "जब जब", "rom": "jab jab", "gloss": {"eng": "whenever"}}
-{"lang-code": "hin", "text": "कुछ कुछ", "rom": "kuch kuch", "gloss": {"eng": "something, somewhat, some of, part of"}}
-{"lang-code": "eng", "text": "they they", "delete": true}
-```
-Notes:
-* Searches for files <i>owl/data/legitimate_duplicates.jsonl</i> in directories "greekroom", "$XDG_DATA_HOME", "/usr/share", "$HOME/.local/share"
-* later entries overwrite prior entries
-* <i>"delete": true</i> entries delete prior entries
-
-</details>
-
+<a name="wb"></a>
 ## Wildebeest
 The _Wildbeest_ scripts investigate, repair and normalize text for a wide range of issues at the character level.
 The <tt>gr-wb-check</tt> script supports external editors such as Fluent.
@@ -397,6 +209,305 @@ used for non-local checks</summary>
 * The <i>text corpus</i>, optional for Wildebeest, stores a larger text corpus along with statistics of that corpus.
 * In Wildebeest, it can be used to identify characters that are rare (and therefore suspicious) in a larger corpus.
 * This can be done by calling wb_c.check on the complete text corpus so far but without an actual check. This might take a few seconds but only has to be done once. This corpus initialization is followed by a number of actual check calls. The text corpus is updated automatically. The original initialization allows for checks that are not local to the verses being checked (such as the rare-character check).
-* Alternatively, a text editor can make stateless calls on a verse or a chapter at a time. These are too short to meet the minimum number of characters (50,000) required for the rare-character test kicks in. Then, somewhat rarely, the text editor might call Wildebeest on a large text, but limiting the checks to \["GreekRoom:Wildebeest:character:rare"\]. Most raw Bible translation projects contain a modest number of rare characters (1-10). 
+* Alternatively, a text editor can make stateless calls on a verse or a chapter at a time. These are too short to meet the minimum number of characters (50,000) required for the rare-character test kicks in. Then, somewhat rarely, the text editor might call Wildebeest on a large text, but limiting the checks to \["GreekRoom:Wildebeest:character:rare"\]. Most raw Bible translation projects contain a modest number of rare characters (1-10).
+* For spell checking, the text corpus with its corpus statistics will be even more important.
+* Corpus statistics are automatically updated when <tt>wb_c.check()</tt> is called with a text-corpus argument.
+* We recommend to keep the text corpus up to date by also calling <tt>wb_c.check()</tt> on any newly updated sentences (without checks).
+* If <tt>wb_c.check()</tt> calls have multiple sentences with the same SntId, only the last one be used for the corpus statistics. 
 
 </details>
+
+<details>
+<summary><b>Version</b> 
+of Wildebeest, Greek Room in general etc.</summary>
+
+```python
+version_dict = wb_c.version()
+```
+
+Sample content of <tt>version_dict</tt>:
+
+```
+defaultdict(<class 'str'>, {'GreekRoom': '0.1.4', 'GreekRoomFormat': '0.0.4', 'GreekRoomWildebeest': '0.11.3'})
+```
+
+</details>
+
+<a name="owl"></a>
+## owl
+_owl_ is a battery of smaller Bible Translation checks.
+
+<details>
+<summary> <b>gr-repeated-words</b>
+A CLI Python script to check a file for repeated words, e.g. "the the".</summary>
+
+```
+usage: gr-repeated-words [-h]
+                         [-j JSON]
+                         [-i IN_FILENAME]
+                         [-r REF_FILENAME]
+                         [-o OUT_FILENAME]
+                         [--html HTML]
+                         [--project_name PROJECT_NAME]
+                         [--lang_code LANGUAGE-CODE]
+                         [--lang_name LANG_NAME]
+                         [--message_id MESSAGE_ID]
+                         [-d DATA_FILENAMES]
+                         [--verbose]
+
+options:
+  -h, --help            show this help message and exit
+  -j JSON, --json JSON  input (alternative 1)
+  -i IN_FILENAME, --in_filename IN_FILENAME
+                        text file (alternative 2)
+  -r REF_FILENAME, --ref_filename REF_FILENAME
+                        ref file (alt. 2)
+  -o OUT_FILENAME, --out_filename OUT_FILENAME
+                        output JSON filename
+  --html HTML           output HTML filename
+  --project_name PROJECT_NAME
+                        full name of Bible translation project
+  --lang_code LANGUAGE-CODE
+                        ISO 639-3, e.g. 'fas' for Persian
+  --lang_name LANG_NAME
+  --message_id MESSAGE_ID
+  -d DATA_FILENAMES, --data_filenames DATA_FILENAMES
+  --verbose
+```
+Notes:
+* Typically, either a JSON INPUT_FILENAME or a JSON INPUT_STRING is provided (but not both).
+* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
+
+
+Sample calls
+```
+gr-repeated-words -h
+
+# GreekRoomFormat 0.0.4
+gr-repeated-words -j ''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}' -o test.json
+cat test.json
+
+# GreekRoomFormat 0.0.1 (deprecated, but can still be used)
+gr-repeated-words -j '{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English",
+             "project-id": "eng-sample",
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}' -o test-deprecated.json
+cat test-deprecated.json
+
+```
+</details>
+
+<details>
+<summary> <b>owl.repeated_words.check_mcp</b>
+A Python function to check a file for repeated words, e.g. "the the".</summary>
+
+```python
+import json
+from greekroom.owl import repeated_words
+
+# GreekRoomFormat 0.0.1 (deprecated, but can still be used)
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English",
+             "project-id": "eng-sample",
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
+
+# GreekRoomFormat 0.0.4
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
+
+# load_data_filename() loads <i>legitimate_duplicates.jsonl</i> (see below); call this function only once, even for multiple checks.
+data_filename_dict = repeated_words.load_data_filename()
+corpus = repeated_words.new_corpus("eng-sample-01")
+mcp_d, misc_data_dict, check_corpus_list = repeated_words.check_mcp(task_s, data_filename_dict, corpus)
+print(json.dumps(mcp_d))
+print(misc_data_dict)
+print(check_corpus_list)
+
+# print to HTML file (for GreekRoomFormat 0.0.1)
+feedback = repeated_words.get_feedback(mcp_d, 'GreekRoom', 'RepeatedWords')
+corpus = repeated_words.update_corpus_if_empty(corpus, check_corpus_list)
+repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng", "English", "English Bible")
+# result will be in test.html
+
+```
+</details>
+
+<details>
+<summary> <b>Legacy formats</b>
+(GreekRoomFormat) </summary>
+
+<br>
+
+#### Deprecated GreekRoomFormat 0.0.1
+still supported for RepeatedWords check (for now)
+
+Input:
+
+```
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English",
+             "project-id": "eng-sample",
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
+```
+
+Output:
+
+```
+{"jsonrpc": "2.0", "id": "eng-sample-01", "result-timestamp": "2026-09-07T14:45:43", "lang-code": "eng",
+ "result": [{"tool": "GreekRoom", "checks": [{"check": "RepeatedWords", "feedback": [
+  {"snt-id": "GEN 1:1", "repeated-word": "in in", "surf": "In in", "start-position": 0, "legitimate": false, "severity": 0.5},
+  {"snt-id": "JHN 12:24", "repeated-word": "truly truly", "surf": "Truly truly", "start-position": 0, "legitimate": true, "severity": 0.1}]}]}]}
+```
+
+#### Current GreekRoomFormat 0.0.4
+same as for Wildebeest and future Greek Room modules
+
+Input:
+
+```
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
+```
+
+Output (draft):
+
+```
+{"jsonrpc": "2.0", "id": "eng-sample-01", "resultTimestamp": "2026-09-07T17:06:43", "corpusLangCode": "eng", "result": [
+  {"sntId": "GEN 1:1", "span": [[0, 5]], "orig": "In in", "repeatedWord": "in in",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": false, "severity": 0.5},
+  {"sntId": "JHN 12:24", "span": [[0, 11]], "orig": "Truly truly", "repeatedWord": "truly truly",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": true, "severity": 0.1}],
+ "version": {"GreekRoom": "0.1.4", "GreekRoomFormat": "0.0.4"}}
+```
+
+</details>
+
+<details>
+<summary> <b>legitimate_duplicates.jsonl</b>
+Data files describing legitimate repeated words.</summary>
+
+Samples:
+
+```
+{"lang-code": "eng", "text": "truly, truly"}
+{"lang-code": "eng", "text": "her her", "snt-ids": ["HOS 2:17", "EST 2:9", "JDT 10:4"], "context-examples": ["give her her vineyards", "gave her her things for purification"]}
+{"lang-code": "grc", "text": "ἀμὴν ἀμὴν", "rom": "amen amen", "gloss": {"eng": "truly truly [I say to you]"}}
+
+{"lang-code": "hin", "text": "जब जब", "rom": "jab jab", "gloss": {"eng": "whenever"}}
+{"lang-code": "hin", "text": "कुछ कुछ", "rom": "kuch kuch", "gloss": {"eng": "something, somewhat, some of, part of"}}
+{"lang-code": "eng", "text": "they they", "delete": true}
+```
+Notes:
+* Searches for files <i>owl/data/legitimate_duplicates.jsonl</i> in directories "greekroom", "$XDG_DATA_HOME", "/usr/share", "$HOME/.local/share"
+* later entries overwrite prior entries
+* <i>"delete": true</i> entries delete prior entries
+
+</details>
+
+
+<a name="gu"></a>
+## gr_utilities
+_gr_utilities_ is a set of Greek Room utilities.
+
+<details>
+<summary> <b>gr-wb-file-props</b>
+A CLI Python script to analyze file properties such as script direction, quotations.</summary>
+
+```
+usage: gr-wb-file-props [-h]
+           [-i INPUT_FILENAME]
+           [-s INPUT_STRING]
+           [-j JSON_OUT_FILENAME]
+           [-o HTML_OUT_FILENAME]
+           [--lang_code LANG_CODE]
+           [--lang_name LANG_NAME]
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUT_FILENAME, --input_filename INPUT_FILENAME
+  -s INPUT_STRING, --input_string INPUT_STRING
+  -j JSON_OUT_FILENAME, --json_out_filename JSON_OUT_FILENAME
+  -o HTML_OUT_FILENAME, --html_out_filename HTML_OUT_FILENAME
+  --lang_code LANG_CODE
+  --lang_name LANG_NAME
+```
+Notes:
+* Typically, either an INPUT_FILENAME or an INPUT_STRING is provided (but not both).
+* Typically, a JSON_OUT_FILENAME or a HTML_OUT_FILENAME is provided (or both).
+
+Sample calls
+```
+gr-wb-file-props -h
+gr-wb-file-props -s """She asked: “Whatʼs a ‘PyPi’?”
+He replied: “I don't know.”""" -j test.json
+cat test.json
+
+```
+</details>
+
+<details>
+<summary> <b>gr_utilities.wb_file_props.script_props</b>
+A Python function to analyze file properties such as script direction, quotations.</summary>
+
+```python
+import json
+from greekroom.gr_utilities import wb_file_props
+
+## Apply script to string
+text = """She asked: “Whatʼs a ‘PyPi’?”
+He replied: “I don't know.”"""
+result_dict = wb_file_props.script_props(None, text, "eng", "English")
+print(result_dict)
+
+## Apply script to file content
+# Write text to file
+filename = "test.txt"
+with open(filename, "w") as f_out:
+    f_out.write(text)
+
+# Apply script
+result_dict2 = wb_file_props.script_props(filename)
+# Print result as JSON string
+print(json.dumps(result_dict2))
+# Write result to HTML file
+html_output = "test.html"
+with open(html_output, "w") as f_html:
+    wb_file_props.print_to_html(result_dict2, f_html)
+
+```
+</details>
+
