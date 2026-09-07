@@ -284,7 +284,7 @@ Sample calls
 gr-repeated-words -h
 
 # GreekRoomFormat 0.0.4
-gr-repeated-words -j ''{"jsonrpc": "2.0",
+gr-repeated-words -j '{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
  "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
