@@ -336,7 +336,11 @@ repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng
 
 <br>
 
-Deprecated format ("GreekRoomFormat": "0.0.1"), still supported for RepeatedWords check (for now):
+#### Deprecated GreekRoomFormat 0.0.1
+still supported for RepeatedWords check (for now)
+
+Input:
+
 ```
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
@@ -349,7 +353,20 @@ task_s = '''{"jsonrpc": "2.0",
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
 ```
 
-Current format ("GreekRoomFormat": "0.0.4"), same as for Wildebeest and future Greek Room modules:
+Output:
+
+```
+{"jsonrpc": "2.0", "id": "eng-sample-01", "result-timestamp": "2026-09-07T14:45:43", "lang-code": "eng",
+ "result": [{"tool": "GreekRoom", "checks": [{"check": "RepeatedWords", "feedback": [
+  {"snt-id": "GEN 1:1", "repeated-word": "in in", "surf": "In in", "start-position": 0, "legitimate": false, "severity": 0.5},
+  {"snt-id": "JHN 12:24", "repeated-word": "truly truly", "surf": "Truly truly", "start-position": 0, "legitimate": true, "severity": 0.1}]}]}]}
+```
+
+#### Current GreekRoomFormat 0.0.4
+same as for Wildebeest and future Greek Room modules
+
+Input:
+
 ```
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
@@ -359,6 +376,16 @@ task_s = '''{"jsonrpc": "2.0",
                         "corpusId": "eng-sample", "corpusName": "English Bible",
                         "body": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                                  {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
+```
+
+Output (draft):
+
+```
+{"jsonrpc": "2.0", "id": "eng-sample-01", "resultTimestamp": "2026-09-07T14:45:43", "corpusLangCode": "eng", "result": [
+  {"sntId": "GEN 1:1", "span": [[0, 5]], "orig": "In in", "repeated-word": "in in",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": false, "severity": 0.5},
+  {"sntId": "JHN 12:24", "span": [[0, 11]], "orig": "Truly truly", "repeated-word": "truly truly",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": true, "severity": 0.1}]}
 ```
 
 </details>
