@@ -387,12 +387,12 @@ class WildebeestAnalysis:
                 del self.analysis[key1][block]
 
     def pattern_to_regex(self, pattern: str):
-        pattern = regex.sub(r'[]', '', pattern)
+        pattern = regex.sub(r'[\u0091\u0092\u0093\u0003]', '', pattern)
         active_abbreviations_regex = None
         if 'Abbreviation.' in pattern:
             reg_active_abbreviations = map(regex.escape, self.active_abbreviations[self.lang_code])
             active_abbreviations_regex = f"(?:{'|'.join(reg_active_abbreviations)})"
-            pattern = regex.sub(r'Abbreviation\\?.', '', pattern)
+            pattern = regex.sub(r'Abbreviation\\?.', '\u0003', pattern)
         s = regex.escape(pattern)
         s = regex.sub('Xml', r'&(?:[aA][mM][pP];)*(?:#[xX][0-9A-Fa-f]{1,6}|#\\d{1,7}|[A-Za-z]{1,6});', s)
         s = regex.sub('WordWLM', r'[\\u064E-\\u0650]\\pL\\pM*(?:[\\u200C\\u200D]?\\pL\\pM*)*', s)
@@ -406,7 +406,7 @@ class WildebeestAnalysis:
         s = regex.sub('Modifiers', r'\\pM{2,}', s)
         s = regex.sub('Modifier', r'\\pM', s)
         if active_abbreviations_regex:
-            s = s.replace('', active_abbreviations_regex)
+            s = s.replace('\u0003', active_abbreviations_regex)
         return s
 
     def token_to_patterns(self, token: str) -> List[str]:
@@ -414,19 +414,19 @@ class WildebeestAnalysis:
         if result := self.token_to_pattern_dict[token]:
             return result
         pattern = token
-        pattern = regex.sub(r'[]', '', pattern)
+        pattern = regex.sub(r'[\u0091\u0092\u0093\u0003]', '', pattern)
         if self.lang_code:
             if m := regex.match(r'(.*?)((?:(?:\pL\pM*)+\.){2,})(.*)$', pattern):
                 pre, abbreviation, post = m.group(1, 2, 3)
                 if abbreviation in self.abbreviations[self.lang_code]:
                     self.active_abbreviations[self.lang_code].add(abbreviation)
-                    pattern = pre + '' + post
-        pattern = regex.sub('\u0640', '', pattern)  # tatweel
+                    pattern = pre + '\u0003' + post
+        pattern = regex.sub('\u0640', '\u0091', pattern)  # tatweel
         pattern = regex.sub(r'&(?:[aA][mM][pP];)*(?:#[xX][0-9A-Fa-f]{1,6}|#\d{1,7}|[A-Za-z]{1,6});',
-                            r'&;', pattern, regex.IGNORECASE)  # problem with IGNORECASE
+                            r'&\u0092;', pattern, regex.IGNORECASE)  # problem with IGNORECASE
         pattern = regex.sub(r'(?:%(?:25)*[0-9A-Fa-f]{2}){2,}',
-                            r'%', pattern, regex.IGNORECASE)  # problem with IGNORECASE
-        pattern = regex.sub(r'(?<!\pL\pM*|\pM)[\u064E-\u0650]\pL\pM*(?:[\u200C\u200D]?\pL\pM*)*', '', pattern)
+                            r'%\u0092', pattern, regex.IGNORECASE)  # problem with IGNORECASE
+        pattern = regex.sub(r'(?<!\pL\pM*|\pM)[\u064E-\u0650]\pL\pM*(?:[\u200C\u200D]?\pL\pM*)*', '\u0093', pattern)
         if self.lang_code in ('enb', 'tuy'):
             pattern = regex.sub(r"(?::|\*|\*:|/|\*/)?\pL+(?:'\pL+)*'?", 'Word', pattern)
         else:
@@ -436,10 +436,10 @@ class WildebeestAnalysis:
         pattern = regex.sub(r'(?<!\pN)\pN{1,3}(\.\pN{3})+(?!\.?\pN)', 'NumberWP', pattern)
         pattern = regex.sub(r'(?<!\pN)\pN{1,3}(,\pN{3})+(?!,?\pN)', 'NumberWC', pattern)
         pattern = regex.sub(r'\pN+', 'Number', pattern)
-        pattern = regex.sub(r'', 'Abbreviation.', pattern)
-        pattern = regex.sub(r'', 'WordWLM', pattern)
-        pattern = regex.sub(r'', 'Xml', pattern)
-        pattern = regex.sub(r'', '\u0640', pattern)
+        pattern = regex.sub(r'\u0003', 'Abbreviation.', pattern)
+        pattern = regex.sub(r'\u0093', 'WordWLM', pattern)
+        pattern = regex.sub(r'\u0092', 'Xml', pattern)
+        pattern = regex.sub(r'\u0091', '\u0640', pattern)
         # if "\u00AD" in token:
         #     sys.stderr.write(f"  SH:{token} P:{pattern}\n")
         pattern1 = pattern
@@ -457,10 +457,10 @@ class WildebeestAnalysis:
                 if ((in_word_punct == "\u00AD")
                         and not regex.match(r"[^\u00AD]*\pL\pM*(?:\u00AD\pL\pM*)+[^\u00AD]*$", token)):
                     continue
-                pattern3 = regex.sub(r'[]', '', token)
-                pattern3 = pattern3.replace(in_word_punct, '')
+                pattern3 = regex.sub(r'[\u0091\u0092\u0093]', '', token)
+                pattern3 = pattern3.replace(in_word_punct, '\u0091')
                 pattern3 = regex.sub(r'\pL\pM*(?:[\u200C\u200D]?\pL\pM*)*', 'Word', pattern3)
-                pattern3 = pattern3.replace('', in_word_punct)
+                pattern3 = pattern3.replace('\u0091', in_word_punct)
                 pattern3 = regex.sub(r'[.,;:!?})]+’[ ”»⌟]*$', '', pattern3)
                 pattern3 = pattern3.lstrip("‘“«⌞([{ ")
                 pattern3 = pattern3.rstrip(".,;:?!)]}”»⌟ ")
