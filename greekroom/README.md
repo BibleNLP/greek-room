@@ -331,6 +331,39 @@ repeated_words.write_to_html(feedback, misc_data_dict, corpus, "test.html", "eng
 </details>
 
 <details>
+<summary> <b>Legacy formats</b>
+(GreekRoomFormat) </summary>
+
+<br>
+
+Deprecated format ("GreekRoomFormat": "0.0.1"), still supported for RepeatedWords check (for now):
+```
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"lang-code": "eng", "lang-name": "English",
+             "project-id": "eng-sample",
+             "project-name": "English Bible",
+             "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
+             "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
+```
+
+Current format ("GreekRoomFormat": "0.0.4"), same as for Wildebeest and future Greek Room modules:
+```
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
+```
+
+</details>
+
+<details>
 <summary> <b>legitimate_duplicates.jsonl</b>
 Data files describing legitimate repeated words.</summary>
 
