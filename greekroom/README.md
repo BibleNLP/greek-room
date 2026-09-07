@@ -282,6 +282,19 @@ Notes:
 Sample calls
 ```
 gr-repeated-words -h
+
+# GreekRoomFormat 0.0.4
+gr-repeated-words -j ''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}' -o test.json
+cat test.json
+
+# GreekRoomFormat 0.0.1 (deprecated, but can still be used)
 gr-repeated-words -j '{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
@@ -290,8 +303,9 @@ gr-repeated-words -j '{"jsonrpc": "2.0",
              "project-name": "English Bible",
              "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}' -o test.json
-cat test.json
+                              {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}' -o test-deprecated.json
+cat test-deprecated.json
+
 ```
 </details>
 
@@ -303,6 +317,7 @@ A Python function to check a file for repeated words, e.g. "the the".</summary>
 import json
 from greekroom.owl import repeated_words
 
+# GreekRoomFormat 0.0.1 (deprecated, but can still be used)
 task_s = '''{"jsonrpc": "2.0",
  "id": "eng-sample-01",
  "method": "BibleTranslationCheck",
@@ -312,6 +327,16 @@ task_s = '''{"jsonrpc": "2.0",
              "selectors": [{"tool": "GreekRoom", "checks": ["RepeatedWords"]}],
              "check-corpus": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
                               {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}]}'''
+
+# GreekRoomFormat 0.0.4
+task_s = '''{"jsonrpc": "2.0",
+ "id": "eng-sample-01",
+ "method": "BibleTranslationCheck",
+ "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
+             "corpus": {"langCode": "eng", "langName": "English",
+                        "corpusId": "eng-sample", "corpusName": "English Bible",
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
 
 # load_data_filename() loads <i>legitimate_duplicates.jsonl</i> (see below); call this function only once, even for multiple checks.
 data_filename_dict = repeated_words.load_data_filename()
