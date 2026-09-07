@@ -2477,39 +2477,15 @@ def add_missing_default_argparse_args(args: argparse.Namespace) -> None:
     for var_name, var_value in default_values:
         if not hasattr(args, var_name):
             setattr(args, var_name, var_value)
-    # d = vars(args)
-    # if 'max_pattern_lines' not in d.keys(): args.max_pattern_lines = 0
-    # if 'max_bad_pattern_lines' not in d.keys(): args.max_bad_pattern_lines = 0
-    # if 'max_examples' not in d.keys():
-    #     args.max_examples = 0
-    # if 'max_examples_viz' not in d.keys():
-    #     args.max_examples_viz = 0
-    # if 'max_cases' not in d.keys():
-    #     args.max_cases = 0
-    # if 'max_script_lines' not in d.keys():
-    #     args.max_script_lines = 0
-    # if 'max_non_canonical_lines' not in d.keys():
-    #     args.max_non_canonical_lines = 0
-    # if 'max_char_conflict_lines' not in d.keys():
-    #     args.max_char_conflict_lines = 0
-    # if 'max_notable_token_lines' not in d.keys():
-    #     args.max_notable_token_lines = 0
-    # if 'summary' not in d.keys():
-    #     args.summary = 0
-    # if 'input' not in d.keys():
-    #     args.input = None
-    # if 'legacy_text_output' not in d.keys():
-    #     args.legacy_text_output = None
-    # if 'snt_index_to_ref_id' not in d.keys():
-    #     args.snt_index_to_ref_id = None
-    # if 'json_legacy_out' not in d.keys():
-    #     args.json_legacy_out = None
-    # if 'summary_file' not in d.keys():
-    #     args.summary_file = None
-    # if 'progress_bar' not in d.keys():
-    #     args.progress_bar = False
-    # if 'ref_cross_snt_span_files' not in d.keys():
-    #     args.ref_cross_snt_span_files = ()
+
+
+def close_open_filehandles(args: argparse.Namespace) -> None:
+    for arg_name in ('json_out_filename', 'html_out_filename_by_snt_id', 'html_out_filename_by_check',
+                     'legacy_text_output', 'json_legacy_out'):
+        if fh := getattr(args, arg_name):
+            if fh.name != "stdout":
+                fh.close()
+                sys.stderr.write(f'CLOSE {arg_name} {fh}\n')
 
 
 def main():
@@ -2618,6 +2594,7 @@ def main():
         if args.html_output_filename:
             wb_pp.main_with_args(args, wb_ana)
     sys.stderr.write(bv.report_stats())
+    close_open_filehandles(args)
     if args.verbose:
         end_time = datetime.datetime.now()
         log.info(f'End: {end_time}')
