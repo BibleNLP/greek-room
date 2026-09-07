@@ -480,7 +480,7 @@ cat test.json
 </details>
 
 <details>
-<summary> <b>gr_utilities.wb_file_props.script_punct</b>
+<summary> <b>gr_utilities.wb_file_props.script_props</b>
 A Python function to analyze file properties such as script direction, quotations.</summary>
 
 ```python
@@ -490,7 +490,7 @@ from greekroom.gr_utilities import wb_file_props
 ## Apply script to string
 text = """She asked: “Whatʼs a ‘PyPi’?”
 He replied: “I don't know.”"""
-result_dict = wb_file_props.script_punct(None, text, "eng", "English")
+result_dict = wb_file_props.script_props(None, text, "eng", "English")
 print(result_dict)
 
 ## Apply script to file content
@@ -500,7 +500,7 @@ with open(filename, "w") as f_out:
     f_out.write(text)
 
 # Apply script
-result_dict2 = wb_file_props.script_punct(filename)
+result_dict2 = wb_file_props.script_props(filename)
 # Print result as JSON string
 print(json.dumps(result_dict2))
 # Write result to HTML file
