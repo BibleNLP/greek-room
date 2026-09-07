@@ -209,10 +209,29 @@ used for non-local checks</summary>
 * The <i>text corpus</i>, optional for Wildebeest, stores a larger text corpus along with statistics of that corpus.
 * In Wildebeest, it can be used to identify characters that are rare (and therefore suspicious) in a larger corpus.
 * This can be done by calling wb_c.check on the complete text corpus so far but without an actual check. This might take a few seconds but only has to be done once. This corpus initialization is followed by a number of actual check calls. The text corpus is updated automatically. The original initialization allows for checks that are not local to the verses being checked (such as the rare-character check).
-* Alternatively, a text editor can make stateless calls on a verse or a chapter at a time. These are too short to meet the minimum number of characters (50,000) required for the rare-character test kicks in. Then, somewhat rarely, the text editor might call Wildebeest on a large text, but limiting the checks to \["GreekRoom:Wildebeest:character:rare"\]. Most raw Bible translation projects contain a modest number of rare characters (1-10). 
+* Alternatively, a text editor can make stateless calls on a verse or a chapter at a time. These are too short to meet the minimum number of characters (50,000) required for the rare-character test kicks in. Then, somewhat rarely, the text editor might call Wildebeest on a large text, but limiting the checks to \["GreekRoom:Wildebeest:character:rare"\]. Most raw Bible translation projects contain a modest number of rare characters (1-10).
+* For spell checking, the text corpus with its corpus statistics will be even more important.
+* Corpus statistics are automatically updated when <tt>wb_c.check()</tt> is called with a text-corpus argument.
+* We recommend to keep the text corpus up to date by also calling <tt>wb_c.check()</tt> on any newly updated sentences (without checks).
+* If <tt>wb_c.check()</tt> calls have multiple sentences with the same SntId, only the last one be used for the corpus statistics. 
 
 </details>
 
+<details>
+<summary><b>Version</b> 
+of Wildebeest, Greek Room in general etc.</summary>
+
+```python
+version_dict = wb_c.version()
+```
+
+Sample content of <tt>version_dict</tt>:
+
+```
+defaultdict(<class 'str'>, {'GreekRoom': '0.1.4', 'GreekRoomFormat': '0.0.4', 'GreekRoomWildebeest': '0.11.3'})
+```
+
+</details>
 
 <a name="owl"></a>
 ## owl
