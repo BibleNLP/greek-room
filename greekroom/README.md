@@ -381,11 +381,16 @@ task_s = '''{"jsonrpc": "2.0",
 Output (draft):
 
 ```
-{"jsonrpc": "2.0", "id": "eng-sample-01", "resultTimestamp": "2026-09-07T14:45:43", "corpusLangCode": "eng", "result": [
-  {"sntId": "GEN 1:1", "span": [[0, 5]], "orig": "In in", "repeated-word": "in in",
+  {"sntId": "GEN 1:1", "span": [[0, 5]], "orig": "In in", "repeatedWord": "in in",
      "check": "GreekRoom:Owl:RepeatedWords", "legitimate": false, "severity": 0.5},
-  {"sntId": "JHN 12:24", "span": [[0, 11]], "orig": "Truly truly", "repeated-word": "truly truly",
+  {"sntId": "JHN 12:24", "span": [[0, 11]], "orig": "Truly truly", "repeatedWord": "truly truly",
      "check": "GreekRoom:Owl:RepeatedWords", "legitimate": true, "severity": 0.1}]}
+{"jsonrpc": "2.0", "id": "eng-sample-01", "resultTimestamp": "2026-09-07T17:06:43", "corpusLangCode": "eng", "result": [
+  {"sntId": "GEN 1:1", "span": [[0, 5]], "orig": "In in", "repeatedWord": "in in",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": false, "severity": 0.5},
+  {"sntId": "JHN 12:24", "span": [[0, 11]], "orig": "Truly truly", "repeatedWord": "truly truly",
+     "check": "GreekRoom:Owl:RepeatedWords", "legitimate": true, "severity": 0.1}],
+ "version": {"GreekRoom": "0.1.4", "GreekRoomFormat": "0.0.4"}}
 ```
 
 </details>
