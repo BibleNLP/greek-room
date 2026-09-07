@@ -374,8 +374,8 @@ task_s = '''{"jsonrpc": "2.0",
  "params": [{"checks": ["GreekRoom:Owl:RepeatedWords"],
              "corpus": {"langCode": "eng", "langName": "English",
                         "corpusId": "eng-sample", "corpusName": "English Bible",
-                        "body": [{"snt-id": "GEN 1:1", "text": "In in the beginning ..."},
-                                 {"snt-id": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
+                        "body": [{"sntId": "GEN 1:1", "text": "In in the beginning ..."},
+                                 {"sntId": "JHN 12:24", "text": "Truly truly, I say to you ..."}]}}]}'''
 ```
 
 Output (draft):
