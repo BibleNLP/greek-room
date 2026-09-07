@@ -52,6 +52,9 @@ def slot_value_in_double_colon_del_list(line: str, slot: str, default: Optional 
     return m.group(1).strip() if m else default
 
 
+unicode_util: corpus.UnicodeUtilities | None = None
+
+
 def control_character_name(char: str) -> str | None:
     # Dictionary with the names of the most common control characters.
     control_character_dict = {
@@ -61,11 +64,15 @@ def control_character_name(char: str) -> str | None:
     if char in control_character_dict:
         return f'control character {control_character_dict[char]}'
     hex_code = f"U+{ord(char):04X}"
+    global unicode_util
+    if unicode_util is None:
+        # initialize only once, and only when needed
+        unicode_util = corpus.UnicodeUtilities()
     if char <= '\x1F':            # Unicode block C0
-        unicode_name = corpus.UnicodeUtilities().ctrl_char_to_name(char)
+        unicode_name = unicode_util.ctrl_char_to_name(char)
         return f"control character {hex_code} = {unicode_name}"
     elif '\x80' <= char <= '\x9F':  # Unicode block C1
-        unicode_name = corpus.UnicodeUtilities().ctrl_char_to_name(char)
+        unicode_name = unicode_util.ctrl_char_to_name(char)
         return f"control character {hex_code} = {unicode_name}"
     else:
         return None
