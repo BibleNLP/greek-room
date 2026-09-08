@@ -261,7 +261,7 @@ class WildebeestAnalysis:
         self.ref_id_list = []
         self.snt_index_to_ref_id = defaultdict(str)
         self.ref_id_to_snt_index = defaultdict(int)
-        self.ref_id_to_text = {}  # HHERE possibly use self.text_corpus.snt_id_to_snt
+        self.ref_id_to_text = {}  # HERE possibly use self.text_corpus.snt_id_to_snt
         self.script_repair = None
         self.char_script_dict = {}
         self.auto_correct_threshold: float | None = None
@@ -559,9 +559,11 @@ class WildebeestAnalysis:
                     if (last_close_right_pos and (last_close_right_pos[0] < line_number)
                             and (last_close_right_pos not in self.punct_analysis['unmatched'][char])):
                         self.punct_analysis['unmatched'][char].append(last_close_right_pos)
-                        if verbose: print("FLAG", char, 'unmatched', last_close_right_pos)
+                        if verbose:
+                            print("FLAG", char, 'unmatched', last_close_right_pos)
                     self.punct_analysis['unmatched'][char].append(full_pos)
-                    if verbose: print("FLAG", char, 'unmatched', full_pos)
+                    if verbose:
+                        print("FLAG", char, 'unmatched', full_pos)
                 if triple_nesting and popped_pos:
                     span_info = self.span_info_with_ids(popped_pos, full_pos2)
                     self.punct_analysis['triple_nesting'][left_char].append(span_info)
@@ -723,8 +725,7 @@ class WildebeestAnalysis:
                 last_legit_orln = self.punct_analysis['last_legit_open_refresher_line_number'][char]
                 last_illegit_orln = self.punct_analysis['last_illegit_open_refresher_line_number'][char]
                 if (((open_line_number-tos_line_number <= 20)
-                            or ((last_legit_orln is not None)
-                                and (open_line_number-last_legit_orln <= 15)))
+                            or ((last_legit_orln is not None) and (open_line_number-last_legit_orln <= 15)))
                         or ((last_illegit_orln is not None) and (open_line_number-last_illegit_orln <= 10))):
                     if tos_full_pos not in self.punct_analysis['open-quote-refresher'][char]:
                         self.punct_analysis['open-quote-refresher'][char].append(tos_full_pos)
@@ -840,7 +841,7 @@ class WildebeestAnalysis:
         xml_esc_nst_tokens = regex.findall(r'&(?:amp;)+(?:#X[0-9A-F]{1,6}|#\d{1,7}|[a-z]{1,6});',
                                            line, regex.IGNORECASE)
         for token in words + complex_chars + xml_esc_dec_tokens + xml_esc_hex_tokens \
-                     + xml_esc_abc_tokens + xml_esc_nst_tokens:
+                           + xml_esc_abc_tokens + xml_esc_nst_tokens:
             self.token_count[token] += 1
             token_tuple = [token, line_number]
             if (len(self.token_examples[token]) < max_token_examples) \
@@ -893,7 +894,7 @@ class WildebeestAnalysis:
         input_file: IO = args.input
         if input_file:
             with (tqdm(input_file, total=total_bytes, disable=not progress_bar, unit='b', unit_scale=True,
-                      dynamic_ncols=True, desc=prefix) as data_bar):
+                       dynamic_ncols=True, desc=prefix) as data_bar):
                 for line in data_bar:
                     self.collect_counts_and_examples_in_text(line, stats)
         elif self.snt_list:
@@ -914,12 +915,14 @@ class WildebeestAnalysis:
     def assess_pattern(self, pattern_character_of_interest: str, pattern: str) -> Tuple[str, str]:
         ass_class, ass_descr = '', ''
         if len(pattern_character_of_interest) == 1:
-            ass_char_name = self.unicode_util.unicode_name(pattern_character_of_interest) or pattern_character_of_interest
+            ass_char_name = (self.unicode_util.unicode_name(pattern_character_of_interest)
+                             or pattern_character_of_interest)
         else:
             ass_char_name = pattern_character_of_interest
         a = "an" if regex.match('AEIOU', ass_char_name, re.IGNORECASE) else "a"
         # count = self.pattern_count[pattern]
-        if (pattern_character_of_interest in '।॥.።։!?,፣;፤:፦،؛؟۔)]>”’›»⌟') and pattern.startswith(pattern_character_of_interest):
+        if ((pattern_character_of_interest in '।॥.።։!?,፣;፤:፦،؛؟۔)]>”’›»⌟')
+                and pattern.startswith(pattern_character_of_interest)):
             ass_class = '-'
             ass_descr = (f'Token starts with {a} {ass_char_name} {pattern_character_of_interest}\n'
                          f'Please check whether there is any spurious space before it.')
@@ -941,8 +944,8 @@ class WildebeestAnalysis:
                          f'which is an unusual character.')
         # ?? etc.
         if (pattern_character_of_interest in '-?!,？՞') and ((pattern_character_of_interest * 2) in pattern):
-                ass_class = '-'
-                ass_descr = f'Word token includes a double {ass_char_name} {pattern_character_of_interest}\n'
+            ass_class = '-'
+            ass_descr = f'Word token includes a double {ass_char_name} {pattern_character_of_interest}\n'
         for bad_substring in ["//", "\u00AD\u00AD", "<SOFT HYPHEN><SOFT HYPHEN>"]:
             if bad_substring in pattern:
                 ass_class = '-'
@@ -950,19 +953,19 @@ class WildebeestAnalysis:
                              f"'{self.repl_invisible_chars_in_pattern(bad_substring)}'\n")
         if regex.match(
                 #  \u202f is narrow space
-                '([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"])[.።]?)?([\])])?$',
+                r'([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"])[.።]?)?([\])])?$',
                 pattern):
             ass_class = '+'
         elif regex.match(
-                '([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?[)\]]((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
+                r'([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([।॥.።։,፣;፤!?:፦،؛؟۔])?[)\]]((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
                 pattern):
             ass_class = '+'
         elif regex.match(
-                '([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)[)\]]([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
+                r'([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]*‘|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)[)\]]([।॥.።։,፣;፤!?:፦،؛؟۔])?((?:”[ \u202f]’[ \u202f]”|”[ \u202f]’|’[.።?! \u202f]”|’”|[”’»›⌟"]))?$',
                 pattern):
             ass_class = '+'
-        elif regex.match('([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]‘|“[ \u202f]‘[ \u202f]“|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([”’»›⌟"])?([)\]])?([।॥.።։,፣;፤!?:፦،؛؟۔])?$',
-                       pattern):
+        elif regex.match(r'([([])?([“‘‚„«‹⌞]|“‘|“[ \u202f]‘|“[ \u202f]‘[ \u202f]“|‘[ \u202f]“)?(Word(?:ʼWord)*(-Word(?:ʼWord)*)*ʼ?|WordWLM|Number|NumberWP|NumberWC)([”’»›⌟"])?([)\]])?([।॥.።։,፣;፤!?:፦،؛؟۔])?$',
+                         pattern):
             ass_class = '+'
         elif regex.search(r'^Word(ʼWord)+$', pattern):  # ʼ (U+02BC MODIFIER LETTER APOSTROPHE)
             ass_class = '+'
@@ -994,7 +997,7 @@ class WildebeestAnalysis:
             updated_counts[1] += pattern_count
         self.pattern_class_counts[(pattern_character_of_interest, pattern)] = updated_counts
 
-    def norm_char(self, token: str, dyn: bool) -> Tuple[str, dict|None]:
+    def norm_char(self, token: str, dyn: bool) -> Tuple[str, dict | None]:
         if cached_result := self.norm_char_dict.get(token):
             return cached_result
         elif regex.match(r'\pL\pM*$', token):
@@ -1045,22 +1048,25 @@ class WildebeestAnalysis:
                 else:
                     form_clause = f'{unicode_form}, '
                     form_clause2 = f'{unicode_form2}, '
-                d = {"form-clause": form_clause, "form-clause2": form_clause2, "norm_count": norm_count, "changes": changes}
+                d = {"form-clause": form_clause, "form-clause2": form_clause2,
+                     "norm_count": norm_count, "changes": changes}
                 return norm, d
         return token, None
 
-    def dyn_selector_match(self, check: str) -> bool:
+    def dyn_selector_match(self, check_type: str) -> bool:
+        """Checks whether a check type such as 'GreekRoom:Wildebeest:punctuation'
+        matches a dynamic selector such as 'GreekRoom:Wildebeest'"""
         if self.dyn_check_selectors is None:
             # sys.stderr.write(f'Smatch disabled {check}\n')
             return True
         else:
             for check_selector in self.dyn_check_selectors:
-                if (check_selector == check) \
-                        or check_selector.startswith(check + ':') \
-                        or check.startswith(check_selector + ':'):
-                    # sys.stderr.write(f'Smatch {check} {check_selector}\n')
+                if (check_selector == check_type) \
+                        or check_selector.startswith(check_type + ':') \
+                        or check_type.startswith(check_selector + ':'):
+                    # sys.stderr.write(f'Smatch {check_type} {check_selector}\n')
                     return True
-            self.dyn_skipped_checks.append(check)
+            self.dyn_skipped_checks.append(check_type)
             # sys.stderr.write(f'Smatch failed {check} {self.dyn_check_selectors}\n')
         return False
 
@@ -1185,13 +1191,18 @@ class WildebeestAnalysis:
             if paired_delimiters := self.paired_delimiter_state['paired-delimiters'][char]:
                 paired_open_pos4, paired_close_pos4 = paired_delimiters[-1]
                 if paired_open_pos4[0] > last_line_number:
-                    if verbose: sys.stderr.write(
-                        f"is_repeating_open_delimiter False1 {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+                    if verbose:
+                        sys.stderr.write(f"is_repeating_open_delimiter False1 {char} {pos4}"
+                                         f" {unpaired_open_delimiters} {repeating_open_delimiters}\n")
                     return False
             if (pos == 0) and (line_number - last_line_number <= 10):
-                if verbose: sys.stderr.write(f"is_repeating_open_delimiter True {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+                if verbose:
+                    sys.stderr.write(f"is_repeating_open_delimiter True {char} {pos4}"
+                                     f" {unpaired_open_delimiters} {repeating_open_delimiters}\n")
                 return True
-            if verbose: sys.stderr.write(f"is_repeating_open_delimiter False2 {char} {pos4} {unpaired_open_delimiters} {repeating_open_delimiters}\n")
+            if verbose:
+                sys.stderr.write(f"is_repeating_open_delimiter False2 {char} {pos4}"
+                                 f" {unpaired_open_delimiters} {repeating_open_delimiters}\n")
         return False
 
     def dyn_paired_delimiter_check(self) -> None:
@@ -1209,18 +1220,19 @@ class WildebeestAnalysis:
             for char in snt:
                 pos4 = (line_number, pos, snt_id, char)
                 if char in self.paired_delimiter_state['all-close-delimiters']:
-                    # sys.stderr.write(f'close {char} {snt_id} {pos}\n')
+                    # sys.stderr.write(f' close {char} {snt_id} {pos}\n')
                     open_delimiters = self.paired_delimiter_state['close-to-open-delimiters'][char]
                     most_recent_open_delimiter, most_recent_open_delimiter_pos = None, None
                     for open_delimiter in open_delimiters:
                         if positions := self.paired_delimiter_state['unpaired-open-delimiters'][open_delimiter]:
-                            # sys.stderr.write(f'open_delimiters {open_delimiter} {positions}\n')
+                            # sys.stderr.write(f' open_delimiters {open_delimiter} {positions}\n')
                             last_pos = positions[-1]
                             if (most_recent_open_delimiter_pos is None) \
                                     or (last_pos > most_recent_open_delimiter_pos):
                                 most_recent_open_delimiter = open_delimiter
                                 most_recent_open_delimiter_pos = last_pos
-                    # sys.stderr.write(f"most_recent_open_delimiter {most_recent_open_delimiter} {self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter]}\n")
+                    sys.stderr.write(f" most_recent_open_delimiter {most_recent_open_delimiter} "
+                                     f"{self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter]}\n")
                     if most_recent_open_delimiter:
                         open_pos4 = self.paired_delimiter_state['unpaired-open-delimiters'][most_recent_open_delimiter].pop()
                         open_char = open_pos4[3]
@@ -1254,7 +1266,8 @@ class WildebeestAnalysis:
                                     unicode_name = self.unicode_util.unicode_name(open_delimiter)
                                     check_type = f"GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open:{unicode_name.lower()}"
                                     prev_span = self.simple_span(prev_pos, prev_char)
-                                    dyn_feedback_item = {"sntId": prev_snt_id, "span": prev_span, "orig": open_delimiter,
+                                    dyn_feedback_item = {"sntId": prev_snt_id, "span": prev_span,
+                                                         "orig": open_delimiter,
                                                          "check": check_type, "severity": 0.5}
                                     self.dyn_json_results.add(dyn_feedback_item)
                                 self.paired_delimiter_state['unpaired-open-delimiters'][char] = []
@@ -1374,7 +1387,7 @@ class WildebeestAnalysis:
                 right_space = m_right.group(1) if m_right else None
                 # exclude numerical items such as 3.14 or 20,000 or 3:16
                 if m_left and m_right and (left_space == '') and (right_space == '') \
-                    and m_left.group(1).isdigit() and m_right.group(3).isdigit():
+                        and m_left.group(1).isdigit() and m_right.group(3).isdigit():
                     continue
                 if left_space or (right_space == ''):
                     punct_name = self.unicode_util.unicode_name(punct_char)
@@ -1612,7 +1625,7 @@ class WildebeestAnalysis:
                     self.analysis['pattern'][key2][orig_pattern]['ass-class'] = ass_class
                     self.analysis['pattern'][key2][orig_pattern]['ass-descr'] = ass_descr
         # Check for conflict sets (e.g. text containing both Arabic k and Farsi k)
-        char_conflict_set = ['əǝә', # LATIN SMALL LETTER SCHWA, LATIN SMALL LETTER TURNED E, CYRILLIC SMALL LETTER SCHWA
+        char_conflict_set = ['əǝә',  # LATIN SMALL LETTER SCHWA,LATIN SMALL LETTER TURNED E,CYRILLIC SMALL LETTER SCHWA
                              'كک',  # Arabic/Farsi k
                              'يی',  # Arabic/Farsi y
                              'μµ',  # Greek letter mu/micro sign
@@ -1633,7 +1646,7 @@ class WildebeestAnalysis:
                              ':꞉፥：',        # ASCII/modifier letter/Ethiopic/Chinese colon
                              '!！',        # ASCII/Chinese exclamation mark
                              '?\u061F፧？',  # ASCII/ARABIC/Ethiopic/Chinese question mark
-                             '.\u06D4।።。．', # ASCII/ARABIC full stop/DANDA/Ethiopic/CHINESE PERIOD/FULLWIDTH PERIOD
+                             '.\u06D4।።。．',  # ASCII/ARABIC full stop/DANDA/Ethiopic/CHINESE PERIOD/FULLWIDTH PERIOD
                              '–—―',        # EN DASH/EM DASH/HORIZONTAL BAR
                              '-−',         # HYPHEN-MINUS, MINUS SIGN
                              '|।৷',         # VERTICAL LINE/DEVANAGARI DANDA/BENGALI CURRENCY NUMERATOR FOUR
@@ -1646,13 +1659,12 @@ class WildebeestAnalysis:
                              '?՞',         # ASCII/Armenian question mark
                              '.։',         # ASCII/Armenian full stop
                              ':։',         # ASCII colon/Armenian full stop
-                             '`՝',          # ASCII grave accent/Armenian comma
-
-                            ]
+                             '`՝']         # ASCII grave accent/Armenian comma
         for char_conflict in char_conflict_set:
-            # Matching quotations such as ASCII LOW/LEFT DOUBLE QUOTATION MARK in Ukrainian should not be marked as conflict set
+            # Matching quotations such as ASCII LOW/LEFT DOUBLE QUOTATION MARK in Ukrainian
+            #     should not be marked as conflict set
             if (len(char_conflict) == 2) and (self.punct_analysis.get(('lr', char_conflict[0])) == char_conflict[1]):
-                # sys.stderr.write(f'MP skipping {char_conflict} conflict set\n')
+                # sys.stderr.write(f' MP skipping {char_conflict} conflict set\n')
                 continue
             char_list = []
             info_list = []
@@ -1724,7 +1736,7 @@ class WildebeestAnalysis:
     def repl_invisible_chars_in_pattern(s: str):
         """for better human legibility"""
         result = ''.join(list(map(lambda c: f'<U+{ord(c):04X}>'  # {self.unicode_util.unicode_name(c)}'
-                 if (regex.match(r'(?:\pC|\pZ|\pM)', c) and (not c in ' \u00AD\u202F')) else c, s)))
+                         if (regex.match(r'(?:\pC|\pZ|\pM)', c) and (c not in ' \u00AD\u202F')) else c, s)))
         for old, new in (('\u00AD', '<SOFT HYPHEN>'),):
             result = result.replace(old, new)
         return result
@@ -1781,7 +1793,7 @@ class WildebeestAnalysis:
             for token in tokens:
                 notable_dict[key1]['TYPE_COUNT'] = notable_dict[key1].get('TYPE_COUNT', 0) + 1
                 notable_dict[key1]['TOKEN_COUNT'] = notable_dict[key1].get('TOKEN_COUNT', 0) \
-                                                    + self.analysis['notable-token'][notable_heading][token]['count']
+                    + self.analysis['notable-token'][notable_heading][token]['count']
         for key1 in notable_dict.keys():
             group_count = notable_dict[key1]['GROUP_COUNT']
             type_count = notable_dict[key1]['TYPE_COUNT']
@@ -2022,13 +2034,13 @@ class WildebeestAnalysis:
         return self.n_snt
 
     @staticmethod
-    def populate_version(version: dict | None = None) -> dict:
-        if version is None:
-            version = defaultdict(str)
-        version['GreekRoom'] = __greekRoomVersion__
-        version['GreekRoomFormat'] = __greekRoomFormatVersion__
-        version['GreekRoomWildebeest'] = __wildebeestVersion__
-        return version
+    def populate_version(version_d: dict | None = None) -> dict:
+        if version_d is None:
+            version_d = defaultdict(str)
+        version_d['GreekRoom'] = __greekRoomVersion__
+        version_d['GreekRoomFormat'] = __greekRoomFormatVersion__
+        version_d['GreekRoomWildebeest'] = __wildebeestVersion__
+        return version_d
 
     @staticmethod
     def load_ref_ids(snt_index_to_ref_id: dict, filename) -> None:
@@ -2114,47 +2126,47 @@ class WildebeestAnalysis:
         s = regex.sub(r'("skippedChecks":)', r'\n \1', s)
         return s
 
-    def verbalize_greek_room_check_id(self, check: str, _lang_code, sub_s: str | None = None) -> str | None:
-        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):detach-from-right', check):
+    def verbalize_greek_room_check_id(self, check_type: str, _lang_code, sub_s: str | None = None) -> str | None:
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):detach-from-right', check_type):
             return f"add missing space to the right of {m_check.group(1)}"
-        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):attach-to-left', check):
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):attach-to-left', check_type):
             return f"remove spurious space on the left of {m_check.group(1)}"
-        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):reattach-to-left', check):
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:space:([^:]*):reattach-to-left', check_type):
             return f"remove spurious space on the left, and add missing space to the right of {m_check.group(1)}"
-        if regex.match(r'GreekRoom:Wildebeest:encoding:nukta-position', check):
+        if regex.match(r'GreekRoom:Wildebeest:encoding:nukta-position', check_type):
             return f"move the nukta to the correct position right after the main letter"
-        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open', check):
+        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:open', check_type):
             result = f"no matching close delimiter"
             if close_delimiters := self.paired_delimiter_state['open-to-close-delimiters'][sub_s]:
                 result += ' such as: ' + ' '.join(close_delimiters)
             return result
-        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:close', check):
+        if regex.match(r'GreekRoom:Wildebeest:punctuation:unpaired-delimiter:close', check_type):
             result = f"no matching open delimiter"
             if open_delimiters := self.paired_delimiter_state['close-to-open-delimiters'][sub_s]:
-                result += ' such as: ' +  ' '.join(open_delimiters)
+                result += ' such as: ' + ' '.join(open_delimiters)
             return result
-        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:punctuation:repair:([^:]*):([^:]*)', check):
+        if m_check := regex.match(r'GreekRoom:Wildebeest:punctuation:punctuation:repair:([^:]*):([^:]*)', check_type):
             return f"replace {m_check.group(1)} by {m_check.group(2)}"
-        if check == 'GreekRoom:Wildebeest:punctuation:unexpected':
+        if check_type == 'GreekRoom:Wildebeest:punctuation:unexpected':
             return f"unexpected punctuation"
-        if check == 'GreekRoom:Wildebeest:character:suspicious:C1_CONTROL':
+        if check_type == 'GreekRoom:Wildebeest:character:suspicious:C1_CONTROL':
             return f"remove control character"
-        if check == 'GreekRoom:Wildebeest:character:suspicious:VARIATION_SELECTORS':
+        if check_type == 'GreekRoom:Wildebeest:character:suspicious:VARIATION_SELECTORS':
             return f"remove variation selector"
         return None
 
-    def verbalize_action_menu(self, action_menu: list, check: str, lang_code) -> str:
+    def verbalize_action_menu(self, action_menu: list, check_type: str, lang_code) -> str:
         result = ""
         index = 0
         for menu_item in action_menu:
             index += 1
             substitute = menu_item.get('substitute')
             if substitute is not None:
-                # sys.stderr.write(f"Verb subst {check} {menu_item} {substitute}\n")
-                check_verbalization = self.verbalize_greek_room_check_id(check, lang_code)
+                # sys.stderr.write(f"Verb subst {check_type} {menu_item} {substitute}\n")
+                check_verbalization = self.verbalize_greek_room_check_id(check_type, lang_code)
                 substitute_clause = f'''Replace by "{substitute}"''' if substitute else "Delete"
                 if check_verbalization:
-                        result += f'''  [{index}] {substitute_clause} ({check_verbalization})'''
+                    result += f'''  [{index}] {substitute_clause} ({check_verbalization})'''
                 else:
                     result += f'''  [{index}] {substitute_clause}  ({simple_unicode_names(substitute, ',  ')})'''
             else:
@@ -2199,23 +2211,28 @@ class WildebeestAnalysis:
                 if len(sub_s) == 1:
                     name_clause = f"  • Character name: {unicode_names}  (at position {start_pos})"
                 else:
-                    name_clause = f"  • Character names ({len(sub_s)}): {unicode_names}  (starting at position {start_pos})"
+                    name_clause = (f"  • Character names ({len(sub_s)}): {unicode_names}"
+                                   f"  (starting at position {start_pos})")
                 wrapped_name_clause = self.dyn_wrap_text(name_clause, r', {2,}', f',{title_newline}&xnbsp;', 80)
                 title += wb_pp.guard_html(wrapped_name_clause + title_newline, True)
                 best_substitute, best_substitute_start, best_substitute_end, best_confidence = None, None, None, 0
                 for local_feedback_item in local_feedback_items:
-                    check = local_feedback_item.get("check")
-                    title += wb_pp.guard_html(f'''{'‾'*100}{title_newline}Check alert: {check}  {title_newline}''', True)
+                    check_type = local_feedback_item.get("check")
+                    title += wb_pp.guard_html(f'''{'‾'*100}{title_newline}Check alert: {check_type}  {title_newline}''',
+                                              True)
                     if scripts := local_feedback_item.get('scripts'):
                         title += wb_pp.guard_html(f'''  • Scripts: {", ".join(scripts)}{title_newline}''', True)
                     if minority_script := local_feedback_item.get('minorityScript'):
                         title += wb_pp.guard_html(f'''  • Minority script: {minority_script}{title_newline}''', True)
                     if minority_script_letters := local_feedback_item.get('minorityScriptLetters'):
-                        title += wb_pp.guard_html(f'''  • Minority script letters: {", ".join(minority_script_letters)}{title_newline}''', True)
+                        title += wb_pp.guard_html(f'''  • Minority script letters: {", ".join(minority_script_letters)}{title_newline}''',
+                                                  True)
                     if action_menu := local_feedback_item.get('actionMenu'):
-                        action_menu_pp = "  • Action menu:" + self.verbalize_action_menu(action_menu, check, self.lang_code)
+                        action_menu_pp = ("  • Action menu:"
+                                          + self.verbalize_action_menu(action_menu, check_type, self.lang_code))
                         # sys.stderr.write(f'  action_menu_pp: {action_menu_pp}\n')
-                        wrapped_action_menu_pp = self.dyn_wrap_text(action_menu_pp, r' {2,}', f'{title_newline}&xnbsp;', 80)
+                        wrapped_action_menu_pp = self.dyn_wrap_text(action_menu_pp, r' {2,}',
+                                                                    f'{title_newline}&xnbsp;', 80)
                         title += wb_pp.guard_html(f'''{wrapped_action_menu_pp}{title_newline}''', True)
                         for menu_item in action_menu:
                             substitute = menu_item.get('substitute')
@@ -2224,9 +2241,10 @@ class WildebeestAnalysis:
                                     and (local_feedback_item.get('span') == [[start_pos, end_pos]])):
                                 best_substitute, best_substitute_start, best_substitute_end, best_confidence \
                                     = substitute, start_pos, end_pos, confidence
-                    elif check_verbalization := self.verbalize_greek_room_check_id(check, self.lang_code, sub_s):
+                    elif check_verbalization := self.verbalize_greek_room_check_id(check_type, self.lang_code, sub_s):
                         verbalization_pp = "  • Help: " + check_verbalization
-                        wrapped_verbalization_pp = self.dyn_wrap_text(verbalization_pp, r' {2,}', f'{title_newline}&xnbsp;', 80)
+                        wrapped_verbalization_pp = self.dyn_wrap_text(verbalization_pp, r' {2,}',
+                                                                      f'{title_newline}&xnbsp;', 80)
                         title += wb_pp.guard_html(f'''{wrapped_verbalization_pp}{title_newline}''', True)
                 if best_substitute == '':
                     print_string = sub_s
@@ -2239,7 +2257,6 @@ class WildebeestAnalysis:
                 if best_confidence >= min_auto_correct:
                     if len(local_feedback_items) >= 2:
                         markup = f'''<span style="color:blue;background-color:#DFDFFF;font-weight:bold;white-space: pre;{text_deco}" pbtitle="{title}">'''
-
                     else:
                         markup = f'''<span style="color:{color};background-color:#DFFFDF;font-weight:bold;white-space: pre;{text_deco}" pbtitle="{title}">'''
                     markup += html_util.guard_html(print_string)
@@ -2285,7 +2302,9 @@ class WildebeestAnalysis:
         out.write('</ul>\n')
 
     def dyn_html_print_by_snt(self, out: io.TextIOWrapper) -> None:
-        out.write(html_util.html_head(f"Dynamic Wildebeest Visualization", datetime.datetime.now().strftime('%B %d, %Y at %H:%M'), "wb viz"))
+        out.write(html_util.html_head(f"Dynamic Wildebeest Visualization",
+                                      datetime.datetime.now().strftime('%B %d, %Y at %H:%M'),
+                                      "wb viz"))
         self.write_corpus_info(out)
         out.write('''    <table cellpadding="10">\n''')
         for snt, snt_id in zip(self.snt_list, self.ref_id_list):
@@ -2306,7 +2325,8 @@ class WildebeestAnalysis:
             count = len(self.dyn_json_results.results_by_check_id[check_id])
             count_s = "" if count == 1 else "s"
             out.write(f'''      <tr><td colspan="2"><b>Check: {check_id}</b> ({count} instance{count_s})</td>\n''')
-            for snt_id in sorted(self.dyn_json_results.check_id_snt_ids[check_id], key=lambda x: self.ref_id_to_snt_index[x]):
+            for snt_id in sorted(self.dyn_json_results.check_id_snt_ids[check_id],
+                                 key=lambda x: self.ref_id_to_snt_index[x]):
                 if feedback_items := self.dyn_json_results.results_by_check_id_and_snt_id[(check_id, snt_id)]:
                     snt = self.ref_id_to_text.get(snt_id, "???")
                     snt_id_g = html_util.guard_html(snt_id).replace(' ', '&nbsp;')
@@ -2391,7 +2411,7 @@ def process_args(args) -> WildebeestAnalysis:
     else:  # nothing to process
         log.warning('Called function process_with_args with neither args.input nor args.snt_list nor args.strings')
     wb.aggregate()  # Aggregate raw counts and examples into analysis.
-    wb.text_corpus = corpus.TextCorpus(snt_list = wb.snt_list, snt_id_list = wb.ref_id_list)
+    wb.text_corpus = corpus.TextCorpus(snt_list=wb.snt_list, snt_id_list=wb.ref_id_list)
     wb.dyn_checks()
     wb.remove_empty_dicts()  # Remove empty dictionaries that were created to impose a specific order
     wb.sort_pattern_headings_in_analysis_pattern()
@@ -2441,7 +2461,8 @@ def process(in_file: str | None = None,     # provide exactly one input: input f
             max_char_conflict_lines: int = 100,
             max_notable_token_lines: int = 1000,
             verbose: int = 0,
-            # snt_index_to_ref_id is a dictionary mapping line_numbers/string_indexes (int, starting at 1) to snt IDs (str)
+            # snt_index_to_ref_id is a dictionary mapping line_numbers/string_indexes (int, starting at 1)
+            #     to snt IDs (str)
             summary_file: Optional[str] = None,
             snt_index_to_ref_id: Optional[dict] = None) -> WildebeestAnalysis:
     """Entry point when Wildebeest Analysis for non-CLI use; maps to CLI interface"""
@@ -2504,9 +2525,11 @@ def main():
                         default=None, metavar='INPUT-FILENAME', help='(alternative 2; default: None/STDIN)')
     parser.add_argument('-o', '--json_out_filename', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
                         default=None, help='output JSON filename')
-    parser.add_argument('-H', '--html_out_filename_by_snt_id', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+    parser.add_argument('-H', '--html_out_filename_by_snt_id',
+                        type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
                         default=None)
-    parser.add_argument('-C', '--html_out_filename_by_check', type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
+    parser.add_argument('-C', '--html_out_filename_by_check',
+                        type=argparse.FileType('w', encoding='utf-8', errors='ignore'),
                         default=None)
     parser.add_argument('--batch', type=Path, default=None, metavar='BATCH_DIR',
                         help='Directory with batch of input files (BATCH_DIR/*.txt)')
