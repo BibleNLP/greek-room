@@ -77,6 +77,7 @@ When using STDIN and/or STDOUT, if might be necessary, particularly for older ve
 'export PYTHONIOENCODING=UTF-8' before calling this Python script to ensure UTF-8 encoding.
 """
 # -*- encoding: utf-8 -*-
+from __future__ import annotations
 import argparse
 from itertools import chain
 import datetime
@@ -797,7 +798,7 @@ class Wildebeest:
 
     # noinspection SpellCheckingInspection
     def repair_encoding_errors(self, s: str) -> str:
-        """
+        r"""
         Interpret non-UTF8 characters (standalone \x80-\xFF, read in as surrogate characters \uDC80-\uDCFF])
         as one-byte Windows-1252/Latin-1 (ISO-8859-1) characters. Please note that ASCII characters (\u0000-\u007F)
         are encoded identically in UTF-8, Latin-1, and Windows-1252, so no conversion is necessary in that case.
@@ -813,7 +814,7 @@ class Wildebeest:
     # noinspection SpellCheckingInspection
     @staticmethod
     def delete_surrogates(s: str, default: str = '') -> str:
-        """As an alternative or backup to windows1252_to_utf8, delete all surrogate characters [\uDC80-\uDCFF])."""
+        r"""As an alternative or backup to windows1252_to_utf8, delete all surrogate characters [\uDC80-\uDCFF])."""
         return re.sub(r"[\uDC80-\uDCFF]", default, s)
 
     @staticmethod
