@@ -119,10 +119,10 @@ cat test.json
 
 <details>
 <summary><b>Sample output</b> 
-as of Sept. 4, 2026, reporting 10 issues in 3 out of 4 verses</summary>
+as of Sept. 8, 2026, reporting 10 issues in 3 out of 4 verses</summary>
 
 ```
-{"jsonrpc": "2.0", "id": "eng-test-02", "resultTimestamp": "2026-09-04T18:22:12", "corpusLangCode": "eng", "result": [
+{"jsonrpc": "2.0", "id": "eng-test-02", "resultTimestamp": "2026-09-07T18:22:12", "corpusLangCode": "eng", "result": [
   {"sntId": "GEN 1:1", "span": [[19, 20]], "orig": ",",
      "check": "GreekRoom:Wildebeest:punctuation:space:comma:detach-from-right", "severity": 0.6,
      "actionMenu": [{"substitute": ", ", "confidence": 0.9}]},
@@ -152,7 +152,7 @@ as of Sept. 4, 2026, reporting 10 issues in 3 out of 4 verses</summary>
   {"sntId": "NUM 1:23", "span": [[53, 54]], "orig": "|",
      "check": "GreekRoom:Wildebeest:punctuation:repair:vertical line:danda", "severity": 0.7,
      "actionMenu": [{"substitute": "\u0964", "confidence": 0.6}]}],
- "version": {"GreekRoom": "0.1.3", "GreekRoomFormat": "0.0.4", "GreekRoomWildebeest": "0.11.2"},
+ "version": {"GreekRoom": "0.1.4", "GreekRoomFormat": "0.0.4", "GreekRoomWildebeest": "0.11.4"},
  "skippedChecks": []}
 ```
 
@@ -228,7 +228,7 @@ version_dict = wb_c.version()
 Sample content of <tt>version_dict</tt>:
 
 ```
-defaultdict(<class 'str'>, {'GreekRoom': '0.1.4', 'GreekRoomFormat': '0.0.4', 'GreekRoomWildebeest': '0.11.3'})
+defaultdict(<class 'str'>, {'GreekRoom': '0.1.4', 'GreekRoomFormat': '0.0.4', 'GreekRoomWildebeest': '0.11.4'})
 ```
 
 </details>
