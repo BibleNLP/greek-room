@@ -325,7 +325,7 @@ def load_data_filename(explicit_data_filenames: List[str] | None = None, verbose
 
 
 def update_corpus_if_empty(corpus: general_util.Corpus, check_corpus_list: List[dict]) -> general_util.Corpus:
-    sys.stderr.write(f"check_corpus_list: {check_corpus_list}\n")
+    sys.stderr.write(f"check_corpus_list: {len(check_corpus_list)} entries\n")
     corpus_id = corpus.corpus_id if corpus else None
     if (corpus is None) or (not corpus.snt_id2snt.keys()) and check_corpus_list:
         corpus = new_corpus(corpus_id)
