@@ -1275,7 +1275,8 @@ class SentenceAlignment:
             if (weighted_count < 1) or (weighted_count / a_count <= 0.01):
                 continue
             for aligned_sub_word in sub_strings(aligned_word, min_sub_length):
-                if regex.search(aligned_sub_word, lc_b_token):
+                # Literal substring test: words can contain regex metacharacters such as '*'.
+                if aligned_sub_word in lc_b_token:
                     if len(aligned_sub_word) == min_sub_length:
                         if not lc_b_token.startswith(aligned_sub_word):
                             continue
